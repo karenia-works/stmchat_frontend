@@ -1,7 +1,6 @@
 Name:”軒”,  
 Time:”上午10:32”, 
-Text:”假装@所有人
-据可靠消息，不填文档的今晚六点将会被拉群\n【腾讯文档】1721冯如杯项目统计https://docs.qq.com/sheet/DRU93eHZieUJFaHV4?c=E4A0A0”
+Text:”假装@所有人\n据可靠消息，不填文档的今晚六点将会被拉群\n【腾讯文档】1721冯如杯项目统计https://docs.qq.com/sheet/DRU93eHZieUJFaHV4?c=E4A0A0”
 
 Name:”如余得水”,  
 Time:”上午10:34”,
