@@ -14,12 +14,12 @@
 </template>
 
 <script>
-import HelloWorld from "./components/HelloWorld.vue";
+import Contacts from "./components/Contacts.vue";
 
 export default {
   name: "app",
   components: {
-    HelloWorld
+    Contacts
   }
 };
 </script>
