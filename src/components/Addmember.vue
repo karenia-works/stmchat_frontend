@@ -21,7 +21,7 @@ export default {
   name: "Addmember",
 };
 </script>
-<style>
+<style lang="stylus" scoped>
 .item {
   padding: 18px 0;
 }
