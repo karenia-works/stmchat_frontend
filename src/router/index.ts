@@ -6,7 +6,7 @@ import Addmember from "@/components/Addmember.vue";
 import Setgroup from "@/components/Setgroup.vue";
 import Contacts from "@/components/Contacts.vue";
 import Chat from "@/components/Chat.vue";
-import ChatList from "@/components/Chatlist.vue";
+import ChatList from "@/components/ChatList.vue";
 
 Vue.use(VueRouter);
 
