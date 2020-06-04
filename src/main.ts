@@ -6,11 +6,10 @@ import store from "./store";
 
 import ElementUI from "element-ui";
 import "element-ui/lib/theme-chalk/index.css";
+import Usersearch from "@/components/Usersearch.vue";
+import Userlist from "@/components/Userlist.vue";
 // import "./plugins/element.js";
 // import { Button } from "element-ui";
-
-import Userlist from "./components/Userlist";
-import Usersearch from "./components/Usersearch";
 
 Vue.config.productionTip = false;
 Vue.use(ElementUI);

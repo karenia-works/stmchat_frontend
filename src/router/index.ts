@@ -1,11 +1,11 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
-import Login from "@/components/Login";
-import Regist from "@/components/Register";
-import Addmember from "@/components/Addmember";
-import Setgroup from "@/components/Setgroup";
-import Contacts from "@/components/Contacts";
-import Chat from "@/components/Chat";
+import Login from "@/components/Login.vue";
+import Regist from "@/components/Register.vue";
+import Addmember from "@/components/Addmember.vue";
+import Setgroup from "@/components/Setgroup.vue";
+import Contacts from "@/components/Contacts.vue";
+import Chat from "@/components/Chat.vue";
 
 Vue.use(VueRouter);
 
