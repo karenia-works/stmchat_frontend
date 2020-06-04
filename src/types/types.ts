@@ -39,6 +39,8 @@ export interface ChatMessage extends Message {
   msg: ChatMsg;
 }
 
+export interface User {}
+
 let a: TextChatMsg = {
   _t: "text",
   id: "0066778899aa",
