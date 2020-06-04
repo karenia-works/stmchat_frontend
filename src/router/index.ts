@@ -6,6 +6,7 @@ import Addmember from "@/components/Addmember.vue";
 import Setgroup from "@/components/Setgroup.vue";
 import Contacts from "@/components/Contacts.vue";
 import Chat from "@/components/Chat.vue";
+import ChatList from "@/components/Chatlist.vue";
 
 Vue.use(VueRouter);
 
@@ -38,6 +39,10 @@ const routes = [
   {
     path: "/chat",
     component: Chat,
+  },
+  {
+    path: "/chatlist",
+    component: ChatList,
   },
 ];
 
