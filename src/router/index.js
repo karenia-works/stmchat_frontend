@@ -8,6 +8,7 @@ import Contacts from "@/components/Contacts";
 import Chat from "@/components/Chat";
 import ChatList from "@/components/ChatList";
 
+
 Vue.use(VueRouter);
 
 const routes = [
