@@ -2,16 +2,21 @@ import { User } from "@/types/types";
 import axios from "axios";
 import { Lru } from "tiny-lru";
 
-export interface IProfileCache<T> {
+/**
+ * Represents an async data caching service of type `T`, which
+ */
+export interface ICachingDataPool<T> {
   getData(id: string): Promise<T>;
   refreshData(id: string): Promise<void>;
   updateData(id: string, data: T): Promise<void>;
+  removeData(id: string): Promise<void>;
 }
 
-export class UserProfileCache implements IProfileCache<User> {
+export class UserProfilePool implements ICachingDataPool<User> {
   public constructor(private limit: number) {
     this.cache = new Lru(limit);
   }
+
   cache: Lru<User>;
 
   private async lookUpUser(id: string): Promise<User> {
@@ -30,6 +35,11 @@ export class UserProfileCache implements IProfileCache<User> {
 
   public updateData(id: string, data: User): Promise<void> {
     this.cache.set(id, data);
+    return Promise.resolve();
+  }
+
+  public removeData(id: string): Promise<void> {
+    this.cache.delete(id);
     return Promise.resolve();
   }
 }
