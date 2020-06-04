@@ -8,6 +8,7 @@ export class WsMessageService extends Subject<Message> {
 
     this.chat_msg = new Subject()
     this.connection_state = new Subject()
+    this.errors = new Subject()
     this.connectWebsocket(dest)
   }
 
@@ -31,6 +32,7 @@ export class WsMessageService extends Subject<Message> {
   ws_connection: WebSocket
   readonly chat_msg: Subject<ChatMessage>
   readonly connection_state: Subject<boolean>
+  readonly errors: Subject<Error>
 
   public get chatMessageSubject() {
     return this.chat_msg
@@ -64,6 +66,7 @@ export class WsMessageService extends Subject<Message> {
       }
     } catch (e) {
       this.chat_msg.error(e)
+      this.errors.next(e)
     }
   }
 
