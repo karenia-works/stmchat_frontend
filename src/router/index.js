@@ -1,41 +1,50 @@
-import Vue from 'vue'
-import Router from 'vue-router'
-import Home from '@/views/Home'
-import Login from '@/components/Login'
-import Regist from '@/components/Register'
-import Addmember from '@/components/Addmember'
-import Setgroup from '@/components/Setgroup'
-import Contacts from '@/components/Contacts'
+import Vue from "vue";
+import VueRouter from "vue-router";
+import Login from "@/components/Login";
+import Regist from "@/components/Register";
+import Addmember from "@/components/Addmember";
+import Setgroup from "@/components/Setgroup";
+import Contacts from "@/components/Contacts";
+import Chat from "@/components/Chat";
 
-Vue.use(Router)
+Vue.use(VueRouter);
 
-export default new Router({
-  routes: [
-    { path: '', name: 'home', component: Home },
-    {
-      path: '/Login',
-      name: 'Login',
-      component: Login,
-    },
-    {
-      path: '/Regist',
-      name: 'Regist',
-      component: Regist,
-    },
-    {
-      path: '/Addmember',
-      name: 'Addmember',
-      component: Addmember,
-    },
-    {
-      path: '/Setgroup',
-      name: 'Setgroup',
-      component: Setgroup,
-    },
-    {
-      path: '/Contacts',
-      name: 'Contacts',
-      component: Contacts,
-    },
-  ],
-})
+const routes = [
+  {
+    path: "/Login",
+    name: "Login",
+    component: Login,
+  },
+  {
+    path: "/Regist",
+    name: "Regist",
+    component: Regist,
+  },
+  {
+    path: "/Addmember",
+    name: "Addmember",
+    component: Addmember,
+  },
+  {
+    path: "/Setgroup",
+    name: "Setgroup",
+    component: Setgroup,
+  },
+  {
+    path: "/Contacts",
+    name: "Contacts",
+    component: Contacts,
+  },
+  {
+    path: "/chat",
+    component: Chat,
+  },
+];
+
+const router = new VueRouter({
+  mode: "history",
+  base: process.env.BASE_URL,
+  routes,
+});
+
+export default router;
