@@ -2,7 +2,7 @@
   <div class="chat">
     <!-- <div class="wrapper">
       <div v-for="msg in list" :key="msg.msg.id">{{ msg }}</div>
-    </div> -->
+    </div>-->
     <div class="chat-top-bar">
       <div class="chatinfo">{{ chatinfo.name }}</div>
       <div class="chatopt icon24">
@@ -14,22 +14,44 @@
         <div
           v-for="data in messages"
           :key="data.msg.id"
-          class="msg"
-          :class="data.msg.sender.name == me.name ? 'self' : 'others'"
+          :class="
+            'msg ' + (data.msg.sender.name == me.name ? 'self' : 'others')
+          "
         >
           <el-avatar
             :src="data.msg.sender.avatar"
             v-if="showAvatar"
           ></el-avatar>
-          <div class="msgbody">
+
+          <div :class="'msgbody type-' + data.msg._t">
             <div class="sendername" v-if="showSender">
               {{ data.msg.sender.name }}
             </div>
+
             <div v-if="data.msg._t == 'text'" class="msg-text">
               <span>{{ data.msg.text }}</span>
               <span class="time" type="info">
                 {{ data.msg.time | msgTime }}
               </span>
+            </div>
+
+            <div
+              v-else-if="data.msg._t == 'image'"
+              :class="data.msg.caption ? 'msg-image' : 'image-only'"
+            >
+              <el-image
+                :src="data.msg.image"
+                :preview-src-list="[data.msg.image]"
+                :class="showSender ? '' : 'noSender'"
+                lazy
+              ></el-image>
+              <div class="msg-text" v-if="data.msg.caption">
+                <span>{{ data.msg.caption }}</span>
+                <span class="time" type="info">
+                  {{ data.msg.time | msgTime }}
+                </span>
+              </div>
+              <div v-else class="time">{{ data.msg.time | msgTime }}</div>
             </div>
           </div>
         </div>
@@ -46,8 +68,7 @@
         placeholder="请输入内容"
         v-model="sendMessage"
         resize="none"
-      >
-      </el-input>
+      ></el-input>
       <div class="sendicon icon24">
         <i
           class="el-icon-s-promotion"
@@ -60,6 +81,13 @@
 </template>
 
 <script>
+//todo: to bottom
+//todo: upload image/ file
+//todo: style for file
+//todo: bottom-bar height
+//todo: jump to message
+//todo: send by enter
+
 import { WsMessageService } from "../services/websocket";
 import img from "../assets/sample/avatar/pic_001.jpg";
 // import { Message } from "../types/types";
@@ -115,8 +143,8 @@ export default {
   },
   data() {
     return {
-      showSender: false,
-      showAvatar: false,
+      showSender: true,
+      showAvatar: true,
       connector: null,
       list: [],
       sendMessage: "",
@@ -160,7 +188,20 @@ export default {
             time: new Date("2019-05-20 23:55:10"),
             image:
               "https://lh3.googleusercontent.com/proxy/MhGU06fbVup0doKzBHLnGCaiL8pVDl1VYCkJwsT0ZdMMGs-VaicoHPACWjRZFBhMew30OkIE5DaBWAGJO-9Iva3uYO2k3rxXPGNwRhEZ5WeNNJQxPXltSHrZCEYm5CkFpzGYu8dV",
-            caption: "a image!",
+            caption: "gugugu",
+          },
+        },
+        {
+          msg: {
+            _t: "image",
+            id: 12349,
+            sender: {
+              name: "lynz",
+              avatar:
+                "https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png",
+            },
+            time: new Date(),
+            image: "https://img-blog.csdnimg.cn/20190813152642135.png",
           },
         },
         {
@@ -207,10 +248,10 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
-
 .chat-bottom-bar {
   .sendopt {
     width: 60px;
+
     & i:first-child {
       margin-right: 12px;
     }
@@ -231,7 +272,7 @@ export default {
 .chat-messages {
   .msg {
     display: flex;
-    margin: 4px 20px;
+    margin: 6px 20px;
 
     .el-avatar {
       margin-left: 0;
@@ -249,24 +290,82 @@ export default {
         font-weight: bold;
         margin-bottom: 2px;
       }
+
+      .msg-text {
+        white-space: pre-wrap;
+        word-wrap: break-word;
+        text-align: justify;
+
+        .time {
+          margin-left: 8px;
+          color: #909399;
+          font-size: 12px;
+          float: right;
+          line-height: 12px;
+          padding-top: 7px;
+        }
+      }
+
+      &.type-image {
+        padding: 0;
+        position: relative;
+
+        .sendername {
+          margin: 6px 10px 2px;
+        }
+
+        .msg-text {
+          margin: 0 10px 6px;
+        }
+
+        .el-image {
+          max-width: 400px;
+          max-height: 250px;
+          fit: cover;
+
+          &.noSender {
+            border-top-left-radius: 7px;
+            border-top-right-radius: 7px;
+          }
+        }
+      }
+
+      .image-only {
+        .el-image {
+          border-bottom-left-radius: 7px;
+          border-bottom-right-radius: 7px;
+          margin-bottom: -5px;
+        }
+
+        .time {
+          opacity: 0;
+          position: absolute;
+          font-size: 12px;
+          padding: 3px 10px;
+          right: 8px;
+          bottom: 8px;
+          border-radius: 7px;
+          color: white;
+          background-color: rgba(0, 0, 0, 0.3);
+          transition: opacity 0.1s ease-in;
+        }
+
+        &:hover {
+          .time {
+            opacity: 1;
+          }
+        }
+      }
     }
 
     &.self {
       align-self: flex-end;
       flex-direction: row-reverse;
+
       .el-avatar {
         margin-right: 0;
         margin-left: 12px;
       }
-    }
-  }
-  .msg-text {
-     white-space: pre-wrap;
-     word-wrap: break-word;
-    .time {
-      margin-left: 8px;
-      color: #909399;
-      font-size: 12px;
     }
   }
 }
@@ -300,7 +399,7 @@ export default {
 
   .chat-messages {
     padding: 0;
-    height: 300px;
+    height: 500px;
     flex-shrink: 1;
   }
 
@@ -312,8 +411,7 @@ export default {
   }
 }
 
-.chat-top-bar,
-.chat-bottom-bar {
+.chat-top-bar, .chat-bottom-bar {
   background-color: #b3c0d1;
 }
 
