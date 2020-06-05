@@ -1,7 +1,7 @@
 <template>
   <el-card class="sgp-card">
     <el-container>
-      <el-main heitght="600px">
+      <el-main height="600px">
         <el-container>
           <el-aside width="50px">
             <i style="font-size: 50px;" class="el-icon-camera"></i>
