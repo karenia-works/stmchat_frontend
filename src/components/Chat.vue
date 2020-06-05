@@ -10,7 +10,23 @@
       </div>
     </div>
     <div class="chat-messages">
-      <vuescroll :ops="scrollOption" ref="chat-messages">
+      <el-button
+        type="primary"
+        icon="el-icon-arrow-down"
+        circle
+        v-show="messageProcess < 0.8"
+        class="goBtn"
+        @click="jumpToMessage(-1)"
+      ></el-button>
+      <vuescroll
+        :ops="scrollOption"
+        ref="chat-messages"
+        @handle-scroll="
+          vertical => {
+            this.messageProcess = vertical.process;
+          }
+        "
+      >
         <div
           v-for="data in messages"
           :key="data.msg.id"
@@ -81,7 +97,6 @@
 </template>
 
 <script>
-//todo: to bottom
 //todo: upload image/ file
 //todo: style for file
 //todo: bottom-bar height
@@ -105,11 +120,9 @@ export default {
   // },
   watch: {
     messages(val) {
-      this.$refs["chat-messages"].scrollTo({
-        y: "200%",
-      });
-      // const { v, h } = this.$refs["chat-messages"].getScrollProcess();
-      // console.log(v, h);
+      let pos = this.chatPosition();
+      if (pos == 1) this.jumpToMessage(-1);
+      else this.messageProcess = pos;
     },
   },
   // beforeMount: function() {
@@ -139,10 +152,29 @@ export default {
         },
       });
       this.sendMessage = "";
+
+      // this.jumpToMessage(-1);
+      // const { v, h } = this.$refs["chat-messages"].getScrollProcess();
+      // console.log(v, h);
+    },
+    chatPosition() {
+      const { v, h } = this.$refs["chat-messages"].getScrollProcess();
+      // console.log(v);
+      return v;
+    },
+    jumpToMessage(id) {
+      let vs = this.$refs["chat-messages"];
+      if (id < 0) {
+        //jump to bottom
+        vs.scrollTo({
+          y: "200%",
+        });
+      }
     },
   },
   data() {
     return {
+      messageProcess: 0,
       showSender: true,
       showAvatar: true,
       connector: null,
@@ -269,7 +301,16 @@ export default {
   }
 }
 
+.goBtn {
+  position: absolute;
+  z-index: 99;
+  right: 16px;
+  bottom: 16px;
+}
+
 .chat-messages {
+  position: relative;
+
   .msg {
     display: flex;
     margin: 6px 20px;
