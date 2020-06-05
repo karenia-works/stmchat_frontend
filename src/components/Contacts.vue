@@ -2,7 +2,7 @@
   <el-card class="box-card">
     <el-container>
       <el-header height="15px"><span>Contacts</span></el-header>
-      <el-main heitght="600px"><user></user></el-main>
+      <el-main height="600px"><user></user></el-main>
       <el-footer height="30px">
         <el-button style="float: left" type="text">ADD CONTACT</el-button>
         <el-button style="float: right" type="text">CLOSE</el-button>

@@ -5,7 +5,7 @@
         <span>Add Members</span>
         <span class="mem-num">1/200000</span>
       </el-header>
-      <el-main heitght="600px"><user></user></el-main>
+      <el-main height="600px"><user></user></el-main>
       <el-footer height="30px">
         <el-button style="float: right" type="text">CANCEL</el-button>
         <el-button style="float: right;margin-right:20px" type="text"
