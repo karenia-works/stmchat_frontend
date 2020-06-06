@@ -14,18 +14,14 @@
         type="primary"
         icon="el-icon-arrow-down"
         circle
-        v-show="messageProcess < 0.8"
+        v-show="showGoDown"
         class="goBtn"
         @click="jumpToMessage(-1)"
       ></el-button>
       <vuescroll
         :ops="scrollOption"
         ref="chat-messages"
-        @handle-scroll="
-          vertical => {
-            this.messageProcess = vertical.process;
-          }
-        "
+        @handle-scroll="handleScroll"
       >
         <div
           v-for="data in messages"
@@ -84,6 +80,7 @@
         placeholder="请输入内容"
         v-model="sendMessage"
         resize="none"
+        @keydown.native="enterInput"
       ></el-input>
       <div class="sendicon icon24">
         <i
@@ -101,11 +98,12 @@
 //todo: style for file
 //todo: bottom-bar height
 //todo: jump to message
-//todo: send by enter
+//todo: send empty warning
+//todo: foward/qoute style
 
 import { WsMessageService } from "../services/websocket";
-import img from "../assets/sample/avatar/pic_001.jpg";
 // import { Message } from "../types/types";
+import { ChatMessages } from "../assets/sample/wsSample";
 
 import vuescroll from "vuescroll/dist/vuescroll-native";
 import moment from "moment";
@@ -152,10 +150,6 @@ export default {
         },
       });
       this.sendMessage = "";
-
-      // this.jumpToMessage(-1);
-      // const { v, h } = this.$refs["chat-messages"].getScrollProcess();
-      // console.log(v, h);
     },
     chatPosition() {
       const { v, h } = this.$refs["chat-messages"].getScrollProcess();
@@ -171,6 +165,20 @@ export default {
         });
       }
     },
+    handleScroll(vertical) {
+      let vp = vertical.process;
+      if (vp < 1 && vp > this.messageProcess) this.showGoDown = true;
+      else this.showGoDown = false;
+      this.messageProcess = vp;
+    },
+    enterInput(e) {
+      if (e.keyCode == 13 && e.ctrlKey) {
+        this.sendMessage += "\n";
+      } else if (e.keyCode == 13) {
+        this.send();
+        e.preventDefault();
+      }
+    },
   },
   data() {
     return {
@@ -178,6 +186,7 @@ export default {
       showSender: true,
       showAvatar: true,
       connector: null,
+      showGoDown: false,
       list: [],
       sendMessage: "",
       me: {
@@ -194,76 +203,7 @@ export default {
         },
         bar: { background: "#409EFF" },
       },
-      messages: [
-        {
-          msg: {
-            _t: "text",
-            id: 12345,
-            sender: {
-              name: "lynz",
-              avatar:
-                "https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png",
-            },
-            time: new Date("2019-05-20 23:55:10"),
-            text: "hello",
-          },
-        },
-        {
-          msg: {
-            _t: "image",
-            id: 12346,
-            sender: {
-              name: "lynz",
-              avatar:
-                "https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png",
-            },
-            time: new Date("2019-05-20 23:55:10"),
-            image:
-              "https://lh3.googleusercontent.com/proxy/MhGU06fbVup0doKzBHLnGCaiL8pVDl1VYCkJwsT0ZdMMGs-VaicoHPACWjRZFBhMew30OkIE5DaBWAGJO-9Iva3uYO2k3rxXPGNwRhEZ5WeNNJQxPXltSHrZCEYm5CkFpzGYu8dV",
-            caption: "gugugu",
-          },
-        },
-        {
-          msg: {
-            _t: "image",
-            id: 12349,
-            sender: {
-              name: "lynz",
-              avatar:
-                "https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png",
-            },
-            time: new Date(),
-            image: "https://img-blog.csdnimg.cn/20190813152642135.png",
-          },
-        },
-        {
-          msg: {
-            _t: "text",
-            id: 12347,
-            sender: {
-              name: "skuld",
-              avatar:
-                "https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg",
-            },
-            time: new Date("2020-06-03 23:55:10"),
-            text: "world",
-          },
-        },
-        {
-          msg: {
-            _t: "text",
-            id: 12348,
-            sender: {
-              name: "lynz",
-              avatar:
-                "https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png",
-            },
-            time: new Date(),
-            text:
-              "hello hello hello hello hello hello hello hello hello hello hello hello hello hello ",
-          },
-        },
-      ],
+      messages: ChatMessages,
     };
   },
   filters: {
