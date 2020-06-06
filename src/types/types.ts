@@ -24,6 +24,7 @@ export interface FileChatMsg extends ChatMsg {
   file: string;
   filename: string;
   caption?: string;
+  size: number;
 }
 
 /** WebSocket 中传递的消息 */
@@ -37,6 +38,22 @@ export interface ChatMessage extends Message {
   _t: "chat";
   from: string;
   msg: ChatMsg;
+}
+
+export interface UserProfile {
+  id: string;
+  username: string;
+  nickname: string;
+  avatarUrl: string;
+  friends: string[];
+  groups: string[];
+}
+
+export interface GroupProfile {
+  id: string;
+  name: string;
+  desc: string;
+  members: string[];
 }
 
 let a: TextChatMsg = {
