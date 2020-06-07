@@ -8,8 +8,12 @@
         <user></user>
       </el-main>
       <el-footer height="30px">
-        <el-button style="float: left" type="text" class="dark_main_text">ADD CONTACT</el-button>
-        <el-button style="float: right" type="text" class="dark_main_text">CLOSE</el-button>
+        <el-button style="float: left" type="text" class="dark_main_text"
+          >ADD CONTACT</el-button
+        >
+        <el-button style="float: right" type="text" class="dark_main_text"
+          >CLOSE</el-button
+        >
       </el-footer>
     </el-container>
   </el-card>
@@ -45,25 +49,25 @@ export default {
 
 @media (prefers-color-scheme: dark) {
   .dark_light_bg {
-    background-color: #606266;
-    border-color: #44474E;
+    background-color: colors.dark-light;
+    border-color: colors.dark-midium;
   }
 
   .dark_midium_bg {
-    background-color: #44474E;
-    border-color: #606266;
+    background-color: colors.dark-midium;
+    border-color: colors.dark-light;
   }
 
   .dark_deep_bg {
-    background-color: #303133;
+    background-color: colors.dark-deep;
   }
 
   .dark_sub_text {
-    color: #909399;
+    color: colors.dark-sub-text;
   }
 
   .dark_main_text {
-    color: #E4E7ED;
+    color: colors.dark-main-text;
   }
 }
 </style>

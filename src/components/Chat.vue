@@ -18,7 +18,11 @@
         class="goBtn"
         @click="jumpToMessage(-1)"
       ></el-button>
-      <vuescroll :ops="scrollOption" ref="chat-messages" @handle-scroll="handleScroll">
+      <vuescroll
+        :ops="scrollOption"
+        ref="chat-messages"
+        @handle-scroll="handleScroll"
+      >
         <div
           v-for="data in messages"
           :key="data.msg.id"
@@ -26,14 +30,21 @@
             'msg ' + (data.msg.sender.name == me.name ? 'self' : 'others')
           "
         >
-          <el-avatar :src="data.msg.sender.avatar" v-if="showAvatar"></el-avatar>
+          <el-avatar
+            :src="data.msg.sender.avatar"
+            v-if="showAvatar"
+          ></el-avatar>
 
           <div :class="'msgbody type-' + data.msg._t">
-            <div class="sendername" v-if="showSender">{{ data.msg.sender.name }}</div>
+            <div class="sendername" v-if="showSender">
+              {{ data.msg.sender.name }}
+            </div>
 
             <div v-if="data.msg._t == 'text'" class="msg-text">
               <span>{{ data.msg.text }}</span>
-              <span class="time" type="info">{{ data.msg.time | msgTime }}</span>
+              <span class="time" type="info">{{
+                data.msg.time | msgTime
+              }}</span>
             </div>
 
             <div
@@ -48,7 +59,9 @@
               ></el-image>
               <div class="msg-text" v-if="data.msg.caption">
                 <span>{{ data.msg.caption }}</span>
-                <span class="time" type="info">{{ data.msg.time | msgTime }}</span>
+                <span class="time" type="info">{{
+                  data.msg.time | msgTime
+                }}</span>
               </div>
               <div v-else class="time">{{ data.msg.time | msgTime }}</div>
             </div>
@@ -188,7 +201,7 @@ export default {
           gutterOfEnds: "5px",
           gutterOfSide: "5px",
         },
-        bar: { background: "#409EFF" },
+        bar: { background: "colors.theme-blue" },
       },
       messages: ChatMessages,
     };
@@ -254,7 +267,7 @@ export default {
       max-width: 400px;
 
       .sendername {
-        color: #409EFF;
+        color: colors.theme-blue;
         font-weight: bold;
         margin-bottom: 2px;
       }
@@ -266,7 +279,7 @@ export default {
 
         .time {
           margin-left: 8px;
-          color: #909399;
+          color: colors.dark-sub-text;
           font-size: 12px;
           float: right;
           line-height: 12px;
@@ -380,50 +393,50 @@ export default {
 }
 
 .chat-top-bar, .chat-bottom-bar {
-  background-color: #b3c0d1;
+  background-color: colors.theme-grey;
 }
 
 .chat-messages {
-  background-color: #e9eef3;
+  background-color: colors.theme-light-grey;
 }
 
 @media (prefers-color-scheme: dark) {
   .dark_light_bg {
-    background-color: #606266;
-    border-color: #44474E;
+    background-color: colors.dark-light;
+    border-color: colors.dark-midium;
   }
 
   .dark_midium_bg {
-    background-color: #44474E;
-    border-color: #606266;
+    background-color: colors.dark-midium;
+    border-color: colors.dark-light;
   }
 
   .dark_deep_bg {
-    background-color: #303133;
+    background-color: colors.dark-deep;
   }
 
   .dark_sub_text {
-    color: #909399;
+    color: colors.dark-sub-text;
   }
 
   .dark_main_text {
-    color: #E4E7ED;
+    color: colors.dark-main-text;
   }
 
   .chat-messages {
     .msg {
       .msgbody {
-        background-color: #44474E;
+        background-color: colors.dark-midium;
 
         .sendername {
-          color: #409EFF;
+          color: colors.theme-blue;
         }
 
         .msg-text {
-          color: #E4E7ED;
+          color: colors.dark-main-text;
 
           .time {
-            color: #909399;
+            color: colors.dark-sub-text;
           }
         }
       }
@@ -431,8 +444,8 @@ export default {
   }
 
   .el-textarea__inner {
-    color: #e4e7ed;
-    background-color: #606266;
+    color: colors.dark-main-text;
+    background-color: colors.dark-light;
   }
 }
 </style>

@@ -39,25 +39,25 @@ export default {
 
 @media (prefers-color-scheme: dark) {
   .dark_light_bg {
-    background-color: #606266;
-    border-color: #44474E;
+    background-color: colors.dark-light;
+    border-color: colors.dark-midium;
   }
 
   .dark_midium_bg {
-    background-color: #44474E;
-    border-color: #606266;
+    background-color: colors.dark-midium;
+    border-color: colors.dark-light;
   }
 
   .dark_deep_bg {
-    background-color: #303133;
+    background-color: colors.dark-deep;
   }
 
   .dark_sub_text {
-    color: #909399;
+    color: colors.dark-sub-text;
   }
 
   .dark_main_text {
-    color: #E4E7ED;
+    color: colors.dark-main-text;
   }
 }
 </style>

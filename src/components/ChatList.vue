@@ -1,11 +1,19 @@
 <template>
   <div id="app">
     <el-container style="height: 700px; border: 1px solid #eee">
-      <el-aside width="300px" style="background-color:white;" padding="0" class="dark_midium_bg">
+      <el-aside
+        width="300px"
+        style="background-color:white;"
+        padding="0"
+        class="dark_midium_bg"
+      >
         <el-input v-model="input" placeholder="search" class="dark_eee_bg">
           <el-dropdown slot="prepend" @command="handleCommand">
             <span class="el-dropdown-link">
-              <i style="font-size: 20px" class="dark_main_text el-icon-s-unfold el-icon--center"></i>
+              <i
+                style="font-size: 20px"
+                class="dark_main_text el-icon-s-unfold el-icon--center"
+              ></i>
             </span>
 
             <el-dropdown-menu slot="dropdown" class="dark_midium_bg">
@@ -44,13 +52,20 @@
           <!-- <el-card body-style="{ padding: '0' }" style="height:100px"> -->
           <el-row type="flex" style="height:65px" align="middle">
             <el-col span="6" offset="2">
-              <img :src="o.head_pic" style="width: 45px;height:45px" class="round_icon" />
+              <img
+                :src="o.head_pic"
+                style="width: 45px;height:45px"
+                class="round_icon"
+              />
             </el-col>
             <el-col span="12">
               <div style="padding-bottom:10px;font-size: 16px">
                 <span>{{ o.name }}</span>
               </div>
-              <div class="bottom clearfix margin-bottom:5px" style="font-size:12px;color: dimgray">
+              <div
+                class="bottom clearfix margin-bottom:5px"
+                style="font-size:12px;color: dimgray"
+              >
                 <!--                                <div >{{o.chat| ellipsis}}</div>-->
                 <template>
                   <span class="dark_sub_text">{{ o.chat | ellipsis }}</span>
@@ -79,7 +94,7 @@
   </div>
 </template>
 
-<style>
+<style lang="stylus">
 .el-icon--center {
   color: dimgray;
 }
@@ -93,48 +108,48 @@
   overflow: hidden;
 }
 .addclass {
-  background-color: deepskyblue;
-  color: #eeeeee;
+  background-color: colors.theme-blue;
+  color: colors.theme-light-grey;
 }
 
 @media (prefers-color-scheme: dark) {
   .dark_light_bg {
-    background-color: #606266;
+    background-color: colors.dark-light;
   }
 
   .dark_midium_bg {
-    background-color: #44474e;
+    background-color: colors.dark-midium;
   }
 
   .dark_deep_bg {
-    background-color: #303133;
+    background-color: colors.dark-deep;
   }
   .dark_eee_bg {
-    background-color: #eee;
+    background-color: colors.theme-light-grey;
   }
 
 
   .dark_sub_text {
-    color: #909399;
+    color: colors.dark-sub-text;
   }
 
   .dark_main_text {
-    color: #e4e7ed;
+    color: colors.dark-main-text;
   }
 
   .el-badge__content {
-    color: #e4e7ed;
-    background-color: #409EFF;
+    color: colors.dark-main-text;
+    background-color: colors.theme-blue;
   }
 
   .el-input__inner {
-    color: #e4e7ed;
-    background-color: #606266;
+    color: colors.dark-main-text;
+    background-color: colors.dark-light;
   }
 
   .el-input-group__prepend {
-    color: #e4e7ed;
-    background-color: #606266;
+    color: colors.dark-main-text;
+    background-color: colors.dark-light;
   }
 }
 </style>
