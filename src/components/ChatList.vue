@@ -1,34 +1,31 @@
 <template>
   <div id="app">
     <el-container style="height: 700px; border: 1px solid #eee">
-      <el-aside width="300px" style="background-color:white;" padding="0">
-        <el-input v-model="input" placeholder="search">
+      <el-aside width="300px" style="background-color:white;" padding="0" class="dark_midium_bg">
+        <el-input v-model="input" placeholder="search" class="dark_eee_bg">
           <el-dropdown slot="prepend" @command="handleCommand">
-            <span class="el-dropdown-link ">
-              <i
-                style="font-size: 20px;color:dimgray"
-                class="el-icon-s-unfold el-icon--center"
-              ></i>
+            <span class="el-dropdown-link">
+              <i style="font-size: 20px" class="dark_main_text el-icon-s-unfold el-icon--center"></i>
             </span>
 
-            <el-dropdown-menu slot="dropdown">
-              <el-dropdown-item command="a">
+            <el-dropdown-menu slot="dropdown" class="dark_midium_bg">
+              <el-dropdown-item command="a" class="dark_main_text">
                 <i style="font-size: 20px " class="el-icon-user-solid"></i>
                 New group
               </el-dropdown-item>
-              <el-dropdown-item command="b">
+              <el-dropdown-item command="b" class="dark_main_text">
                 <i style="font-size: 20px " class="el-icon-s-custom"></i>
                 Contacts
               </el-dropdown-item>
-              <el-dropdown-item command="c">
+              <el-dropdown-item command="c" class="dark_main_text">
                 <i style="font-size: 20px " class="el-icon-setting"></i>
                 Settings
               </el-dropdown-item>
-              <el-dropdown-item command="d">
+              <el-dropdown-item command="d" class="dark_main_text">
                 <i style="font-size: 20px " class="el-icon-question"></i>
                 STM FAQ
               </el-dropdown-item>
-              <el-dropdown-item command="e">
+              <el-dropdown-item command="e" class="dark_main_text">
                 <i style="font-size: 20px " class="el-icon-s-promotion"></i>
                 About
               </el-dropdown-item>
@@ -42,32 +39,27 @@
           v-bind:key="o"
           @click="handleclick(index), (o.unread = 0)"
           :class="active == index ? 'addclass' : ''"
+          class="dark_main_text dark_deep_bg"
         >
           <!-- <el-card body-style="{ padding: '0' }" style="height:100px"> -->
           <el-row type="flex" style="height:65px" align="middle">
             <el-col span="6" offset="2">
-              <img
-                :src="o.head_pic"
-                style="width: 45px;height:45px"
-                class=" round_icon"
-            /></el-col>
+              <img :src="o.head_pic" style="width: 45px;height:45px" class="round_icon" />
+            </el-col>
             <el-col span="12">
               <div style="padding-bottom:10px;font-size: 16px">
                 <span>{{ o.name }}</span>
               </div>
-              <div
-                class="bottom clearfix margin-bottom:5px"
-                style="font-size:12px;color: dimgray"
-              >
+              <div class="bottom clearfix margin-bottom:5px" style="font-size:12px;color: dimgray">
                 <!--                                <div >{{o.chat| ellipsis}}</div>-->
                 <template>
-                  <span>{{ o.chat | ellipsis }}</span>
+                  <span class="dark_sub_text">{{ o.chat | ellipsis }}</span>
                 </template>
               </div>
             </el-col>
             <el-col span="5">
               <div style="height:50px;font-size:12px;color:dimgray;">
-                {{ o.time }}
+                <div class="dark_sub_text">{{ o.time }}</div>
                 <el-badge
                   :value="o.unread"
                   class="item"
@@ -82,11 +74,15 @@
         <!-- </el-card> -->
       </el-aside>
 
-      <el-container> </el-container>
+      <el-container></el-container>
     </el-container>
   </div>
 </template>
+
 <style>
+.el-icon--center {
+  color: dimgray;
+}
 .round_icon {
   width: 34px;
   height: 34px;
@@ -99,6 +95,47 @@
 .addclass {
   background-color: deepskyblue;
   color: #eeeeee;
+}
+
+@media (prefers-color-scheme: dark) {
+  .dark_light_bg {
+    background-color: #606266;
+  }
+
+  .dark_midium_bg {
+    background-color: #44474e;
+  }
+
+  .dark_deep_bg {
+    background-color: #303133;
+  }
+  .dark_eee_bg {
+    background-color: #eee;
+  }
+
+
+  .dark_sub_text {
+    color: #909399;
+  }
+
+  .dark_main_text {
+    color: #e4e7ed;
+  }
+
+  .el-badge__content {
+    color: #e4e7ed;
+    background-color: #606266;
+  }
+
+  .el-input__inner {
+    color: #e4e7ed;
+    background-color: #606266;
+  }
+
+  .el-input-group__prepend {
+    color: #e4e7ed;
+    background-color: #606266;
+  }
 }
 </style>
 
