@@ -1,13 +1,14 @@
-import { Message, ChatMessage } from "../types/types";
+import {
+  Message,
+  ChatMessage,
+  ClientMessage,
+  UnreadCountMessage,
+} from "../types/types";
 import "rxjs";
 import { Subject } from "rxjs";
 
 export class WsMessageService {
   public constructor(private dest: string) {
-    this.msg = new Subject();
-    this.chat_msg = new Subject();
-    this.connection_state = new Subject();
-    this.errors = new Subject();
     this.connectWebsocket(dest);
   }
 
@@ -29,10 +30,11 @@ export class WsMessageService {
   }
 
   ws_connection!: WebSocket;
-  readonly msg: Subject<Message>;
-  readonly chat_msg: Subject<ChatMessage>;
-  readonly connection_state: Subject<boolean>;
-  readonly errors: Subject<Error>;
+  readonly msg: Subject<Message> = new Subject();
+  readonly chat_msg: Subject<ChatMessage> = new Subject();
+  readonly unread_count_msg: Subject<UnreadCountMessage> = new Subject();
+  readonly connection_state: Subject<boolean> = new Subject();
+  readonly errors: Subject<Error> = new Subject();
 
   public get messageSubject() {
     return this.msg;
@@ -41,10 +43,13 @@ export class WsMessageService {
     return this.chat_msg;
   }
   public get connectionState(): Subject<boolean> {
-    return this.connectionState;
+    return this.connection_state;
+  }
+  public get unreadMessageCount(): Subject<UnreadCountMessage> {
+    return this.unread_count_msg;
   }
 
-  public sendMessage(msg: Message) {
+  public sendMessage(msg: ClientMessage) {
     this.ws_connection.send(JSON.stringify(msg));
   }
 
@@ -65,6 +70,9 @@ export class WsMessageService {
       switch (msg._t) {
         case "chat":
           this.chat_msg.next(msg as ChatMessage);
+          break;
+        case "unread":
+          this.unread_count_msg.next(msg as UnreadCountMessage);
           break;
         default:
           throw new Error(`Unknown Message type ${msg._t}`);
