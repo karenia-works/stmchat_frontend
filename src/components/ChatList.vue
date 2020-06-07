@@ -5,7 +5,7 @@
         width="300px"
         style="background-color:white;"
         padding="0"
-        class="dark_midium_bg"
+        class="dark_medium_bg"
       >
         <el-input v-model="input" placeholder="search" class="dark_eee_bg">
           <el-dropdown slot="prepend" @command="handleCommand">
@@ -16,7 +16,7 @@
               ></i>
             </span>
 
-            <el-dropdown-menu slot="dropdown" class="dark_midium_bg">
+            <el-dropdown-menu slot="dropdown" class="dark_medium_bg">
               <el-dropdown-item command="a" class="dark_main_text">
                 <i style="font-size: 20px " class="el-icon-user-solid"></i>
                 New group
@@ -117,8 +117,8 @@
     background-color: colors.dark-light;
   }
 
-  .dark_midium_bg {
-    background-color: colors.dark-midium;
+  .dark_medium_bg {
+    background-color: colors.dark-medium;
   }
 
   .dark_deep_bg {

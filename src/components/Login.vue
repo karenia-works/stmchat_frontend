@@ -9,7 +9,7 @@
           <div class="grid-content"></div>
         </el-col>
         <el-col :span="12">
-          <el-card class="box-card dark_midium_bg" shadow="always">
+          <el-card class="box-card dark_medium_bg" shadow="always">
             <div slot="header" class="dark_main_text">
               Welcome to STM-Chat
               <el-link
@@ -101,11 +101,11 @@
 @media (prefers-color-scheme: dark) {
   .dark_light_bg {
     background-color: colors.dark-light;
-    border-color: colors.dark-midium;
+    border-color: colors.dark-medium;
   }
 
-  .dark_midium_bg {
-    background-color: colors.dark-midium;
+  .dark_medium_bg {
+    background-color: colors.dark-medium;
     border-color: colors.dark-light;
   }
 

@@ -7,7 +7,6 @@
             <el-col :span="4">
               <div>
                 <el-button
-                  disabled="disabled"
                   class="set_title top_btn"
                   type="text"
                   >Settings</el-button
@@ -243,21 +242,20 @@ export default {
 }
 
 .set_title {
-  disabled = 'disabled';
-  color: white;
+  color: colors.theme-light-grey;
 }
 
 .set_title:hover {
-  color: white;
+  color: colors.theme-light-grey;
 }
 
 .func_btn {
-  color: colors.theme-grey;
+  color: colors.theme-light-grey;
 
 }
 
 .up_card {
-  background-color: colors.accent;
+  background-color: colors.theme-blue;
   border-bottom-left-radius: 0px;
   border-bottom-right-radius: 0px;
 }

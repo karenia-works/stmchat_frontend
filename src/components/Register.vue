@@ -10,7 +10,7 @@
         </el-col>
         <el-col :span="12">
           <div>
-            <el-card class="dark_midium_bg">
+            <el-card class="dark_medium_bg">
               <div slot="header">
                 <el-steps
                   :active="active"
@@ -240,11 +240,11 @@ export default {
 @media (prefers-color-scheme: dark) {
   .dark_light_bg {
     background-color: colors.dark-light;
-    border-color: colors.dark-midium;
+    border-color: colors.dark-medium;
   }
 
-  .dark_midium_bg {
-    background-color: colors.dark-midium;
+  .dark_medium_bg {
+    background-color: colors.dark-medium;
     border-color: colors.dark-light;
   }
 

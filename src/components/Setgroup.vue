@@ -1,5 +1,5 @@
 <template>
-  <el-card class="sgp-card dark_midium_bg">
+  <el-card class="sgp-card dark_medium_bg">
     <el-container>
       <el-main height="600px">
         <el-container>
@@ -100,11 +100,11 @@ export default {
 @media (prefers-color-scheme: dark) {
   .dark_light_bg {
     background-color: colors.dark-light;
-    border-color: colors.dark-midium;
+    border-color: colors.dark-medium;
   }
 
-  .dark_midium_bg {
-    background-color: colors.dark-midium;
+  .dark_medium_bg {
+    background-color: colors.dark-medium;
     border-color: colors.dark-light;
   }
 
