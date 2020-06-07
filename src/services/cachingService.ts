@@ -21,11 +21,10 @@ export class ProfilePool<T> implements ICachingDataPool<T> {
 
   private async lookUpUser(id: string): Promise<T | undefined> {
     // TODO: get data from backend
-    throw new Error("Method not implemented.");
-
     let userResp = await axios.get<T>(this.endpoint);
     let user = userResp.data;
     this.cache.set(id, user);
+    return user;
   }
 
   public async getData(
@@ -33,11 +32,9 @@ export class ProfilePool<T> implements ICachingDataPool<T> {
     force: boolean = false,
   ): Promise<T | undefined> {
     let data = this.cache.get(id);
-    if (data !== undefined) {
+    if (data !== undefined && !force) {
       return data;
     } else {
-      return Promise.resolve(undefined);
-      // TODO
       return this.lookUpUser(id);
     }
   }
