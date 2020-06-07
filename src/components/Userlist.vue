@@ -4,8 +4,8 @@
       <el-avatar :size="50" :src="circleUrl"></el-avatar>
     </el-aside>
     <el-container>
-      <el-header height="30px">Header</el-header>
-      <el-footer height="20px">Footer</el-footer>
+      <el-header height="30px" class="dark_main_text">Header</el-header>
+      <el-footer height="20px" class="dark_sub_text">Footer</el-footer>
     </el-container>
   </el-container>
 </template>
@@ -24,14 +24,40 @@ export default {
 .el-header {
   text-align: left;
 }
+
 .el-footer {
   text-align: left;
   font-size: 13px;
   color: #999;
 }
+
 .el-aside {
   text-align: center;
   justify-content: center;
   height: 70px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .dark_light_bg {
+    background-color: #606266;
+    border-color: #44474E;
+  }
+
+  .dark_midium_bg {
+    background-color: #44474E;
+    border-color: #606266;
+  }
+
+  .dark_deep_bg {
+    background-color: #303133;
+  }
+
+  .dark_sub_text {
+    color: #909399;
+  }
+
+  .dark_main_text {
+    color: #E4E7ED;
+  }
 }
 </style>
