@@ -5,7 +5,7 @@
         <i slot="prefix" class="el-input__icon el-icon-search"></i>
       </el-input>
     </div>
-    <hr style="border:1.5px inset #FAFAFA;" />
+    <hr class="hr111 dark_hr" />
     <userlist></userlist>
     <userlist></userlist>
     <userlist></userlist>
@@ -26,5 +26,25 @@ export default {
 <style lang="stylus" scoped>
 .el-input input {
   border: none;
+}
+
+.hr111 {
+  margin-top: 15px;
+  margin-bottom: 15px;
+  border-style: solid;
+  border-radius: 1px;
+  border-width: 1px;
+  border-color: #333;
+  background-color: #333;
+}
+
+@media (prefers-color-scheme: dark) {
+  .dark_hr {
+    border-style: solid;
+    border-radius: 1px;
+    border-width: 1px;
+    border-color: white;
+    background-color: white;
+  }
 }
 </style>

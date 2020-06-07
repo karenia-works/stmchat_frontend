@@ -11,7 +11,18 @@
             </el-col>
             <el-col :span="4" :offset="12">
               <div>
-                <el-button class="func_btn top_btn" type="text">Edit</el-button>
+                <el-button
+                  v-show="!editmode"
+                  v-on:click="edit_on"
+                  class="func_btn top_btn"
+                  type="text"
+                >Edit</el-button>
+                <el-button
+                  v-show="editmode"
+                  v-on:click="save_on"
+                  class="func_btn top_btn"
+                  type="text"
+                >Save</el-button>
               </div>
             </el-col>
             <el-col :span="4">
@@ -34,7 +45,10 @@
             </el-col>
             <el-col :span="12" :offset="2">
               <div class="name_part" type="justify" align="start">
-                <div class="name">Skuld</div>
+                <div v-show="!editmode" class="name">{{nickname}}</div>
+                <div v-show="editmode" class="name">
+                  <el-input v-model="changename" placeholder="Nick name" style="height:35px"></el-input>
+                </div>
                 <div class="state">online</div>
               </div>
             </el-col>
@@ -54,11 +68,11 @@
             </el-col>
             <el-col :span="12" :offset="2">
               <div class="name_part top_pad" type="justify" align="start">
-                <div class="content">+86 13918128942</div>
+                <div class="content">{{phonenum}}</div>
                 <div class="comment">phone number</div>
               </div>
               <div class="name_part top_pad" type="justify" align="start">
-                <div class="content">@skuld_yi</div>
+                <div class="content">@{{username}}</div>
                 <div class="comment">username</div>
               </div>
             </el-col>
@@ -78,23 +92,23 @@
               <div class="name_part" type="justify" align="start">
                 <el-row class="top_pad" type="flex" justify="space-between" align="middle">
                   <div class="content">Desktop Notifications</div>
-                  <el-switch v-model="value" active-color="#13ce66" inactive-color="#ff4949"></el-switch>
+                  <el-switch v-model="value1" active-color="#13ce66" inactive-color="#ff4949"></el-switch>
                 </el-row>
                 <el-row class="top_pad" type="flex" justify="space-between" align="middle">
                   <div class="content">Background Notifications</div>
-                  <el-switch v-model="value" active-color="#13ce66" inactive-color="#ff4949"></el-switch>
+                  <el-switch v-model="value2" active-color="#13ce66" inactive-color="#ff4949"></el-switch>
                 </el-row>
                 <el-row class="top_pad" type="flex" justify="space-between" align="middle">
                   <div class="content">Message preview</div>
-                  <el-switch v-model="value" active-color="#13ce66" inactive-color="#ff4949"></el-switch>
+                  <el-switch v-model="value3" active-color="#13ce66" inactive-color="#ff4949"></el-switch>
                 </el-row>
                 <el-col>
                   <el-row class="top_pad" type="flex" justify="space-between" align="middle">
                     <div class="content">Sound</div>
-                    <el-switch v-model="value" active-color="#13ce66" inactive-color="#ff4949"></el-switch>
+                    <el-switch v-model="value4" active-color="#13ce66" inactive-color="#ff4949"></el-switch>
                   </el-row>
                   <div class="block">
-                    <el-slider v-model="value2"></el-slider>
+                    <el-slider v-model="value_block"></el-slider>
                   </div>
                 </el-col>
               </div>
@@ -112,10 +126,11 @@
               </div>
             </el-col>
             <el-col :span="19" :offset="2" align="start">
-              <el-row class="top_pad" type="flex" justify="space-between" align="middle">
-                <div class="content">Sound</div>
-                <el-switch v-model="value" active-color="#13ce66" inactive-color="#ff4949"></el-switch>
-              </el-row>
+              <div class="content top_pad">Hot Key</div>
+              <el-col :span="19" align="start">
+                <el-radio class = "radio_pad" v-model="radio" label="1"><strong>Enter</strong> - Send Message,<br /><strong> Shift + Enter</strong> - new line</el-radio>
+                <el-radio class = "radio_pad"  v-model="radio" label="2"><strong>Ctrl + Enter</strong> - Send Message,<br /><strong> Enter</strong> - new line</el-radio>
+              </el-col>
             </el-col>
           </el-row>
 
@@ -221,6 +236,11 @@ export default {
   padding-bottom: 10px;
 }
 
+.radio_pad {
+  padding-top: 0px;
+  padding-bottom: 10px;
+}
+
 .icon_pad {
   padding-top: 5px;
 }
@@ -231,7 +251,7 @@ export default {
 
 .comment {
   padding-top: 10px;
-  font-size:15px
+  font-size: 15px;  
 }
 
 .name {
@@ -240,8 +260,30 @@ export default {
 }
 
 .state {
-  font-size:15px
+  font-size: 15px;
   color: white;
+}
+
+@media (prefers-color-scheme: dark) {
+  .up_card {
+    background-color: #606266;
+  }
+
+  .down_card {
+    background-color: #303133;
+
+    .comment {
+      color: #909399;
+    }
+
+    .content {
+      color: #E4E7ED;
+    }
+  }
+
+  .icon_part {
+    color: #E4E7ED;
+  }
 }
 </style>
 
@@ -249,13 +291,35 @@ export default {
 export default {
   data() {
     return {
-      value: true,
-      value2: 50,
+      nickname: "Skuld",
+      changename: "",
+      phonenum: "+86 13918128942",
+      username: "skuld_yi",
+      editmode: false,
+      value1: true,
+      value2: true,
+      value3: true,
+      value4: true,
+      radio: "1",
+      value_block: 50,
     };
   },
   methods: {
     formatTooltip(val) {
       return val / 100;
+    },
+    edit_on() {
+      this.changename = this.nickname;
+      this.editmode = true;
+    },
+    save_on() {
+      if (this.changename == "") {
+        alert("昵称不能为空！");
+        this.editmode = false;
+      } else {
+        this.nickname = this.changename;
+        this.editmode = false;
+      }
     },
   },
 };
