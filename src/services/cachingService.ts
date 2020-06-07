@@ -1,6 +1,9 @@
 import { UserProfile, GroupProfile } from "@/types/types";
 import axios from "axios";
 import { Lru } from "tiny-lru";
+import { injectable, inject } from "inversify";
+import { WsMessageService } from "./websocket";
+import { TYPES } from "./dependencyInjection";
 
 /**
  * Represents an async data caching service of type `T`, which
@@ -54,9 +57,18 @@ export class ProfilePool<T> implements ICachingDataPool<T> {
   }
 }
 
+@injectable()
 export class UserProfilePool extends ProfilePool<UserProfile> {
-  public constructor(limit: number) {
+  public constructor(
+    limit: number,
+    @inject(TYPES.WebsocketService) ws: WsMessageService,
+  ) {
     super(limit, "TODO: Endpoint");
+    ws.userOnlineState.subscribe({
+      next: msg => {
+        this.updateUserOnlineStatus(msg.userId, msg.online);
+      },
+    });
   }
 
   public updateUserOnlineStatus(id: string, online: boolean) {
@@ -67,6 +79,7 @@ export class UserProfilePool extends ProfilePool<UserProfile> {
   }
 }
 
+@injectable()
 export class GroupProfilePool extends ProfilePool<GroupProfile> {
   public constructor(limit: number) {
     super(limit, "TODO: Endpoint");

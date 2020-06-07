@@ -3,10 +3,13 @@ import {
   ServerChatMessage,
   ClientMessage,
   ServerUnreadCountMessage,
+  ServerOnlineStatusMessage,
 } from "../types/types";
 import "rxjs";
 import { Subject } from "rxjs";
+import { injectable } from "inversify";
 
+@injectable()
 export class WsMessageService {
   public constructor(private dest: string) {
     this.connectWebsocket(dest);
@@ -30,25 +33,44 @@ export class WsMessageService {
   }
 
   ws_connection!: WebSocket;
-  readonly msg: Subject<ServerMessage> = new Subject();
-  readonly chat_msg: Subject<ServerChatMessage> = new Subject();
-  readonly unread_count_msg: Subject<ServerUnreadCountMessage> = new Subject();
-  readonly connection_state: Subject<boolean> = new Subject();
-  readonly errors: Subject<Error> = new Subject();
+  private readonly msg: Subject<ServerMessage> = new Subject();
+  private readonly chat_msg: Subject<ServerChatMessage> = new Subject();
+  private readonly unread_count_msg: Subject<
+    ServerUnreadCountMessage
+  > = new Subject();
+  private readonly user_online_state: Subject<
+    ServerOnlineStatusMessage
+  > = new Subject();
+  private readonly errors: Subject<Error> = new Subject();
 
+  private readonly connection_state: Subject<boolean> = new Subject();
+
+  /** 所有消息 */
   public get messageSubject() {
     return this.msg;
   }
+
+  /** 聊天消息 */
   public get chatMessageSubject() {
     return this.chat_msg;
   }
+
+  /** websocket 连接情况 */
   public get connectionState(): Subject<boolean> {
     return this.connection_state;
   }
+
+  /** 未读消息数目 */
   public get unreadMessageCount(): Subject<ServerUnreadCountMessage> {
     return this.unread_count_msg;
   }
 
+  /** 其他用户在线状态 */
+  public get userOnlineState(): Subject<ServerOnlineStatusMessage> {
+    return this.user_online_state;
+  }
+
+  /** 发送消息 */
   public sendMessage(msg: ClientMessage) {
     this.ws_connection.send(JSON.stringify(msg));
   }
@@ -74,16 +96,18 @@ export class WsMessageService {
         case "unread":
           this.unread_count_msg.next(msg as ServerUnreadCountMessage);
           break;
+        case "online_status":
+          this.user_online_state.next(msg as ServerOnlineStatusMessage);
         default:
           throw new Error(`Unknown Message type ${msg._t}`);
       }
     } catch (e) {
-      this.chat_msg.error(e);
+      this.msg.error(e);
       this.errors.next(e);
     }
   }
 
-  protected onWebsocketError(ws: WebSocket, err: Event) {
+  protected onWebsocketError(_ws: WebSocket, err: Event) {
     this.connection_state.next(false);
     this.chat_msg.error(err);
 
