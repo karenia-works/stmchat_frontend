@@ -231,7 +231,7 @@ export default {
 
 .comment {
   padding-top: 10px;
-  font-size:15px
+  font-size: 15px;
 }
 
 .name {
@@ -240,9 +240,34 @@ export default {
 }
 
 .state {
-  font-size:15px
+  font-size: 15px;
   color: white;
 }
+
+@media (prefers-color-scheme: dark) {
+  .up_card {
+    background-color: #606266;
+  }
+
+  .down_card {
+    background-color: #303133;
+
+    .comment {
+      color: #909399;
+    }
+
+    .content {
+      color: #E4E7ED;
+    }
+  }
+
+  .icon_part {
+    color: #E4E7ED;
+  }
+}
+
+// @media (prefers-color-scheme: light) {
+// }
 </style>
 
 <script>
