@@ -124,7 +124,7 @@
 
   .el-badge__content {
     color: #e4e7ed;
-    background-color: #606266;
+    background-color: #409EFF;
   }
 
   .el-input__inner {
