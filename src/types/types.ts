@@ -80,7 +80,7 @@ export interface ClientForwardMsg extends ClientChatMsg {
 /** WebSocket 中传递的消息 */
 export interface ServerMessage {
   /** 消息类型 */
-  _t: "chat" | "unread";
+  _t: "chat" | "unread" | "online_status";
   [propName: string]: any;
 }
 
@@ -93,7 +93,18 @@ export interface ServerChatMessage extends ServerMessage {
 export interface ServerUnreadCountMessage extends ServerMessage {
   _t: "unread";
   /** 未读信息：<聊天名称, 未读数> */
-  items: Map<string, number>;
+  items: Map<string, UnreadProperty>;
+}
+
+export interface UnreadProperty {
+  count: number;
+  maxMsgId: number;
+}
+
+export interface ServerOnlineStatusMessage extends ServerMessage {
+  _t: "online_status";
+  userId: string;
+  online: boolean;
 }
 
 export interface ClientMessage {
@@ -119,12 +130,19 @@ export interface UserProfile {
   avatarUrl: string;
   friends: string[];
   groups: string[];
+  state: boolean;
+  desktopNotifications: boolean;
+  backgroundNotification: boolean;
+  soundOn: boolean;
+  soundDegree: number;
+  hotkey: number;
 }
 
 export interface GroupProfile {
   id: string;
   name: string;
   desc: string;
+  avatarUrl: string;
   members: string[];
 }
 

@@ -58,6 +58,13 @@ export class UserProfilePool extends ProfilePool<UserProfile> {
   public constructor(limit: number) {
     super(limit, "TODO: Endpoint");
   }
+
+  public updateUserOnlineStatus(id: string, online: boolean) {
+    let result = this.cache.get(id);
+    if (result !== undefined) {
+      result.state = online;
+    }
+  }
 }
 
 export class GroupProfilePool extends ProfilePool<GroupProfile> {
