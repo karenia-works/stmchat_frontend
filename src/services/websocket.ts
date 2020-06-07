@@ -1,8 +1,8 @@
 import {
-  Message,
-  ChatMessage,
+  ServerMessage,
+  ServerChatMessage,
   ClientMessage,
-  UnreadCountMessage,
+  ServerUnreadCountMessage,
 } from "../types/types";
 import "rxjs";
 import { Subject } from "rxjs";
@@ -30,9 +30,9 @@ export class WsMessageService {
   }
 
   ws_connection!: WebSocket;
-  readonly msg: Subject<Message> = new Subject();
-  readonly chat_msg: Subject<ChatMessage> = new Subject();
-  readonly unread_count_msg: Subject<UnreadCountMessage> = new Subject();
+  readonly msg: Subject<ServerMessage> = new Subject();
+  readonly chat_msg: Subject<ServerChatMessage> = new Subject();
+  readonly unread_count_msg: Subject<ServerUnreadCountMessage> = new Subject();
   readonly connection_state: Subject<boolean> = new Subject();
   readonly errors: Subject<Error> = new Subject();
 
@@ -45,7 +45,7 @@ export class WsMessageService {
   public get connectionState(): Subject<boolean> {
     return this.connection_state;
   }
-  public get unreadMessageCount(): Subject<UnreadCountMessage> {
+  public get unreadMessageCount(): Subject<ServerUnreadCountMessage> {
     return this.unread_count_msg;
   }
 
@@ -65,14 +65,14 @@ export class WsMessageService {
   protected onWebsocketMessage(ws: WebSocket, ev: MessageEvent) {
     try {
       let raw_msg = ev.data;
-      let msg = JSON.parse(raw_msg) as Message;
+      let msg = JSON.parse(raw_msg) as ServerMessage;
       this.msg.next(msg);
       switch (msg._t) {
         case "chat":
-          this.chat_msg.next(msg as ChatMessage);
+          this.chat_msg.next(msg as ServerChatMessage);
           break;
         case "unread":
-          this.unread_count_msg.next(msg as UnreadCountMessage);
+          this.unread_count_msg.next(msg as ServerUnreadCountMessage);
           break;
         default:
           throw new Error(`Unknown Message type ${msg._t}`);
