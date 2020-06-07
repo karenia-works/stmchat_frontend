@@ -50,9 +50,11 @@ export default {
 
 <style lang="stylus" scoped>
 .hr111 {
+  border-style: solid;
+  border-radius: 1px;
   border-width: 1px;
-  border-style: inset;
   border-color: #333;
+  background-color: #333;
 }
 
 .item {
@@ -112,9 +114,11 @@ export default {
   }
 
   .dark_hr {
-    border-width: 1px;
-    border-style: inset;
-    border-color: white;
+  border-style: solid;
+  border-radius: 1px;
+  border-width: 1px;
+  border-color: white;
+  background-color: white;
   }
 }
 </style>
