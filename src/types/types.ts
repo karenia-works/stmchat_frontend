@@ -1,5 +1,5 @@
-/** 聊天消息 */
-export interface ChatMsg {
+/** 聊天消息，和在数据库中储存的是相同类型 */
+export interface ServerChatMsg {
   /** 消息类型 */
   _t: "text" | "image" | "file";
   id: string;
@@ -9,24 +9,29 @@ export interface ChatMsg {
   /** 转发信息 */
   forwardFrom?: ForwardProperty;
   /** 回复信息 */
-  replyTo?: ChatMsg;
+  replyTo?: ServerChatMsg;
 
   [propName: string]: any;
 }
 
-export interface TextChatMsg extends ChatMsg {
+/** 文字信息 */
+export interface TextChatMsg extends ServerChatMsg {
   _t: "text";
   text: string;
 }
 
-export interface ImageChatMsg extends ChatMsg {
+/** 图片信息 */
+export interface ImageChatMsg extends ServerChatMsg {
   _t: "image";
+  /** 图片链接或者 ID，未确定 */
   image: string;
+  /** 图片 */
   caption?: string;
 }
 
-export interface FileChatMsg extends ChatMsg {
+export interface FileChatMsg extends ServerChatMsg {
   _t: "file";
+  /** 文件链接或者 ID，未确定 */
   file: string;
   filename: string;
   caption?: string;
@@ -73,22 +78,33 @@ export interface ClientForwardMsg extends ClientChatMsg {
 }
 
 /** WebSocket 中传递的消息 */
-export interface Message {
+export interface ServerMessage {
   /** 消息类型 */
-  _t: "chat" | "unread";
+  _t: "chat" | "unread" | "online_status";
   [propName: string]: any;
 }
 
-export interface ChatMessage extends Message {
+export interface ServerChatMessage extends ServerMessage {
   _t: "chat";
   chatId: string;
-  msg: ChatMsg;
+  msg: ServerChatMsg;
 }
 
-export interface UnreadCountMessage extends Message {
+export interface ServerUnreadCountMessage extends ServerMessage {
   _t: "unread";
   /** 未读信息：<聊天名称, 未读数> */
-  items: Map<string, number>;
+  items: Map<string, UnreadProperty>;
+}
+
+export interface UnreadProperty {
+  count: number;
+  maxMsgId: number;
+}
+
+export interface ServerOnlineStatusMessage extends ServerMessage {
+  _t: "online_status";
+  userId: string;
+  online: boolean;
 }
 
 export interface ClientMessage {
@@ -98,7 +114,6 @@ export interface ClientMessage {
 
 export interface ClientChatMessage extends ClientMessage {
   _t: "chat";
-  chatId: string;
   msg: ClientChatMsg;
 }
 
@@ -115,12 +130,19 @@ export interface UserProfile {
   avatarUrl: string;
   friends: string[];
   groups: string[];
+  state: boolean;
+  desktopNotifications: boolean;
+  backgroundNotification: boolean;
+  soundOn: boolean;
+  soundDegree: number;
+  hotkey: number;
 }
 
 export interface GroupProfile {
   id: string;
   name: string;
   desc: string;
+  avatarUrl: string;
   members: string[];
 }
 
@@ -132,7 +154,7 @@ let a: TextChatMsg = {
   text: "MyText",
 };
 
-let my_msg: ChatMessage = {
+let my_msg: ServerChatMessage = {
   _t: "chat",
   chatId: "abcdef123456",
   msg: a,
