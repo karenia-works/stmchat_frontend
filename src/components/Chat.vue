@@ -3,13 +3,13 @@
     <!-- <div class="wrapper">
       <div v-for="msg in list" :key="msg.msg.id">{{ msg }}</div>
     </div>-->
-    <div class="chat-top-bar">
+    <div class="chat-top-bar dark_main_text dark_light_bg">
       <div class="chatinfo">{{ chatinfo.name }}</div>
       <div class="chatopt icon24">
         <i class="el-icon-more"></i>
       </div>
     </div>
-    <div class="chat-messages">
+    <div class="chat-messages dark_deep_bg">
       <el-button
         type="primary"
         icon="el-icon-arrow-down"
@@ -18,11 +18,7 @@
         class="goBtn"
         @click="jumpToMessage(-1)"
       ></el-button>
-      <vuescroll
-        :ops="scrollOption"
-        ref="chat-messages"
-        @handle-scroll="handleScroll"
-      >
+      <vuescroll :ops="scrollOption" ref="chat-messages" @handle-scroll="handleScroll">
         <div
           v-for="data in messages"
           :key="data.msg.id"
@@ -30,21 +26,14 @@
             'msg ' + (data.msg.sender.name == me.name ? 'self' : 'others')
           "
         >
-          <el-avatar
-            :src="data.msg.sender.avatar"
-            v-if="showAvatar"
-          ></el-avatar>
+          <el-avatar :src="data.msg.sender.avatar" v-if="showAvatar"></el-avatar>
 
           <div :class="'msgbody type-' + data.msg._t">
-            <div class="sendername" v-if="showSender">
-              {{ data.msg.sender.name }}
-            </div>
+            <div class="sendername" v-if="showSender">{{ data.msg.sender.name }}</div>
 
             <div v-if="data.msg._t == 'text'" class="msg-text">
               <span>{{ data.msg.text }}</span>
-              <span class="time" type="info">
-                {{ data.msg.time | msgTime }}
-              </span>
+              <span class="time" type="info">{{ data.msg.time | msgTime }}</span>
             </div>
 
             <div
@@ -59,9 +48,7 @@
               ></el-image>
               <div class="msg-text" v-if="data.msg.caption">
                 <span>{{ data.msg.caption }}</span>
-                <span class="time" type="info">
-                  {{ data.msg.time | msgTime }}
-                </span>
+                <span class="time" type="info">{{ data.msg.time | msgTime }}</span>
               </div>
               <div v-else class="time">{{ data.msg.time | msgTime }}</div>
             </div>
@@ -69,7 +56,7 @@
         </div>
       </vuescroll>
     </div>
-    <div class="chat-bottom-bar">
+    <div class="chat-bottom-bar dark_light_bg dark_main_text">
       <div class="sendopt icon24">
         <i class="el-icon-paperclip"></i>
         <i class="el-icon-picture-outline"></i>
@@ -84,7 +71,7 @@
       ></el-input>
       <div class="sendicon icon24">
         <i
-          class="el-icon-s-promotion"
+          class="el-icon-s-promotion dark_main_text"
           :class="sendMessage.length > 0 ? '' : 'iconforbid'"
           @click="send()"
         ></i>
@@ -219,7 +206,7 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
+<style lang="stylus">
 .chat-bottom-bar {
   .sendopt {
     width: 60px;
@@ -398,5 +385,54 @@ export default {
 
 .chat-messages {
   background-color: #e9eef3;
+}
+
+@media (prefers-color-scheme: dark) {
+  .dark_light_bg {
+    background-color: #606266;
+    border-color: #44474E;
+  }
+
+  .dark_midium_bg {
+    background-color: #44474E;
+    border-color: #606266;
+  }
+
+  .dark_deep_bg {
+    background-color: #303133;
+  }
+
+  .dark_sub_text {
+    color: #909399;
+  }
+
+  .dark_main_text {
+    color: #E4E7ED;
+  }
+
+  .chat-messages {
+    .msg {
+      .msgbody {
+        background-color: #44474E;
+
+        .sendername {
+          color: #409EFF;
+        }
+
+        .msg-text {
+          color: #E4E7ED;
+
+          .time {
+            color: #909399;
+          }
+        }
+      }
+    }
+  }
+
+  .el-textarea__inner {
+    color: #e4e7ed;
+    background-color: #606266;
+  }
 }
 </style>
