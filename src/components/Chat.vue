@@ -4,10 +4,12 @@
       <div v-for="msg in list" :key="msg.msg.id">{{ msg }}</div>
     </div>-->
     <div class="chat-top-bar dark_main_text dark_light_bg">
-      <div :class="'chatinfo ' + chatinfo.type">
+      <div class="chatinfo" :class="chatinfo.type">
         <template v-if="chatinfo.type == 'private'">
           <span>{{ chatinfo.user.name }}</span>
-          <span :class="'info ' + chatinfo.user.status">{{ chatinfo.user.status }}</span>
+          <span class="info" :class="chatinfo.user.status">{{
+            chatinfo.user.status
+          }}</span>
         </template>
         <template v-if="chatinfo.type == 'group'">
           <span>{{ chatinfo.group.name }}</span>
@@ -27,48 +29,102 @@
         class="goBtn"
         @click="jumpToMessage(-1)"
       ></el-button>
-      <vuescroll :ops="scrollOption" ref="chat-messages" @handle-scroll="handleScroll">
+      <vuescroll
+        :ops="scrollOption"
+        ref="chat-messages"
+        @handle-scroll="handleScroll"
+      >
         <div
           v-for="data in messages"
           :key="data.msg.id"
-          :class="
-            'msg ' + (data.msg.sender.name == me.name ? 'self' : 'others')
-          "
+          class="msg"
+          :class="{ self: data.msg.sender.name == me.name }"
         >
-          <el-avatar :src="data.msg.sender.avatar" v-if="showAvatar"></el-avatar>
+          <el-avatar
+            :src="data.msg.sender.avatar"
+            v-if="showAvatar"
+          ></el-avatar>
 
-          <div :class="'msgbody type-' + data.msg._t">
-            <div class="sendername" v-if="showSender">{{ data.msg.sender.name }}</div>
+          <div class="msgbody dark_main_text" :class="'type-' + data.msg._t">
+            <!-- forwardFrom -->
+            <template v-if="data.msg.forwardFrom">
+              <div class="bodytop">
+                <div class="sendername" v-if="showSender">
+                  {{ data.msg.sender.name }}
+                </div>
+                <div class="sendername">
+                  Forwarded from {{ data.msg.forwardFrom.sender.name }}
+                </div>
+              </div>
+            </template>
 
-            <div v-if="data.msg._t == 'text'" class="msg-text">
-              <span>{{ data.msg.text }}</span>
-              <span class="time info" type="info">
-                {{
-                data.msg.time | msgTime
-                }}
-              </span>
-            </div>
+            <template v-else>
+              <div class="bodytop">
+                <div class="sendername" v-if="showSender">
+                  {{ data.msg.sender.name }}
+                </div>
+                <div v-if="data.msg.replyTo" class="quote">
+                  <!-- replyTo -->
+                  <el-image
+                    v-if="data.msg.replyTo._t == 'image'"
+                    :src="data.msg.replyTo.image"
+                  ></el-image>
 
-            <div
-              v-else-if="data.msg._t == 'image'"
-              :class="data.msg.caption ? 'msg-image' : 'image-only'"
-            >
-              <el-image
-                :src="data.msg.image"
-                :preview-src-list="[data.msg.image]"
-                :class="showSender ? '' : 'noSender'"
-                lazy
-              ></el-image>
-              <div class="msg-text" v-if="data.msg.caption">
-                <span>{{ data.msg.caption }}</span>
+                  <div>
+                    <div class="sendername">
+                      {{ data.msg.replyTo.sender.name }}
+                    </div>
+                    <div class="quote-text">
+                      <template v-if="data.msg.replyTo._t == 'text'">
+                        {{ data.msg.replyTo.text }}
+                      </template>
+                      <template v-else-if="data.msg.replyTo._t == 'image'">
+                        [图片]
+                        <span v-if="data.msg.replyTo.caption"
+                          >, {{ data.msg.replyTo.caption }}</span
+                        >
+                      </template>
+                      <template v-else-if="data.msg.replyTo._t == 'file'">
+                        {{ data.msg.replyTo.filename }}
+                        <span v-if="data.msg.replyTo.caption"
+                          >, {{ data.msg.replyTo.caption }}</span
+                        >
+                      </template>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- message body -->
+              <div v-if="data.msg._t == 'text'" class="msg-text">
+                <span>{{ data.msg.text }}</span>
                 <span class="time info" type="info">
-                  {{
-                  data.msg.time | msgTime
-                  }}
+                  {{ data.msg.time | msgTime }}
                 </span>
               </div>
-              <div v-else class="time">{{ data.msg.time | msgTime }}</div>
-            </div>
+
+              <div
+                v-else-if="data.msg._t == 'image'"
+                :class="{ 'image-only': !data.msg.caption }"
+              >
+                <el-image
+                  :src="data.msg.image"
+                  :preview-src-list="[data.msg.image]"
+                  :class="{
+                    noSender:
+                      !showSender && !data.msg.forwardFrom && !data.msg.replyTo,
+                  }"
+                  lazy
+                ></el-image>
+                <div class="msg-text" v-if="data.msg.caption">
+                  <span>{{ data.msg.caption }}</span>
+                  <span class="time info" type="info">
+                    {{ data.msg.time | msgTime }}
+                  </span>
+                </div>
+                <div v-else class="time">{{ data.msg.time | msgTime }}</div>
+              </div>
+            </template>
           </div>
         </div>
       </vuescroll>
@@ -87,10 +143,12 @@
         @keydown.native="enterInput"
       ></el-input>
       <div class="sendicon icon24" slot="reference">
-        <div :class="'emptyWarning ' + (showEmptyWarning ? 'show' : '')">不能发送空消息</div>
+        <div class="emptyWarning" :class="{ show: showEmptyWarning }">
+          不能发送空消息
+        </div>
         <i
-          class="el-icon-s-promotion dark_main_text"
-          :class="sendMessage.length > 0 ? '' : 'iconforbid'"
+          class="el-icon-s-promotion"
+          :class="{ iconforbid: sendMessage.length == 0 }"
           @click="send()"
         ></i>
       </div>
@@ -103,8 +161,9 @@
 // send empty warning
 // online/offline
 
-//todo: foward/qoute style
+//todo: quote
 //todo: style for file
+//todo: foward
 //todo: upload image/ file
 //todo: bottom-bar height
 //todo: desktop notifiction; notice sound
@@ -205,7 +264,7 @@ export default {
   data() {
     return {
       messageProcess: 0,
-      showSender: true,
+      showSender: false,
       showAvatar: true,
       connector: null,
       showGoDown: false,
@@ -259,272 +318,302 @@ export default {
 </script>
 
 <style lang="stylus">
-$color-highlight-text = #409EFF
-$color-info-text = #909399
+$color-highlight-text = #409EFF;
+$color-info-text = #909399;
 
 .chat-bottom-bar {
   .sendopt {
-    width: 60px
+    width: 60px;
 
     & i:first-child {
-      margin-right: 12px
+      margin-right: 12px;
     }
   }
 
   .el-textarea {
-    width: auto
-    flex-grow: 1
-    margin: 0 12px
+    width: auto;
+    flex-grow: 1;
+    margin: 0 12px;
 
     ::-webkit-scrollbar {
-      display: none
+      display: none;
     }
   }
 
   .icon24 {
-    height: 33px
-    line-height: 33px
-    position: relative
+    height: 33px;
+    line-height: 33px;
+    position: relative;
   }
 }
 
 .goBtn {
-  position: absolute
-  z-index: 99
-  right: 16px
-  bottom: 16px
+  position: absolute;
+  z-index: 99;
+  right: 16px;
+  bottom: 16px;
 }
 
 .emptyWarning {
-  position: absolute
-  bottom: 50px
-  right: 0
-  border: 1px colors.dark-sub-text solid
-  color: colors.dark-sub-text
-  font-size: 14px
-  width: 100px
-  line-height: 14px
-  padding: 10px 15px
-  border-radius: 7px 7px 0 7px
-  background-color: rgba(68, 71, 78, 0.5)
-  opacity: 0
-  transition: opacity 0.3s ease-in
+  position: absolute;
+  bottom: 50px;
+  right: 0;
+  border: 1px colors.dark-sub-text solid;
+  color: colors.dark-sub-text;
+  font-size: 14px;
+  width: 100px;
+  line-height: 14px;
+  padding: 10px 15px;
+  border-radius: 7px 7px 0 7px;
+  background-color: rgba(68, 71, 78, 0.5);
+  opacity: 0;
+  transition: opacity 0.3s ease-in;
 
   &.show {
-    opacity: 1
+    opacity: 1;
+  }
+}
+
+.chatinfo {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  span {
+    line-height: 14px;
+  }
+
+  .info {
+    margin-top: 5px;
+
+    &.online {
+      color: $color-highlight-text;
+    }
+  }
+}
+
+.msgbody {
+  background-color: white;
+  border-radius: 7px;
+  max-width: 400px;
+  font-size: 14px;
+
+  .sendername {
+    color: colors.theme-blue;
+    font-weight: bold;
+  }
+
+  .msg-text {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    text-align: justify;
+    line-height: 24px;
+
+    .time {
+      margin-left: 8px;
+      float: right;
+      line-height: 12px;
+      padding-top: 7px;
+    }
+  }
+}
+
+.msgbody.type-text {
+  padding: 7px 10px;
+}
+
+.msgbody.type-image {
+  position: relative;
+
+  .bodytop {
+    margin: 7px 10px 3px;
+  }
+
+  .msg-text {
+    margin: 0 10px 7px;
+  }
+
+  .el-image {
+    max-width: 400px;
+    max-height: 250px;
+
+    &.noSender {
+      border-top-left-radius: 7px;
+      border-top-right-radius: 7px;
+      margin-top: -6px;
+    }
+  }
+
+  .image-only {
+    .el-image {
+      border-bottom-left-radius: 7px;
+      border-bottom-right-radius: 7px;
+      margin-bottom: -4px;
+    }
+
+    .time {
+      position: absolute;
+      font-size: 12px;
+      padding: 3px 10px;
+      right: 8px;
+      bottom: 8px;
+      border-radius: 7px;
+      color: white;
+      background-color: rgba(0, 0, 0, 0.3);
+      opacity: 0;
+      transition: opacity 0.1s ease-in;
+    }
+
+    &:hover {
+      .time {
+        opacity: 1;
+      }
+    }
+  }
+}
+
+.quote {
+  border-left: 3px colors.theme-blue solid;
+  padding-left: 8px;
+  margin: 3px 0 5px;
+  color: colors.dark-sub-text;
+  display: flex;
+
+  .el-image {
+    height: 43px;
+    width: 43px;
+    border-radius: 3px;
+    margin-right: 5px;
+    opacity: 0.8;
+  }
+
+  .sendername {
+    margin: 0 0 3px !important;
+  }
+
+  .quote-text {
+    // todo: quote width definited by message
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 200px;
+  }
+}
+
+.chat-messages {
+  position: relative;
+
+  .msg {
+    display: flex;
+    margin: 6px 20px;
+
+    .el-avatar {
+      margin-left: 0;
+      margin-right: 12px;
+    }
+
+    &.self {
+      align-self: flex-end;
+      flex-direction: row-reverse;
+
+      .el-avatar {
+        margin-right: 0;
+        margin-left: 12px;
+      }
+    }
   }
 }
 
 .info {
-  color: colors.dark-sub-text
-  font-size: 12px
-}
-
-.chatinfo {
-  display: flex
-  flex-direction: column
-  justify-content: center
-
-  span {
-    line-height: 14px
-  }
-
-  .info {
-    margin-top: 5px
-
-    &.online {
-      color: $color-highlight-text
-    }
-  }
-}
-
-.chat-messages {
-  position: relative
-
-  .msg {
-    display: flex
-    margin: 6px 20px
-
-    .el-avatar {
-      margin-left: 0
-      margin-right: 12px
-    }
-
-    .msgbody {
-      background-color: white
-      padding: 6px 10px
-      border-radius: 7px
-      max-width: 400px
-
-      .sendername {
-        color: colors.theme-blue
-        font-weight: bold
-        margin-bottom: 2px
-      }
-
-      .msg-text {
-        white-space: pre-wrap
-        word-wrap: break-word
-        text-align: justify
-
-        .time {
-          margin-left: 8px
-          float: right
-          line-height: 12px
-          padding-top: 7px
-        }
-      }
-
-      &.type-image {
-        padding: 0
-        position: relative
-
-        .sendername {
-          margin: 6px 10px 2px
-        }
-
-        .msg-text {
-          margin: 0 10px 6px
-        }
-
-        .el-image {
-          max-width: 400px
-          max-height: 250px
-          fit: cover
-
-          &.noSender {
-            border-top-left-radius: 7px
-            border-top-right-radius: 7px
-          }
-        }
-      }
-
-      .image-only {
-        .el-image {
-          border-bottom-left-radius: 7px
-          border-bottom-right-radius: 7px
-          margin-bottom: -5px
-        }
-
-        .time {
-          position: absolute
-          font-size: 12px
-          padding: 3px 10px
-          right: 8px
-          bottom: 8px
-          border-radius: 7px
-          color: white
-          background-color: rgba(0, 0, 0, 0.3)
-          opacity: 0
-          transition: opacity 0.1s ease-in
-        }
-
-        &:hover {
-          .time {
-            opacity: 1
-          }
-        }
-      }
-    }
-
-    &.self {
-      align-self: flex-end
-      flex-direction: row-reverse
-
-      .el-avatar {
-        margin-right: 0
-        margin-left: 12px
-      }
-    }
-  }
+  color: colors.dark-sub-text;
+  font-size: 12px;
 }
 
 .icon24 {
-  font-size: 24px
-  cursor: pointer
-  display: flex
-  align-items: center
+  font-size: 24px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
 }
 
 .iconforbid {
-  color: gray
-  cursor: default
+  color: gray;
+  cursor: default;
 }
 
 .chat {
-  display: flex
-  flex-direction: column
-  max-width: 750px
-  height: 400px
+  display: flex;
+  flex-direction: column;
+  max-width: 750px;
+  height: 400px;
 
   .chat-top-bar {
-    flex-basis: 55px
-    display: flex
-    justify-content: space-between
-    padding: 0 20px
-    flex-shrink: 0
+    flex-basis: 55px;
+    display: flex;
+    justify-content: space-between;
+    padding: 0 20px;
+    flex-shrink: 0;
   }
 
   .chat-messages {
-    padding: 0
-    height: 500px
-    flex-shrink: 1
+    padding: 0;
+    height: 500px;
+    flex-shrink: 1;
   }
 
   .chat-bottom-bar {
-    padding: 6px 20px
-    display: flex
-    align-items: flex-end
-    flex-shrink: 0
+    padding: 6px 20px;
+    display: flex;
+    align-items: flex-end;
+    flex-shrink: 0;
   }
 }
 
-.chat-top-bar,
-.chat-bottom-bar {
-  background-color: colors.theme-grey
+.chat-top-bar, .chat-bottom-bar {
+  background-color: colors.theme-grey;
 }
 
 .chat-messages {
-  background-color: colors.theme-light-grey
+  background-color: colors.theme-light-grey;
 }
 
 @media (prefers-color-scheme: dark) {
   .dark_light_bg {
-    background-color: colors.dark-light
-    border-color: colors.dark-medium
+    background-color: colors.dark-light;
+    border-color: colors.dark-medium;
   }
 
   .dark_medium_bg {
-    background-color: colors.dark-medium
-    border-color: colors.dark-light
+    background-color: colors.dark-medium;
+    border-color: colors.dark-light;
   }
 
   .dark_deep_bg {
-    background-color: colors.dark-deep
+    background-color: colors.dark-deep;
   }
 
   .dark_sub_text {
-    color: colors.dark-sub-text
+    color: colors.dark-sub-text;
   }
 
   .dark_main_text {
-    color: colors.dark-main-text
+    color: colors.dark-main-text;
   }
 
   .chat-messages {
     .msg {
       .msgbody {
-        background-color: colors.dark-medium
+        background-color: colors.dark-medium;
 
         .sendername {
-          color: colors.theme-blue
+          color: colors.theme-blue;
         }
 
         .msg-text {
-          color: colors.dark-main-text
+          color: colors.dark-main-text;
 
           .time {
-            color: colors.dark-sub-text
+            color: colors.dark-sub-text;
           }
         }
       }
@@ -532,8 +621,8 @@ $color-info-text = #909399
   }
 
   .el-textarea__inner {
-    color: colors.dark-main-text
-    background-color: colors.dark-light
+    color: colors.dark-main-text;
+    background-color: colors.dark-light;
   }
 }
 </style>

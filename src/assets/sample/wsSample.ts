@@ -2,6 +2,29 @@ export const ChatMessages = [
   {
     msg: {
       _t: "text",
+      id: 12344,
+      sender: {
+        name: "lynz",
+        avatar:
+          "https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png",
+      },
+      time: new Date("2019-05-20 23:55:10"),
+      forwardFrom: {
+        _t: "text",
+        id: 12345,
+        sender: {
+          name: "skuld",
+          avatar:
+            "https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png",
+        },
+        time: new Date("2019-05-20 23:55:10"),
+        text: "hello",
+      },
+    },
+  },
+  {
+    msg: {
+      _t: "text",
       id: 12345,
       sender: {
         name: "lynz",
@@ -9,7 +32,42 @@ export const ChatMessages = [
           "https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png",
       },
       time: new Date("2019-05-20 23:55:10"),
+      replyTo: {
+        _t: "text",
+        id: 12345,
+        sender: {
+          name: "skuld",
+          avatar:
+            "https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png",
+        },
+        time: new Date("2019-05-20 23:55:10"),
+        text:
+          "hellohellohello\nhellohellohellohellohellohellohellohellohellohellohellohellohellohello hello",
+      },
       text: "hello",
+    },
+  },
+  {
+    msg: {
+      _t: "text",
+      id: 12343,
+      sender: {
+        name: "lynz",
+        avatar:
+          "https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png",
+      },
+      time: new Date("2019-05-20 23:55:10"),
+      text: "hello",
+      replyTo: {
+        _t: "file",
+        id: 12345,
+        sender: {
+          name: "skuld",
+        },
+        time: new Date("2019-05-20 23:55:10"),
+        filename: "testfile.txt",
+        caption: "hi",
+      },
     },
   },
   {
@@ -25,6 +83,19 @@ export const ChatMessages = [
       image:
         "https://img11.360buyimg.com/n1/jfs/t14497/67/1017638125/136874/65c4ecc3/5a422c37N1b36f52c.jpg",
       caption: "gugugu",
+      replyTo: {
+        _t: "image",
+        id: 12346,
+        sender: {
+          name: "lynz",
+          avatar:
+            "https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png",
+        },
+        time: new Date("2019-05-20 23:55:10"),
+        image:
+          "https://img11.360buyimg.com/n1/jfs/t14497/67/1017638125/136874/65c4ecc3/5a422c37N1b36f52c.jpg",
+        caption: "gugugu",
+      },
     },
   },
   {
