@@ -39,14 +39,7 @@ import Vue from "vue";
 
 export default Vue.extend({
   name: "Setgroup",
-  beforeMount() {
-    var chatMsgService = serviceProvider.resolve(ChatMessageService);
-    chatMsgService.getObservable("00000000").subscribe({
-      next: val => {
-        console.log(val);
-      },
-    });
-  },
+
   data() {
     return {
       input: "",
