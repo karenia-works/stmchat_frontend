@@ -32,9 +32,21 @@
   </el-card>
 </template>
 
-<script>
-export default {
+<script lang="ts">
+import { serviceProvider } from "@/services/dependencyInjection";
+import { ChatMessageService } from "@/services/messageService";
+import Vue from "vue";
+
+export default Vue.extend({
   name: "Setgroup",
+  beforeMount() {
+    var chatMsgService = serviceProvider.resolve(ChatMessageService);
+    chatMsgService.getObservable("00000000").subscribe({
+      next: val => {
+        console.log(val);
+      },
+    });
+  },
   data() {
     return {
       input: "",
@@ -45,80 +57,80 @@ export default {
       this.$router.push({ path: "/Addmember" });
     },
   },
-};
+});
 </script>
 
 <style lang="stylus" scoped>
 .hr111 {
-  border-style: solid;
-  border-radius: 1px;
-  border-width: 1px;
-  border-color: #333;
-  background-color: #333;
+  border-style: solid
+  border-radius: 1px
+  border-width: 1px
+  border-color: #333
+  background-color: #333
 }
 
 .item {
-  padding: 18px 0;
+  padding: 18px 0
 }
 
 .el-footer {
-  text-align: center;
-  color: #409eff;
+  text-align: center
+  color: #409eff
 }
 
 .el-header {
-  text-align: center;
+  text-align: center
 }
 
 .el-main {
-  text-align: center;
+  text-align: center
 }
 
 .sgp-card {
-  width: 400px;
-  margin-left: 100px;
-  margin-top: 100px;
+  width: 400px
+  margin-left: 100px
+  margin-top: 100px
 }
 
 .text {
-  font-size: 15px;
-  color: #303133;
+  font-size: 15px
+  color: #303133
 }
 
 .el-aside {
-  margin-top: 30px;
-  text-align: center;
+  margin-top: 30px
+  text-align: center
 }
 
 @media (prefers-color-scheme: dark) {
   .dark_light_bg {
-    background-color: #606266;
-    border-color: #44474E;
+    background-color: #606266
+    border-color: #44474E
   }
 
   .dark_midium_bg {
-    background-color: #44474E;
-    border-color: #606266;
+    background-color: #44474E
+    border-color: #606266
   }
 
   .dark_deep_bg {
-    background-color: #303133;
+    background-color: #303133
   }
 
   .dark_sub_text {
-    color: #909399;
+    color: #909399
   }
 
   .dark_main_text {
-    color: #E4E7ED;
+    color: #E4E7ED
   }
 
   .dark_hr {
-  border-style: solid;
-  border-radius: 1px;
-  border-width: 1px;
-  border-color: white;
-  background-color: white;
+    border-style: solid
+    border-radius: 1px
+    border-width: 1px
+    border-color: white
+    background-color: white
   }
 }
 </style>

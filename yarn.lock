@@ -2,6 +2,11 @@
 # yarn lockfile v1
 
 
+"@abraham/reflection@^0.7.0":
+  version "0.7.0"
+  resolved "https://registry.npm.taobao.org/@abraham/reflection/download/@abraham/reflection-0.7.0.tgz#16d4ff597d3797001bcf88738d6edc3dd19b50c7"
+  integrity sha1-FtT/WX03lwAbz4hzjW7cPdGbUMc=
+
 "@babel/code-frame@^7.0.0", "@babel/code-frame@^7.10.1":
   version "7.10.1"
   resolved "https://registry.npm.taobao.org/@babel/code-frame/download/@babel/code-frame-7.10.1.tgz?cache=0&sync_timestamp=1590617298858&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2F%40babel%2Fcode-frame%2Fdownload%2F%40babel%2Fcode-frame-7.10.1.tgz#d5481c5095daa1c57e16e54c6f9198443afb49ff"
@@ -962,6 +967,13 @@
   version "1.5.4"
   resolved "https://registry.npm.taobao.org/@types/q/download/@types/q-1.5.4.tgz#15925414e0ad2cd765bfef58842f7e26a7accb24"
   integrity sha1-FZJUFOCtLNdlv+9YhC9+JqesyyQ=
+
+"@types/reflect-metadata@^0.1.0":
+  version "0.1.0"
+  resolved "https://registry.npm.taobao.org/@types/reflect-metadata/download/@types/reflect-metadata-0.1.0.tgz#592805bdf6d63dd7229773218afeba37ac2eab16"
+  integrity sha1-WSgFvfbWPdcil3Mhiv66N6wuqxY=
+  dependencies:
+    reflect-metadata "*"
 
 "@types/webpack-env@^1.15.2":
   version "1.15.2"
@@ -4589,7 +4601,7 @@ invariant@^2.2.2, invariant@^2.2.4:
   dependencies:
     loose-envify "^1.0.0"
 
-inversify@*, inversify@^5.0.1:
+inversify@*:
   version "5.0.1"
   resolved "https://registry.npm.taobao.org/inversify/download/inversify-5.0.1.tgz#500d709b1434896ce5a0d58915c4a4210e34fb6e"
   integrity sha1-UA1wmxQ0iWzloNWJFcSkIQ40+24=
@@ -6808,6 +6820,11 @@ readdirp@~3.4.0:
   dependencies:
     picomatch "^2.2.1"
 
+reflect-metadata@*:
+  version "0.1.13"
+  resolved "https://registry.npm.taobao.org/reflect-metadata/download/reflect-metadata-0.1.13.tgz#67ae3ca57c972a2aa1642b10fe363fe32d49dc08"
+  integrity sha1-Z648pXyXKiqhZCsQ/jY/4y1J3Ag=
+
 regenerate-unicode-properties@^8.2.0:
   version "8.2.0"
   resolved "https://registry.npm.taobao.org/regenerate-unicode-properties/download/regenerate-unicode-properties-8.2.0.tgz?cache=0&sync_timestamp=1583946996794&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Fregenerate-unicode-properties%2Fdownload%2Fregenerate-unicode-properties-8.2.0.tgz#e5de7111d655e7ba60c057dbe9ff37c87e65cdec"
@@ -7988,7 +8005,7 @@ ts-pnp@^1.1.6:
   resolved "https://registry.npm.taobao.org/ts-pnp/download/ts-pnp-1.2.0.tgz?cache=0&sync_timestamp=1585245674012&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Fts-pnp%2Fdownload%2Fts-pnp-1.2.0.tgz#a500ad084b0798f1c3071af391e65912c86bca92"
   integrity sha1-pQCtCEsHmPHDBxrzkeZZEshrypI=
 
-tslib@^1.8.0, tslib@^1.8.1, tslib@^1.9.0:
+tslib@^1.8.0, tslib@^1.8.1, tslib@^1.9.0, tslib@^1.9.3:
   version "1.13.0"
   resolved "https://registry.npm.taobao.org/tslib/download/tslib-1.13.0.tgz#c881e13cc7015894ed914862d276436fa9a47043"
   integrity sha1-yIHhPMcBWJTtkUhi0nZDb6mkcEM=
@@ -8025,6 +8042,13 @@ tsutils@^3.17.1:
   integrity sha1-7XGZF/EcoN7lhicrKsSeAVot11k=
   dependencies:
     tslib "^1.8.1"
+
+tsyringe@^4.3.0:
+  version "4.3.0"
+  resolved "https://registry.npm.taobao.org/tsyringe/download/tsyringe-4.3.0.tgz#50ce2ec56c83569a2dfafb7233a5265a2a10bde4"
+  integrity sha1-UM4uxWyDVpot+vtyM6UmWioQveQ=
+  dependencies:
+    tslib "^1.9.3"
 
 tty-browserify@0.0.0:
   version "0.0.0"

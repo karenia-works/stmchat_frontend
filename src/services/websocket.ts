@@ -7,13 +7,17 @@ import {
 } from "../types/types";
 import "rxjs";
 import { Subject } from "rxjs";
-import { injectable } from "inversify";
+import { singleton, inject } from "tsyringe";
+import { IServerConfig } from "./serverConfig";
 
-@injectable()
+@singleton()
 export class WsMessageService {
-  public constructor(private dest: string) {
-    this.connectWebsocket(dest);
+  public constructor(@inject("server_config") serverConfig: IServerConfig) {
+    this.dest = serverConfig.wsEndpoint;
+    this.connectWebsocket(this.dest);
   }
+
+  private dest: string;
 
   protected connectWebsocket(dest: string) {
     let self = this;
@@ -81,6 +85,7 @@ export class WsMessageService {
 
   protected onWebsocketClose(ws: WebSocket, err: CloseEvent) {
     this.connection_state.next(false);
+    console.warn("Disconnected from websocket", ws.url);
     this.connectWebsocket(this.dest);
   }
 
@@ -98,6 +103,7 @@ export class WsMessageService {
           break;
         case "online_status":
           this.user_online_state.next(msg as ServerOnlineStatusMessage);
+          break;
         default:
           throw new Error(`Unknown Message type ${msg._t}`);
       }
@@ -110,7 +116,7 @@ export class WsMessageService {
   protected onWebsocketError(_ws: WebSocket, err: Event) {
     this.connection_state.next(false);
     this.chat_msg.error(err);
-
+    console.error("Failed to connect to websocket", _ws.url);
     this.connectWebsocket(this.dest);
   }
 }

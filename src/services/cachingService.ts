@@ -1,7 +1,7 @@
 import { UserProfile, GroupProfile } from "@/types/types";
 import axios from "axios";
 import { Lru } from "tiny-lru";
-import { injectable, inject } from "inversify";
+import { injectable, inject, singleton } from "tsyringe";
 import { WsMessageService } from "./websocket";
 import { TYPES } from "./dependencyInjection";
 
@@ -57,11 +57,11 @@ export class ProfilePool<T> implements ICachingDataPool<T> {
   }
 }
 
-@injectable()
+@singleton()
 export class UserProfilePool extends ProfilePool<UserProfile> {
   public constructor(
     limit: number,
-    @inject(TYPES.WebsocketService) ws: WsMessageService,
+    @inject("websocket_service") ws: WsMessageService,
   ) {
     super(limit, "TODO: Endpoint");
     ws.userOnlineState.subscribe({
@@ -79,7 +79,7 @@ export class UserProfilePool extends ProfilePool<UserProfile> {
   }
 }
 
-@injectable()
+@singleton()
 export class GroupProfilePool extends ProfilePool<GroupProfile> {
   public constructor(limit: number) {
     super(limit, "TODO: Endpoint");
