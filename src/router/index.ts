@@ -8,6 +8,7 @@ import Contacts from "@/components/Contacts.vue";
 import Chat from "@/components/Chat.vue";
 import ChatList from "@/components/ChatList.vue";
 import Setting from "@/components/Setting.vue";
+import Groupinf from "@/components/Groupinf.vue";
 
 Vue.use(VueRouter);
 
@@ -48,6 +49,10 @@ const routes = [
   {
     path: "/setting",
     component: Setting,
+  },
+  {
+    path: "/Groupinf",
+    component: Groupinf,
   },
 ];
 
