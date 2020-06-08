@@ -68,6 +68,9 @@ export interface MessageListItem {
 }
 
 @singleton()
+/**
+ * 消息列表服务，订阅 `messageListSubject` 获得消息列表的所有更新
+ */
 export class MessageListService {
   public constructor(
     wss: WsMessageService,
@@ -77,22 +80,38 @@ export class MessageListService {
     wss.unreadMessageCount.subscribe({ next: this.onNewUnreadCountUpdate });
   }
 
-  private _messageList = new Map<string, MessageListItem>();
+  private messageMap = new Map<string, MessageListItem>();
+  private _messageListSubject = new BehaviorSubject<MessageListItem[]>([]);
+  private _messageList: MessageListItem[] | undefined;
 
   public get messageList(): MessageListItem[] {
-    return [...this._messageList.values()].sort((a, b) => {
-      return a.lastTimestamp - b.lastTimestamp;
-    });
+    if (this._messageList !== undefined) {
+      return this._messageList;
+    } else {
+      return [...this.messageMap.values()].sort((a, b) => {
+        return a.lastTimestamp - b.lastTimestamp;
+      });
+    }
+  }
+
+  public get messageListSubject(): Observable<MessageListItem[]> {
+    return this._messageListSubject;
+  }
+
+  private messageMapChanged() {
+    // invalidate data
+    this._messageList = undefined;
+    this._messageListSubject.next(this.messageList);
   }
 
   private async onNewChatMessage(msg: ServerChatMessage) {
-    let item = this._messageList.get(msg.chatId);
+    let item = this.messageMap.get(msg.chatId);
     if (item === undefined) {
       let chatProfile = await this.groupProfileService.getData(msg.chatId);
       if (chatProfile === undefined) {
         throw new Error("Cannot find chat profile!");
       }
-      this._messageList.set(msg.chatId, {
+      this.messageMap.set(msg.chatId, {
         chat: chatProfile,
         latestMessage: msg.msg,
         lastTimestamp: moment(msg.msg.time).unix(),
@@ -106,26 +125,28 @@ export class MessageListService {
         item.unreadCount += 1;
       }
     }
+    this.messageMapChanged();
   }
 
   public setUnreadCount(id: string, count: number) {
-    let item = this._messageList.get(id);
+    let item = this.messageMap.get(id);
     if (item === undefined) {
       throw new Error(`ChatID does not exist: ${id}`);
     } else {
       item.unreadCount = count;
     }
+    this.messageMapChanged();
   }
 
   private async onNewUnreadCountUpdate(msg: ServerUnreadCountMessage) {
     for (let [id, unreadProp] of msg.items) {
-      let item = this._messageList.get(id);
+      let item = this.messageMap.get(id);
       if (item === undefined) {
         let chatProfile = await this.groupProfileService.getData(msg.chatId);
         if (chatProfile === undefined) {
           throw new Error("Cannot find chat profile!");
         }
-        this._messageList.set(msg.chatId, {
+        this.messageMap.set(msg.chatId, {
           chat: chatProfile,
           latestMessage: undefined,
           lastTimestamp: moment().unix(),
@@ -135,5 +156,6 @@ export class MessageListService {
         item.unreadCount = unreadProp.count;
       }
     }
+    this.messageMapChanged();
   }
 }
