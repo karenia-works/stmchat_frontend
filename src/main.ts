@@ -3,8 +3,11 @@ import Vue from "vue";
 import App from "./App.vue";
 import router from "./router";
 import store from "./store";
+
 import ElementUI from "element-ui";
 import "element-ui/lib/theme-chalk/index.css";
+import vuescroll from "vuescroll";
+
 import Usersearch from "@/components/Usersearch.vue";
 import Userlist from "@/components/Userlist.vue";
 // import "./plugins/element.js";
@@ -12,6 +15,16 @@ import Userlist from "@/components/Userlist.vue";
 
 Vue.config.productionTip = false;
 Vue.use(ElementUI);
+Vue.use(vuescroll, {
+  ops: {
+    rail: {
+      gutterOfEnds: "5px",
+      gutterOfSide: "5px",
+    },
+    bar: { background: "#409eff" },
+  },
+  name: "vueScroll",
+});
 Vue.component("user", Usersearch);
 Vue.component("userlist", Userlist);
 

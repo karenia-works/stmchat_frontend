@@ -29,11 +29,7 @@
         class="goBtn"
         @click="jumpToMessage(-1)"
       ></el-button>
-      <vuescroll
-        :ops="scrollOption"
-        ref="chat-messages"
-        @handle-scroll="handleScroll"
-      >
+      <vueScroll ref="chat-messages" @handle-scroll="handleScroll">
         <div
           v-for="data in messages"
           :key="data.msg.id"
@@ -47,112 +43,105 @@
 
           <div class="msgbody dark_main_text" :class="'type-' + data.msg._t">
             <!-- forwardFrom -->
-            <template v-if="data.msg.forwardFrom">
-              <div class="bodytop">
-                <div class="sendername" v-if="showSender">
-                  {{ data.msg.sender.name }}
-                </div>
-                <div class="sendername">
-                  Forwarded from {{ data.msg.forwardFrom.sender.name }}
-                </div>
-              </div>
-            </template>
 
-            <template v-else>
-              <div class="bodytop">
-                <div class="sendername" v-if="showSender">
-                  {{ data.msg.sender.name }}
-                </div>
-                <div v-if="data.msg.replyTo" class="quote">
-                  <!-- replyTo -->
-                  <el-image
-                    v-if="data.msg.replyTo._t == 'image'"
-                    :src="data.msg.replyTo.image"
-                  ></el-image>
-                  <div>
-                    <div class="sendername">
-                      {{ data.msg.replyTo.sender.name }}
-                    </div>
-                    <div class="quote-text">
-                      <template v-if="data.msg.replyTo._t == 'text'">
-                        {{ data.msg.replyTo.text }}
-                      </template>
-                      <template v-else-if="data.msg.replyTo._t == 'image'">
-                        [图片]
-                        <span v-if="data.msg.replyTo.caption"
-                          >, {{ data.msg.replyTo.caption }}</span
-                        >
-                      </template>
-                      <template v-else-if="data.msg.replyTo._t == 'file'">
-                        {{ data.msg.replyTo.filename }}
-                        <span v-if="data.msg.replyTo.caption"
-                          >, {{ data.msg.replyTo.caption }}</span
-                        >
-                      </template>
-                    </div>
+            <div class="bodytop">
+              <div class="sendername" v-if="showSender">
+                {{ data.msg.sender.name }}
+              </div>
+              <!-- replyTo -->
+              <div v-if="data.msg.replyTo" class="quote">
+                <el-image
+                  v-if="data.msg.replyTo._t == 'image'"
+                  :src="data.msg.replyTo.image"
+                ></el-image>
+                <div>
+                  <div class="sendername">
+                    {{ data.msg.replyTo.sender.name }}
+                  </div>
+                  <div class="quote-text">
+                    <template v-if="data.msg.replyTo._t == 'text'">
+                      {{ data.msg.replyTo.text }}
+                    </template>
+                    <template v-else-if="data.msg.replyTo._t == 'image'">
+                      [图片]
+                      <span v-if="data.msg.replyTo.caption"
+                        >, {{ data.msg.replyTo.caption }}</span
+                      >
+                    </template>
+                    <template v-else-if="data.msg.replyTo._t == 'file'">
+                      {{ data.msg.replyTo.filename }}
+                      <span v-if="data.msg.replyTo.caption"
+                        >, {{ data.msg.replyTo.caption }}</span
+                      >
+                    </template>
                   </div>
                 </div>
               </div>
 
-              <!-- message body -->
-              <!-- text message -->
-              <div v-if="data.msg._t == 'text'" class="msg-text">
-                <span>{{ data.msg.text }}</span>
+              <!-- forwardFrom -->
+              <div class="sendername" v-if="data.msg.forwardFrom">
+                Forwarded from {{ data.msg.forwardFrom.sender.name }}
+              </div>
+            </div>
+
+            <!-- message body -->
+            <!-- text message -->
+            <div v-if="data.msg._t == 'text'" class="msg-text">
+              <span>{{ data.msg.text }}</span>
+              <span class="time info">
+                {{ data.msg.time | msgTime }}
+              </span>
+            </div>
+
+            <!-- image message -->
+            <div
+              v-else-if="data.msg._t == 'image'"
+              :class="{ 'image-only': !data.msg.caption }"
+            >
+              <el-image
+                :src="data.msg.image"
+                :preview-src-list="[data.msg.image]"
+                :class="{
+                  noSender:
+                    !showSender && !data.msg.forwardFrom && !data.msg.replyTo,
+                }"
+                lazy
+              ></el-image>
+              <div class="msg-text" v-if="data.msg.caption">
+                <span>{{ data.msg.caption }}</span>
+                <span class="time info">
+                  {{ data.msg.time | msgTime }}
+                </span>
+              </div>
+              <div v-else class="time">{{ data.msg.time | msgTime }}</div>
+            </div>
+
+            <!-- file message -->
+            <div v-else-if="data.msg._t == 'file'">
+              <div :href="data.msg.file" class="file">
+                <div class="file-icon icon24">
+                  <i class="el-icon-document"></i>
+                </div>
+                <div>
+                  <div class="file-name">{{ data.msg.filename }}</div>
+                  <div class="info">{{ data.msg.size | fileSize }}</div>
+                </div>
+              </div>
+
+              <div class="msg-text" v-if="data.msg.caption">
+                <span>{{ data.msg.caption }}</span>
                 <span class="time info">
                   {{ data.msg.time | msgTime }}
                 </span>
               </div>
 
-              <!-- image message -->
-              <div
-                v-else-if="data.msg._t == 'image'"
-                :class="{ 'image-only': !data.msg.caption }"
-              >
-                <el-image
-                  :src="data.msg.image"
-                  :preview-src-list="[data.msg.image]"
-                  :class="{
-                    noSender:
-                      !showSender && !data.msg.forwardFrom && !data.msg.replyTo,
-                  }"
-                  lazy
-                ></el-image>
-                <div class="msg-text" v-if="data.msg.caption">
-                  <span>{{ data.msg.caption }}</span>
-                  <span class="time info">
-                    {{ data.msg.time | msgTime }}
-                  </span>
-                </div>
-                <div v-else class="time">{{ data.msg.time | msgTime }}</div>
-              </div>
-
-              <!-- file message -->
-              <div v-else-if="data.msg._t == 'file'">
-                <div :href="data.msg.file" class="file">
-                  <div class="file-icon icon24">
-                    <i class="el-icon-document"></i>
-                  </div>
-                  <div>
-                    <div class="file-name">{{ data.msg.filename }}</div>
-                    <div class="info">{{ data.msg.size | fileSize }}</div>
-                  </div>
-                </div>
-
-                <div class="msg-text" v-if="data.msg.caption">
-                  <span>{{ data.msg.caption }}</span>
-                  <span class="time info">
-                    {{ data.msg.time | msgTime }}
-                  </span>
-                </div>
-
-                <span class="time1 info" v-else>
-                  {{ data.msg.time | msgTime }}
-                </span>
-              </div>
-            </template>
+              <span class="time1 info" v-else>
+                {{ data.msg.time | msgTime }}
+              </span>
+            </div>
           </div>
         </div>
-      </vuescroll>
+      </vueScroll>
     </div>
     <div class="chat-bottom-bar dark_light_bg dark_main_text">
       <div class="sendopt icon24">
@@ -182,7 +171,6 @@
 </template>
 
 <script lang="ts">
-//todo: foward
 //todo: upload image/ file
 //todo: bottom-bar height
 //todo: desktop notifiction; notice sound
@@ -194,19 +182,18 @@
 // send empty warning
 // online/offline
 // quote
-//style for file
+// style for file
+// foward
+
+// * 处理消息数据：格式和字段名；转发消息从对象中移出
 
 import { WsMessageService } from "../services/websocket";
 import { ChatMessages } from "../assets/sample/wsSample";
 
-import vuescroll from "vuescroll";
 import moment from "moment";
 import { serviceProvider, TYPES } from "../services/dependencyInjection";
 
 export default {
-  components: {
-    vuescroll,
-  },
   // props: {
   //   showSender: Boolean,
   //   showAvatar: Boolean,
@@ -317,13 +304,7 @@ export default {
         soundDegree: 100,
         hotKey: "enterSend", //"enterNewline"
       },
-      scrollOption: {
-        rail: {
-          gutterOfEnds: "5px",
-          gutterOfSide: "5px",
-        },
-        bar: { background: "colors.theme-blue" },
-      },
+
       messages: ChatMessages,
     };
   },
@@ -510,7 +491,7 @@ $color-info-text = #909399;
   padding: 7px 10px;
 
   .bodytop {
-    margin-bottom: -6px;
+    margin-bottom: -3px;
   }
 
   .file {
@@ -541,6 +522,7 @@ $color-info-text = #909399;
     border-radius: 50px;
     background-color: colors.theme-blue;
     margin-right: 8px;
+    color: colors.theme-light-grey;
 
     i {
       position: relative;

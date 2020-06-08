@@ -2,6 +2,33 @@ export const ChatMessages = [
   {
     msg: {
       _t: "file",
+      id: 12340,
+      sender: {
+        name: "skuld",
+        avatar:
+          "https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg",
+      },
+      time: new Date(),
+      file: "www.google.com",
+      filename: "dependencyInjection.tsdependencyInjection.ts",
+      caption: "here is a file",
+      size: 3058,
+      replyTo: {
+        _t: "text",
+        id: 12345,
+        sender: {
+          name: "skuld",
+          avatar:
+            "https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png",
+        },
+        time: new Date("2019-05-20 23:55:10"),
+        text: "give me a file",
+      },
+    },
+  },
+  {
+    msg: {
+      _t: "file",
       id: 12341,
       sender: {
         name: "skuld",
@@ -28,28 +55,10 @@ export const ChatMessages = [
       file: "www.google.com",
       filename: "google.html",
       size: 123412341,
-    },
-  },
-  {
-    msg: {
-      _t: "text",
-      id: 12344,
-      sender: {
-        name: "lynz",
-        avatar:
-          "https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png",
-      },
-      time: new Date("2019-05-20 23:55:10"),
       forwardFrom: {
-        _t: "text",
-        id: 12345,
         sender: {
           name: "skuld",
-          avatar:
-            "https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png",
         },
-        time: new Date("2019-05-20 23:55:10"),
-        text: "hello",
       },
     },
   },
@@ -89,15 +98,10 @@ export const ChatMessages = [
       },
       time: new Date("2019-05-20 23:55:10"),
       text: "hello",
-      replyTo: {
-        _t: "file",
-        id: 12345,
+      forwardFrom: {
         sender: {
           name: "skuld",
         },
-        time: new Date("2019-05-20 23:55:10"),
-        filename: "testfile.txt",
-        caption: "hi",
       },
     },
   },
@@ -140,6 +144,11 @@ export const ChatMessages = [
       },
       time: new Date(),
       image: "https://img-blog.csdnimg.cn/20190813152642135.png",
+      forwardFrom: {
+        sender: {
+          name: "skuld",
+        },
+      },
     },
   },
   {
