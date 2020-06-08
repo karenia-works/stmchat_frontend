@@ -6,9 +6,7 @@
           <el-row>
             <el-col :span="4">
               <div>
-                <el-button
-                  class="set_title top_btn"
-                  type="text"
+                <el-button class="set_title top_btn" type="text"
                   >Settings</el-button
                 >
               </div>
@@ -218,7 +216,7 @@ export default {
 </script>
 
 <style lang="stylus">
-@import '../styles/colors.styl'
+@import '../styles/colors.styl';
 
 .el-header {
   text-align: center;
@@ -251,7 +249,6 @@ export default {
 
 .func_btn {
   color: colors.theme-light-grey;
-
 }
 
 .up_card {
@@ -325,7 +322,7 @@ export default {
 
 @media (prefers-color-scheme: dark) {
   .up_card {
-    background-color: colors.dark-light
+    background-color: colors.dark-light;
   }
 
   .down_card {

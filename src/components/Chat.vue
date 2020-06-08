@@ -69,7 +69,6 @@
                     v-if="data.msg.replyTo._t == 'image'"
                     :src="data.msg.replyTo.image"
                   ></el-image>
-
                   <div>
                     <div class="sendername">
                       {{ data.msg.replyTo.sender.name }}
@@ -96,13 +95,15 @@
               </div>
 
               <!-- message body -->
+              <!-- text message -->
               <div v-if="data.msg._t == 'text'" class="msg-text">
                 <span>{{ data.msg.text }}</span>
-                <span class="time info" type="info">
+                <span class="time info">
                   {{ data.msg.time | msgTime }}
                 </span>
               </div>
 
+              <!-- image message -->
               <div
                 v-else-if="data.msg._t == 'image'"
                 :class="{ 'image-only': !data.msg.caption }"
@@ -118,11 +119,35 @@
                 ></el-image>
                 <div class="msg-text" v-if="data.msg.caption">
                   <span>{{ data.msg.caption }}</span>
-                  <span class="time info" type="info">
+                  <span class="time info">
                     {{ data.msg.time | msgTime }}
                   </span>
                 </div>
                 <div v-else class="time">{{ data.msg.time | msgTime }}</div>
+              </div>
+
+              <!-- file message -->
+              <div v-else-if="data.msg._t == 'file'">
+                <div :href="data.msg.file" class="file">
+                  <div class="file-icon icon24">
+                    <i class="el-icon-document"></i>
+                  </div>
+                  <div>
+                    <div class="file-name">{{ data.msg.filename }}</div>
+                    <div class="info">{{ data.msg.size | fileSize }}</div>
+                  </div>
+                </div>
+
+                <div class="msg-text" v-if="data.msg.caption">
+                  <span>{{ data.msg.caption }}</span>
+                  <span class="time info">
+                    {{ data.msg.time | msgTime }}
+                  </span>
+                </div>
+
+                <span class="time1 info" v-else>
+                  {{ data.msg.time | msgTime }}
+                </span>
               </div>
             </template>
           </div>
@@ -156,30 +181,27 @@
   </div>
 </template>
 
-<script>
-// switch hotkey
-// send empty warning
-// online/offline
-
-//todo: quote
-//todo: style for file
+<script lang="ts">
 //todo: foward
 //todo: upload image/ file
 //todo: bottom-bar height
 //todo: desktop notifiction; notice sound
 
-//todo: color variable
-//todo: dark mode
-
 //todo: unread amount
 //todo: jump to message
+
+// switch hotkey
+// send empty warning
+// online/offline
+// quote
+//style for file
 
 import { WsMessageService } from "../services/websocket";
 import { ChatMessages } from "../assets/sample/wsSample";
 
-import vuescroll from "vuescroll/dist/vuescroll-native";
+import vuescroll from "vuescroll";
 import moment from "moment";
-import { serviceProvider, TYPES } from "../services/dependencyInjection.ts";
+import { serviceProvider, TYPES } from "../services/dependencyInjection";
 
 export default {
   components: {
@@ -227,12 +249,13 @@ export default {
       }
     },
     chatPosition() {
-      const { v, h } = this.$refs["chat-messages"].getScrollProcess();
+      let vs: any = this.$refs["chat-messages"];
+      const { v, h } = vs.getScrollProcess();
       // console.log(v);
       return v;
     },
-    jumpToMessage(id) {
-      let vs = this.$refs["chat-messages"];
+    jumpToMessage(id: number) {
+      let vs: any = this.$refs["chat-messages"];
       if (id < 0) {
         //jump to bottom
         vs.scrollTo({
@@ -240,13 +263,13 @@ export default {
         });
       }
     },
-    handleScroll(vertical) {
+    handleScroll(vertical: any) {
       let vp = vertical.process;
       if (vp < 1 && vp > this.messageProcess) this.showGoDown = true;
       else this.showGoDown = false;
       this.messageProcess = vp;
     },
-    enterInput(e) {
+    enterInput(e: any) {
       if (this.configs.hotKey == "enterSend") {
         if (e.keyCode == 13 && e.ctrlKey) {
           this.sendMessage += "\n";
@@ -264,7 +287,7 @@ export default {
   data() {
     return {
       messageProcess: 0,
-      showSender: false,
+      showSender: true,
       showAvatar: true,
       connector: null,
       showGoDown: false,
@@ -305,13 +328,24 @@ export default {
     };
   },
   filters: {
-    msgTime(time) {
+    msgTime(time: number) {
       let m = moment(time);
       if (m.isBefore(moment(), "year"))
         return moment(time).format("YYYY/M/D H:mm");
       else if (m.isBefore(moment(), "day"))
         return moment(time).format("M/D H:mm");
       else return moment(time).format("H:mm");
+    },
+    fileSize(size: number): string {
+      if (size < 1000) {
+        return size + " B";
+      } else if ((size /= 1024) < 1000) {
+        return size.toFixed(2) + " KiB";
+      } else if ((size /= 1024) < 1000) {
+        return size.toFixed(2) + " MiB";
+      } else {
+        return size.toFixed(2) + " GiB";
+      }
     },
   },
 };
@@ -472,6 +506,49 @@ $color-info-text = #909399;
   }
 }
 
+.msgbody.type-file {
+  padding: 7px 10px;
+
+  .bodytop {
+    margin-bottom: -6px;
+  }
+
+  .file {
+    display: flex;
+    margin-top: 11px;
+
+    .file-name {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      width: 180px;
+      margin-bottom: 5px;
+    }
+  }
+
+  .time1 {
+    float: right;
+    margin-top: -6px;
+  }
+
+  .msg-text {
+    margin-top: 6px;
+  }
+
+  .file-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 50px;
+    background-color: colors.theme-blue;
+    margin-right: 8px;
+
+    i {
+      position: relative;
+      left: 10px;
+    }
+  }
+}
+
 .quote {
   border-left: 3px colors.theme-blue solid;
   padding-left: 8px;
@@ -485,10 +562,6 @@ $color-info-text = #909399;
     border-radius: 3px;
     margin-right: 5px;
     opacity: 0.8;
-  }
-
-  .sendername {
-    margin: 0 0 3px !important;
   }
 
   .quote-text {

@@ -1,6 +1,37 @@
 export const ChatMessages = [
   {
     msg: {
+      _t: "file",
+      id: 12341,
+      sender: {
+        name: "skuld",
+        avatar:
+          "https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg",
+      },
+      time: new Date(),
+      file: "www.google.com",
+      filename: "dependencyInjection.tsdependencyInjection.ts",
+      caption: "here is a file",
+      size: 3058,
+    },
+  },
+  {
+    msg: {
+      _t: "file",
+      id: 12342,
+      sender: {
+        name: "skuld",
+        avatar:
+          "https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg",
+      },
+      time: new Date(),
+      file: "www.google.com",
+      filename: "google.html",
+      size: 123412341,
+    },
+  },
+  {
+    msg: {
       _t: "text",
       id: 12344,
       sender: {
