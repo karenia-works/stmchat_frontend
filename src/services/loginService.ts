@@ -1,4 +1,5 @@
 import Axios, { AxiosRequestConfig } from "axios";
+import { singleton } from "tsyringe";
 
 export function interceptAuthorizationData(
   token: string | undefined,
@@ -28,6 +29,7 @@ export class LoginState {
   }
 }
 
+@singleton()
 export class LoginService {
   state: LoginState = new LoginState();
 }
