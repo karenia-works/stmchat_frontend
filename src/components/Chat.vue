@@ -118,7 +118,7 @@
 
             <!-- file message -->
             <div v-else-if="data.msg._t == 'file'">
-              <div :href="data.msg.file" class="file">
+              <a :href="data.msg.file" class="file dark_main_text">
                 <div class="file-icon icon24">
                   <i class="el-icon-document"></i>
                 </div>
@@ -126,7 +126,7 @@
                   <div class="file-name">{{ data.msg.filename }}</div>
                   <div class="info">{{ data.msg.size | fileSize }}</div>
                 </div>
-              </div>
+              </a>
 
               <div class="msg-text" v-if="data.msg.caption">
                 <span>{{ data.msg.caption }}</span>
@@ -178,12 +178,12 @@
 //todo: unread amount
 //todo: jump to message
 
-// switch hotkey
-// send empty warning
-// online/offline
-// quote
-// style for file
-// foward
+//// switch hotkey
+//// send empty warning
+//// online/offline
+//// quote
+//// style for file
+//// foward
 
 // * 处理消息数据：格式和字段名；转发消息从对象中移出
 
@@ -333,9 +333,6 @@ export default {
 </script>
 
 <style lang="stylus">
-$color-highlight-text = #409EFF;
-$color-info-text = #909399;
-
 .chat-bottom-bar {
   .sendopt {
     width: 60px;
@@ -497,7 +494,9 @@ $color-info-text = #909399;
   .file {
     display: flex;
     margin-top: 11px;
+    text-decoration: none;
 
+    // color: colors.theme-black;
     .file-name {
       white-space: nowrap;
       overflow: hidden;
