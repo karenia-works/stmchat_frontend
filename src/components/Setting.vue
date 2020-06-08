@@ -6,7 +6,11 @@
           <el-row>
             <el-col :span="4">
               <div>
-                <el-button disabled="disabled" class="set_title top_btn" type="text">Settings</el-button>
+                <el-button
+                  class="set_title top_btn"
+                  type="text"
+                  >Settings</el-button
+                >
               </div>
             </el-col>
             <el-col :span="4" :offset="12">
@@ -16,18 +20,22 @@
                   v-on:click="edit_on"
                   class="func_btn top_btn"
                   type="text"
-                >Edit</el-button>
+                  >Edit</el-button
+                >
                 <el-button
                   v-show="editmode"
                   v-on:click="save_on"
                   class="func_btn top_btn"
                   type="text"
-                >Save</el-button>
+                  >Save</el-button
+                >
               </div>
             </el-col>
             <el-col :span="4">
               <div>
-                <el-button class="func_btn top_btn" type="text">Close</el-button>
+                <el-button class="func_btn top_btn" type="text"
+                  >Close</el-button
+                >
               </div>
             </el-col>
           </el-row>
@@ -39,15 +47,22 @@
             <el-col :span="6">
               <div class="ava_part">
                 <a href="https://sm.ms/image/Ym1yW5dCfaH2AnU" target="_blank">
-                  <img class="ava" src="https://i.loli.net/2020/06/05/Ym1yW5dCfaH2AnU.jpg" />
+                  <img
+                    class="ava"
+                    src="https://i.loli.net/2020/06/05/Ym1yW5dCfaH2AnU.jpg"
+                  />
                 </a>
               </div>
             </el-col>
             <el-col :span="12" :offset="2">
               <div class="name_part" type="justify" align="start">
-                <div v-show="!editmode" class="name">{{nickname}}</div>
+                <div v-show="!editmode" class="name">{{ nickname }}</div>
                 <div v-show="editmode" class="name">
-                  <el-input v-model="changename" placeholder="Nick name" style="height:35px"></el-input>
+                  <el-input
+                    v-model="changename"
+                    placeholder="Nick name"
+                    style="height:35px"
+                  ></el-input>
                 </div>
                 <div class="state">online</div>
               </div>
@@ -68,11 +83,11 @@
             </el-col>
             <el-col :span="12" :offset="2">
               <div class="name_part top_pad" type="justify" align="start">
-                <div class="content">{{phonenum}}</div>
+                <div class="content">{{ phonenum }}</div>
                 <div class="comment">phone number</div>
               </div>
               <div class="name_part top_pad" type="justify" align="start">
-                <div class="content">@{{username}}</div>
+                <div class="content">@{{ username }}</div>
                 <div class="comment">username</div>
               </div>
             </el-col>
@@ -90,22 +105,58 @@
             </el-col>
             <el-col :span="19" :offset="2">
               <div class="name_part" type="justify" align="start">
-                <el-row class="top_pad" type="flex" justify="space-between" align="middle">
+                <el-row
+                  class="top_pad"
+                  type="flex"
+                  justify="space-between"
+                  align="middle"
+                >
                   <div class="content">Desktop Notifications</div>
-                  <el-switch v-model="value1" active-color="#13ce66" inactive-color="#ff4949"></el-switch>
+                  <el-switch
+                    v-model="value1"
+                    active-color="#13ce66"
+                    inactive-color="#ff4949"
+                  ></el-switch>
                 </el-row>
-                <el-row class="top_pad" type="flex" justify="space-between" align="middle">
+                <el-row
+                  class="top_pad"
+                  type="flex"
+                  justify="space-between"
+                  align="middle"
+                >
                   <div class="content">Background Notifications</div>
-                  <el-switch v-model="value2" active-color="#13ce66" inactive-color="#ff4949"></el-switch>
+                  <el-switch
+                    v-model="value2"
+                    active-color="#13ce66"
+                    inactive-color="#ff4949"
+                  ></el-switch>
                 </el-row>
-                <el-row class="top_pad" type="flex" justify="space-between" align="middle">
+                <el-row
+                  class="top_pad"
+                  type="flex"
+                  justify="space-between"
+                  align="middle"
+                >
                   <div class="content">Message preview</div>
-                  <el-switch v-model="value3" active-color="#13ce66" inactive-color="#ff4949"></el-switch>
+                  <el-switch
+                    v-model="value3"
+                    active-color="#13ce66"
+                    inactive-color="#ff4949"
+                  ></el-switch>
                 </el-row>
                 <el-col>
-                  <el-row class="top_pad" type="flex" justify="space-between" align="middle">
+                  <el-row
+                    class="top_pad"
+                    type="flex"
+                    justify="space-between"
+                    align="middle"
+                  >
                     <div class="content">Sound</div>
-                    <el-switch v-model="value4" active-color="#13ce66" inactive-color="#ff4949"></el-switch>
+                    <el-switch
+                      v-model="value4"
+                      active-color="#13ce66"
+                      inactive-color="#ff4949"
+                    ></el-switch>
                   </el-row>
                   <div class="block">
                     <el-slider v-model="value_block"></el-slider>
@@ -128,8 +179,18 @@
             <el-col :span="19" :offset="2" align="start">
               <div class="content top_pad">Hot Key</div>
               <el-col :span="19" align="start">
-                <el-radio class = "radio_pad" v-model="radio" label="1"><strong>Enter</strong> - Send Message,<br /><strong> Shift + Enter</strong> - new line</el-radio>
-                <el-radio class = "radio_pad"  v-model="radio" label="2"><strong>Ctrl + Enter</strong> - Send Message,<br /><strong> Enter</strong> - new line</el-radio>
+                <el-radio class="radio_pad" v-model="radio" label="1">
+                  <strong>Enter</strong> - Send Message,
+                  <br />
+                  <strong>Shift + Enter</strong>
+                  - new line
+                </el-radio>
+                <el-radio class="radio_pad" v-model="radio" label="2">
+                  <strong>Ctrl + Enter</strong> - Send Message,
+                  <br />
+                  <strong>Enter</strong>
+                  - new line
+                </el-radio>
               </el-col>
             </el-col>
           </el-row>
@@ -156,7 +217,9 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
+<style lang="stylus">
+@import '../styles/colors.styl'
+
 .el-header {
   text-align: center;
 }
@@ -179,24 +242,20 @@ export default {
 }
 
 .set_title {
-  disabled = 'disabled';
-  color: white;
+  color: colors.theme-light-grey;
 }
 
 .set_title:hover {
-  color: white;
+  color: colors.theme-light-grey;
 }
 
 .func_btn {
-  color: #dde8f1;
+  color: colors.theme-light-grey;
 
-  :hover {
-    color: white;
-  }
 }
 
 .up_card {
-  background-color: #409EFF;
+  background-color: colors.theme-blue;
   border-bottom-left-radius: 0px;
   border-bottom-right-radius: 0px;
 }
@@ -251,7 +310,7 @@ export default {
 
 .comment {
   padding-top: 10px;
-  font-size: 15px;  
+  font-size: 15px;
 }
 
 .name {
@@ -266,23 +325,23 @@ export default {
 
 @media (prefers-color-scheme: dark) {
   .up_card {
-    background-color: #606266;
+    background-color: colors.dark-light
   }
 
   .down_card {
-    background-color: #303133;
+    background-color: colors.dark-deep;
 
     .comment {
-      color: #909399;
+      color: colors.dark-sub-text;
     }
 
     .content {
-      color: #E4E7ED;
+      color: colors.dark-main-text;
     }
   }
 
   .icon_part {
-    color: #E4E7ED;
+    color: colors.dark-main-text;
   }
 }
 </style>

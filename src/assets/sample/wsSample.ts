@@ -23,7 +23,7 @@ export const ChatMessages = [
       },
       time: new Date("2019-05-20 23:55:10"),
       image:
-        "https://lh3.googleusercontent.com/proxy/MhGU06fbVup0doKzBHLnGCaiL8pVDl1VYCkJwsT0ZdMMGs-VaicoHPACWjRZFBhMew30OkIE5DaBWAGJO-9Iva3uYO2k3rxXPGNwRhEZ5WeNNJQxPXltSHrZCEYm5CkFpzGYu8dV",
+        "https://img11.360buyimg.com/n1/jfs/t14497/67/1017638125/136874/65c4ecc3/5a422c37N1b36f52c.jpg",
       caption: "gugugu",
     },
   },

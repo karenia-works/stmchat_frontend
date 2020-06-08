@@ -1,6 +1,8 @@
 <template>
   <el-container style="padding:10px;height: 755px; border: 1px solid #eee">
-    <el-header class="dark_light_bg dark_main_text">STM-Chat---STM for Lighter Communication</el-header>
+    <el-header class="dark_light_bg dark_main_text"
+      >STM-Chat---STM for Lighter Communication</el-header
+    >
     <el-main class="dark_deep_bg">
       <el-row>
         <el-col :span="6">
@@ -8,7 +10,7 @@
         </el-col>
         <el-col :span="12">
           <div>
-            <el-card class="dark_midium_bg">
+            <el-card class="dark_medium_bg">
               <div slot="header">
                 <el-steps
                   :active="active"
@@ -26,7 +28,8 @@
                   style="float:right"
                   v-on:click="ToLogin"
                   class="dark_main_text"
-                >已有账户？直接登录</el-link>
+                  >已有账户？直接登录</el-link
+                >
               </div>
               <el-row v-show="active0">
                 <el-col :span="5">
@@ -59,7 +62,8 @@
                     style="margin-top: 12px;"
                     v-on:click="next"
                     class="dark_light_bg dark_main_text"
-                  >下一步</el-button>
+                    >下一步</el-button
+                  >
                 </el-col>
                 <el-col :span="5">
                   <div class="grid-content"></div>
@@ -87,7 +91,8 @@
                     style="margin-top: 12px;"
                     v-on:click="next"
                     class="dark_light_bg dark_main_text"
-                  >下一步</el-button>
+                    >下一步</el-button
+                  >
                 </el-col>
                 <el-col :span="5">
                   <div class="grid-content"></div>
@@ -107,7 +112,8 @@
                     style="margin-top: 12px;"
                     v-on:click="next"
                     class="dark_light_bg dark_main_text"
-                  >下一步</el-button>
+                    >下一步</el-button
+                  >
                 </el-col>
                 <el-col :span="4">
                   <div class="grid-content"></div>
@@ -197,15 +203,15 @@ export default {
 
 <style lang="stylus" scoped>
 .el-header, .el-footer {
-  background-color: #5edaa2;
-  color: #333;
+  background-color: colors.theme-green;
+  color: colors.theme-black;
   text-align: left;
   line-height: 60px;
 }
 
 .el-main {
-  background-color: #a9f1e8;
-  color: #333;
+  background-color: colors.theme-light-green;
+  color: colors.theme-black;
   text-align: center;
   line-height: 70px;
 }
@@ -233,25 +239,25 @@ export default {
 
 @media (prefers-color-scheme: dark) {
   .dark_light_bg {
-    background-color: #606266;
-    border-color: #44474E;
+    background-color: colors.dark-light;
+    border-color: colors.dark-medium;
   }
 
-  .dark_midium_bg {
-    background-color: #44474E;
-    border-color: #606266;
+  .dark_medium_bg {
+    background-color: colors.dark-medium;
+    border-color: colors.dark-light;
   }
 
   .dark_deep_bg {
-    background-color: #303133;
+    background-color: colors.dark-deep;
   }
 
   .dark_sub_text {
-    color: #909399;
+    color: colors.dark-sub-text;
   }
 
   .dark_main_text {
-    color: #E4E7ED;
+    color: colors.dark-main-text;
   }
 }
 </style>

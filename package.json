@@ -8,9 +8,7 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
-    "@abraham/reflection": "^0.7.0",
-    "@types/inversify": "^2.0.33",
-    "@types/reflect-metadata": "^0.1.0",
+    "app-root-path": "^3.0.0",
     "axios": "^0.19.2",
     "core-js": "^3.6.5",
     "element-ui": "^2.4.5",

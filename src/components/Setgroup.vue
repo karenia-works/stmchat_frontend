@@ -1,5 +1,5 @@
 <template>
-  <el-card class="sgp-card dark_midium_bg">
+  <el-card class="sgp-card dark_medium_bg">
     <el-container>
       <el-main height="600px">
         <el-container>
@@ -58,8 +58,8 @@ export default Vue.extend({
   border-style: solid
   border-radius: 1px
   border-width: 1px
-  border-color: #333
-  background-color: #333
+  border-color: colors.theme-black
+  background-color: colors.theme-black
 }
 
 .item {
@@ -68,7 +68,7 @@ export default Vue.extend({
 
 .el-footer {
   text-align: center
-  color: #409eff
+  color: colors.theme-blue
 }
 
 .el-header {
@@ -87,7 +87,7 @@ export default Vue.extend({
 
 .text {
   font-size: 15px
-  color: #303133
+  color: colors.dark-deep
 }
 
 .el-aside {
@@ -97,25 +97,25 @@ export default Vue.extend({
 
 @media (prefers-color-scheme: dark) {
   .dark_light_bg {
-    background-color: #606266
-    border-color: #44474E
+    background-color: colors.dark-light
+    border-color: colors.dark-medium
   }
 
-  .dark_midium_bg {
-    background-color: #44474E
-    border-color: #606266
+  .dark_medium_bg {
+    background-color: colors.dark-medium
+    border-color: colors.dark-light
   }
 
   .dark_deep_bg {
-    background-color: #303133
+    background-color: colors.dark-deep
   }
 
   .dark_sub_text {
-    color: #909399
+    color: colors.dark-sub-text
   }
 
   .dark_main_text {
-    color: #E4E7ED
+    color: colors.dark-main-text
   }
 
   .dark_hr {
