@@ -10,7 +10,7 @@ import { LoginService } from "./loginService";
 import { serverConfig, IServerConfig } from "./serverConfig";
 import { ChatMessageService } from "./messageService";
 
-export const TYPES = {
+export var TYPES = {
   WebsocketService: "websocket_service",
   UserProfilePool: "user_profile_pool",
   GroupProfilePool: "group_profile_pool",
@@ -22,24 +22,43 @@ export const TYPES = {
 };
 
 export const serviceProvider = container;
+
 container.register<IServerConfig>(TYPES.ServerConfig, {
   useValue: serverConfig,
+});
+container.register<WsMessageService>(TYPES.WebsocketService, {
+  useToken: WsMessageService,
 });
 container.register<WsMessageService>(WsMessageService, {
   useClass: WsMessageService,
 });
+container.register<UserProfilePool>(TYPES.UserProfilePool, {
+  useToken: UserProfilePool,
+});
 container.register<UserProfilePool>(UserProfilePool, {
   useClass: UserProfilePool,
+});
+container.register<GroupProfilePool>(TYPES.GroupProfilePool, {
+  useToken: GroupProfilePool,
 });
 container.register<GroupProfilePool>(GroupProfilePool, {
   useClass: GroupProfilePool,
 });
-container.register<ProfilePool<GroupProfile>>(GroupProfilePool, {
-  useToken: GroupProfilePool,
-});
+// container.register<ProfilePool<GroupProfile>>(GroupProfilePool, {
+//   useToken: GroupProfilePool,
+// });
+// container.register<ProfilePool<GroupProfile>>(GroupProfilePool, {
+//   useToken: GroupProfilePool,
+// });
 container.register<LoginService>(LoginService, { useClass: LoginService });
+container.register<LoginService>(TYPES.LoginService, {
+  useToken: LoginService,
+});
 container.register<ChatMessageService>(ChatMessageService, {
   useClass: ChatMessageService,
+});
+container.register<ChatMessageService>(TYPES.ChatMessageService, {
+  useToken: ChatMessageService,
 });
 
 // (function() {
