@@ -8,9 +8,10 @@ import {
 import { UserProfile, GroupProfile } from "@/types/types";
 import { LoginService } from "./loginService";
 import { serverConfig, IServerConfig } from "./serverConfig";
-import { ChatMessageService } from "./messageService";
+import { ChatMessageService, MessageListService } from "./messageService";
 
-export var TYPES = {
+// webpack-include
+var TYPES = {
   WebsocketService: "websocket_service",
   UserProfilePool: "user_profile_pool",
   GroupProfilePool: "group_profile_pool",
@@ -19,9 +20,13 @@ export var TYPES = {
   LoginService: "login_service",
   ServerConfig: "server_config",
   ChatMessageService: "chat_message_service",
+  MessageListService: "message_list_service",
+  types: "types",
 };
 
-export const serviceProvider = container;
+const serviceProvider = container;
+
+export { TYPES, serviceProvider };
 
 container.register<IServerConfig>(TYPES.ServerConfig, {
   useValue: serverConfig,
@@ -44,6 +49,7 @@ container.register<GroupProfilePool>(TYPES.GroupProfilePool, {
 container.register<GroupProfilePool>(GroupProfilePool, {
   useClass: GroupProfilePool,
 });
+container.register(TYPES.types, { useValue: TYPES });
 // container.register<ProfilePool<GroupProfile>>(GroupProfilePool, {
 //   useToken: GroupProfilePool,
 // });
@@ -60,35 +66,9 @@ container.register<ChatMessageService>(ChatMessageService, {
 container.register<ChatMessageService>(TYPES.ChatMessageService, {
   useToken: ChatMessageService,
 });
-
-// (function() {
-//   serviceProvider
-//     .bind<IServerConfig>(TYPES.ServerConfig)
-//     .toConstantValue(serverConfig);
-
-//   serviceProvider
-//     .bind<WsMessageService>(TYPES.WebsocketService)
-//     .to(WsMessageService);
-
-//   serviceProvider
-//     .bind<UserProfilePool>(TYPES.UserProfilePool)
-//     .to(UserProfilePool);
-
-//   serviceProvider
-//     .bind<ProfilePool<UserProfile>>(TYPES.UserProfilePoolInterface)
-//     .toService(TYPES.UserProfilePool);
-
-//   serviceProvider
-//     .bind<GroupProfilePool>(TYPES.GroupProfilePool)
-//     .to(GroupProfilePool);
-
-//   serviceProvider
-//     .bind<ProfilePool<GroupProfile>>(TYPES.GroupProfilePoolInterface)
-//     .toService(TYPES.GroupProfilePool);
-
-//   serviceProvider.bind<LoginService>(TYPES.LoginService).to(LoginService);
-
-//   serviceProvider
-//     .bind<ChatMessageService>(TYPES.ChatMessageService)
-//     .to(ChatMessageService);
-// })();
+container.register<MessageListService>(MessageListService, {
+  useClass: MessageListService,
+});
+container.register<MessageListService>(TYPES.MessageListService, {
+  useToken: MessageListService,
+});

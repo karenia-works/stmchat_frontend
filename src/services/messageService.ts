@@ -1,12 +1,19 @@
 import { Subject, BehaviorSubject, Observable } from "rxjs";
-import { ServerChatMessage, ServerChatMsg } from "@/types/types";
+import {
+  ServerChatMessage,
+  ServerChatMsg,
+  ServerUnreadCountMessage,
+  GroupProfile,
+} from "@/types/types";
 import { WsMessageService } from "./websocket";
 import { TYPES } from "./dependencyInjection";
 import { singleton } from "tsyringe";
+import moment from "moment";
+import { GroupProfilePool } from "./cachingService";
 
 @singleton()
 export class ChatMessageService {
-  public constructor(private wss: WsMessageService) {
+  public constructor(wss: WsMessageService) {
     var chatSubject = wss.chatMessageSubject;
     chatSubject.subscribe({
       next: this.onNextMessage,
@@ -50,5 +57,83 @@ export class ChatMessageService {
     this.createOrModifyMsgList(chatId, arr => {
       arr.splice(0, 0, ...messages);
     });
+  }
+}
+
+export interface MessageListItem {
+  chat: GroupProfile;
+  latestMessage: ServerChatMsg | undefined;
+  lastTimestamp: number;
+  unreadCount: number;
+}
+
+@singleton()
+export class MessageListService {
+  public constructor(
+    wss: WsMessageService,
+    private groupProfileService: GroupProfilePool,
+  ) {
+    wss.chatMessageSubject.subscribe({ next: this.onNewChatMessage });
+    wss.unreadMessageCount.subscribe({ next: this.onNewUnreadCountUpdate });
+  }
+
+  private _messageList = new Map<string, MessageListItem>();
+
+  public get messageList(): MessageListItem[] {
+    return [...this._messageList.values()].sort((a, b) => {
+      return a.lastTimestamp - b.lastTimestamp;
+    });
+  }
+
+  private async onNewChatMessage(msg: ServerChatMessage) {
+    let item = this._messageList.get(msg.chatId);
+    if (item === undefined) {
+      let chatProfile = await this.groupProfileService.getData(msg.chatId);
+      if (chatProfile === undefined) {
+        throw new Error("Cannot find chat profile!");
+      }
+      this._messageList.set(msg.chatId, {
+        chat: chatProfile,
+        latestMessage: msg.msg,
+        lastTimestamp: moment(msg.msg.time).unix(),
+        unreadCount: 0,
+      });
+    } else {
+      let time = moment(msg.msg.time).unix();
+      if (time > item.lastTimestamp) {
+        item.latestMessage = msg.msg;
+        item.lastTimestamp = time;
+        item.unreadCount += 1;
+      }
+    }
+  }
+
+  public setUnreadCount(id: string, count: number) {
+    let item = this._messageList.get(id);
+    if (item === undefined) {
+      throw new Error(`ChatID does not exist: ${id}`);
+    } else {
+      item.unreadCount = count;
+    }
+  }
+
+  private async onNewUnreadCountUpdate(msg: ServerUnreadCountMessage) {
+    for (let [id, unreadProp] of msg.items) {
+      let item = this._messageList.get(id);
+      if (item === undefined) {
+        let chatProfile = await this.groupProfileService.getData(msg.chatId);
+        if (chatProfile === undefined) {
+          throw new Error("Cannot find chat profile!");
+        }
+        this._messageList.set(msg.chatId, {
+          chat: chatProfile,
+          latestMessage: undefined,
+          lastTimestamp: moment().unix(),
+          unreadCount: unreadProp.count,
+        });
+      } else {
+        item.unreadCount = unreadProp.count;
+      }
+    }
   }
 }
