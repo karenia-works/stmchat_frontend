@@ -1,55 +1,64 @@
 <template>
-  <el-container class="container">
-    <el-header class="dark_light_bg dark_main_text">STM-Chat---STM for Lighter Communication</el-header>
-    <el-main class="dark_deep_bg">
-    <el-row type="flex" justify="center">
-        <el-col :span="6"><div>
-            <Setting v-show="showSetting" v-on:closed="closed" v-on:saved="saved"></Setting>
-            <ChatList v-show="showChatList" v-on:chatListCommand="chatListCommand($event)"></ChatList>
-            <Contacts v-show="showContacts" v-on:contactClose="contactClose"></Contacts>
-            <Addmember v-show="showMember" v-on:create="create" v-on:cancel="cancel"></Addmember>
-        </div></el-col>
-        <el-col :span="12"><div><Chat></Chat></div></el-col>
-    </el-row>
+  <el-container class="home-container">
+    <el-header class="home-header dark_light_bg dark_main_text">
+      STM-Chat---STM for Lighter Communication</el-header
+    >
+    <el-main class="home-main dark_deep_bg">
+      <el-row class="home-row" type="flex" justify="center">
+        <el-col :span="6" class="home-col"
+          ><div>
+            <Setting
+              v-show="showSetting"
+              v-on:closed="closed"
+              v-on:saved="saved"
+            >
+            </Setting>
+            <ChatList
+              v-show="showChatList"
+              v-on:chatListCommand="chatListCommand($event)"
+            >
+            </ChatList>
+            <Contacts v-show="showContacts" v-on:contactClose="contactClose">
+            </Contacts>
+            <Addmember
+              v-show="showMember"
+              v-on:create="create"
+              v-on:cancel="cancel"
+            >
+            </Addmember></div
+        ></el-col>
+        <el-col :span="12" class="home-col"
+          ><div>
+            <Chat></Chat></div
+        ></el-col>
+      </el-row>
     </el-main>
   </el-container>
 </template>
 
 <style lang="stylus" scoped>
-.el-header, .el-footer {
+.home-header {
   background-color: #5edaa2;
   color: #333;
   text-align: left;
   line-height: 60px;
 }
-.container{
+.home-container {
   height: 755px;
   border: 1px solid #eee;
 }
-.el-main {
+.home-main {
   background-color: #a9f1e8;
   color: #333;
   text-align: center;
-  line-height: 70px;
 }
-
-.box-card {
-  align: center;
-}
-
-.el-row {
+.home-row {
   &:last-child {
     margin-bottom: 0;
   }
 }
-
-.el-col {
+.home-col {
   border-radius: 4px;
-}
-
-.grid-content {
-  border-radius: 4px;
-  min-height: 36px;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -86,64 +95,65 @@ import Addmember from "@/components/Addmember.vue";
 
 export default {
   components: {
-    'Setting': Setting,
-    'ChatList': ChatList,
-    'Chat': Chat,
-    'Contacts': Contacts,
-    'Addmember': Addmember,
+    Setting: Setting,
+    ChatList: ChatList,
+    Chat: Chat,
+    Contacts: Contacts,
+    Addmember: Addmember,
   },
   methods: {
-    create(){
-        this.showMember=false;
-        this.showChatList=true;
-        this.$message({
-          message: 'Group Created',
-          type: 'success'
-        });
+    create() {
+      this.showMember = false;
+      this.showChatList = true;
+      this.$message({
+        message: "群聊创建成功",
+        type: "success",
+      });
     },
-    cancel(){
-        this.showMember=false;
-        this.showChatList=true;
+    cancel() {
+      this.showMember = false;
+      this.showChatList = true;
     },
-    contactClose(){
-        this.showContacts=false;
-        this.showChatList=true;
+    contactClose() {
+      this.showContacts = false;
+      this.showChatList = true;
     },
     closed() {
       this.showSetting = false;
-      this.showChatList=true;
+      this.showChatList = true;
     },
-    saved(){
-        this.$message({
-          message: 'Settings Updated',
-          type: 'success'
-        });
+    saved() {
+      this.$message({
+        message: "个人设置更新成功",
+        type: "success",
+      });
     },
-    chatListCommand(arg){
-        if(arg=='a'){
-        this.$prompt('Group Name', 'Create a Group', {
-          confirmButtonText: 'Next',
-          cancelButtonText: 'Cancel',
-        }).then(({ value }) => {
-          this.$message('Add Group Members');
-          this.showChatList=false;
-          this.showMember=true;
-        }).catch(() => {
-            this.showChatList=true;
-            this.showMember=false;
-        });
-        
-        }else if(arg=='b'){
-            this.showChatList=false;
-            this.showContacts=true;
-        }else if(arg=='c'){
-            this.showChatList=false;
-            this.showSetting=true;
-        }
+    chatListCommand(arg) {
+      if (arg == "a") {
+        this.$prompt("输入群组名称", "新建群聊", {
+          confirmButtonText: "下一步",
+          cancelButtonText: "取消",
+        })
+          .then(({ value }) => {
+            this.$message("为" + value + "添加成员");
+            this.showChatList = false;
+            this.showMember = true;
+          })
+          .catch(() => {
+            this.showChatList = true;
+            this.showMember = false;
+          });
+      } else if (arg == "b") {
+        this.showChatList = false;
+        this.showContacts = true;
+      } else if (arg == "c") {
+        this.showChatList = false;
+        this.showSetting = true;
+      }
     },
   },
   data() {
-      return {
+    return {
       showChatList: true,
       showSetting: false,
       showContacts: false,

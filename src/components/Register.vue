@@ -1,5 +1,5 @@
 <template>
-  <el-container style="padding:10px;height: 755px; border: 1px solid #eee">
+  <el-container style="padding: 10px; height: 755px; border: 1px solid #eee;">
     <el-header class="dark_light_bg dark_main_text"
       >STM-Chat---STM for Lighter Communication</el-header
     >
@@ -14,7 +14,7 @@
               Welcome to STM-Chat
               <el-link
                 :underline="false"
-                style="float:right"
+                style="float: right;"
                 v-on:click="ToLogin"
                 class="dark_main_text"
                 >已有账户？即刻登录</el-link
@@ -132,7 +132,7 @@ export default {
         alert("基本信息不得为空");
       } else {
         let data = { username: this.userName, password: this.userPasswd };
-        this.$http.post("", data).then(res => {
+        this.$http.post("", data).then((res) => {
           console.log(res);
           if (res.data == "ok") {
             //
