@@ -24,10 +24,10 @@
               <el-col :span="5">
                 <div class="grid-content"></div>
               </el-col>
-              <el-col :span="12">
+              <el-col :span="15">
                 <div class="demo-input-suffix">
                   <el-input
-                    placeholder="用户ID/手机号"
+                    placeholder="用户名"
                     prefix-icon="el-icon-user-solid"
                     clearable
                     v-model="userID"
@@ -54,7 +54,7 @@
             </el-row>
           </el-card>
         </el-col>
-        <el-col :span="6">
+        <el-col :span="3">
           <div class="grid-content"></div>
         </el-col>
       </el-row>
@@ -78,6 +78,7 @@
 }
 
 .box-card {
+  width: 700px;
   align: center;
 }
 
