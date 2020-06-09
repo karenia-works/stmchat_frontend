@@ -31,7 +31,10 @@
             </el-col>
             <el-col :span="4">
               <div>
-                <el-button class="func_btn top_btn" type="text"
+                <el-button
+                  class="func_btn top_btn"
+                  type="text"
+                  v-on:click="closeWindow"
                   >Close</el-button
                 >
               </div>
@@ -111,7 +114,8 @@
                 >
                   <div class="content">Desktop Notifications</div>
                   <el-switch
-                    v-model="value1"
+                    v-model="valueDesktopNotifications"
+                    @change="changeDesktopNotifications"
                     active-color="#13ce66"
                     inactive-color="#ff4949"
                   ></el-switch>
@@ -124,7 +128,8 @@
                 >
                   <div class="content">Background Notifications</div>
                   <el-switch
-                    v-model="value2"
+                    v-model="valueBackgroundNotifications"
+                    @change="changeBackgroundNotifications"
                     active-color="#13ce66"
                     inactive-color="#ff4949"
                   ></el-switch>
@@ -137,7 +142,8 @@
                 >
                   <div class="content">Message preview</div>
                   <el-switch
-                    v-model="value3"
+                    v-model="valueMessagepreview"
+                    @change="changeMessagepreview"
                     active-color="#13ce66"
                     inactive-color="#ff4949"
                   ></el-switch>
@@ -151,13 +157,17 @@
                   >
                     <div class="content">Sound</div>
                     <el-switch
-                      v-model="value4"
+                      v-model="valueSound"
+                      @change="changeSound"
                       active-color="#13ce66"
                       inactive-color="#ff4949"
                     ></el-switch>
                   </el-row>
                   <div class="block">
-                    <el-slider v-model="value_block"></el-slider>
+                    <el-slider
+                      v-model="soundDegree"
+                      @change="changeSoundDegree"
+                    ></el-slider>
                   </div>
                 </el-col>
               </div>
@@ -177,13 +187,23 @@
             <el-col :span="19" :offset="2" align="start">
               <div class="content top_pad">Hot Key</div>
               <el-col :span="19" align="start">
-                <el-radio class="radio_pad" v-model="radio" label="1">
+                <el-radio
+                  class="radio_pad"
+                  v-model="radio"
+                  @change="changeToRadio1"
+                  label="1"
+                >
                   <strong>Enter</strong> - Send Message,
                   <br />
                   <strong>Shift + Enter</strong>
                   - new line
                 </el-radio>
-                <el-radio class="radio_pad" v-model="radio" label="2">
+                <el-radio
+                  class="radio_pad"
+                  v-model="radio"
+                  @change="changeToRadio2"
+                  label="2"
+                >
                   <strong>Ctrl + Enter</strong> - Send Message,
                   <br />
                   <strong>Enter</strong>
@@ -198,7 +218,9 @@
           <!-- 登出 -->
 
           <div>
-            <el-button class="top_btn" type="text">Log Out</el-button>
+            <el-button class="top_btn" type="text" v-on:click="logOut"
+              >Log Out</el-button
+            >
           </div>
 
           <!-- main结束 -->
@@ -352,17 +374,23 @@ export default {
       phonenum: "+86 13918128942",
       username: "skuld_yi",
       editmode: false,
-      value1: true,
-      value2: true,
-      value3: true,
-      value4: true,
+      valueDesktopNotifications: true,
+      valueBackgroundNotifications: true,
+      valueMessagepreview: true,
+      valueSound: true,
       radio: "1",
-      value_block: 50,
+      soundDegree: 50,
     };
   },
   methods: {
     formatTooltip(val) {
       return val / 100;
+    },
+    closeWindow() {
+      this.$emit("closed");
+    },
+    LogOut() {
+      this.$router.push({ path: "Login" });
     },
     edit_on() {
       this.changename = this.nickname;
@@ -372,10 +400,42 @@ export default {
       if (this.changename == "") {
         alert("昵称不能为空！");
         this.editmode = false;
+      }
+      else if (this.changename == this.nickname) {
+        alert("昵称不能与之前昵称相同！");
+        this.editmode = false;
       } else {
         this.nickname = this.changename;
+        alert('Nickname successfully changed to "' + this.changename + '"');
         this.editmode = false;
+        this.$emit("saved");
       }
+    },
+    changeDesktopNotifications() {
+      alert(
+        "Desktop Notifications changes to " + this.valueDesktopNotifications,
+      );
+    },
+    changeBackgroundNotifications() {
+      alert(
+        "Background Notifications changes to " +
+          this.valueBackgroundNotifications,
+      );
+    },
+    changeMessagepreview() {
+      alert("Message preview changes to " + this.valueMessagepreview);
+    },
+    changeSound() {
+      alert("Sound changes to " + this.valueSound);
+    },
+    changeSoundDegree() {
+      alert("Sound Degree changes to " + this.soundDegree);
+    },
+    changeToRadio1() {
+      alert("Enter changes to send message");
+    },
+    changeToRadio2() {
+      alert("Enter changes to start new line");
     },
   },
 };
