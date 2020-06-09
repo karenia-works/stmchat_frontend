@@ -25,6 +25,12 @@
               <div class="multi_num">{{ checkedNumber }}</div>
             </div></el-button
           >
+          <el-button class="multi_delete" @click="forwardMulti"
+            ><div class="multi_button">
+              转发
+              <div class="multi_num">{{ checkedNumber }}</div>
+            </div></el-button
+          >
           <el-button class="multi_cancel" type="text" @click="CancelMulti"
             >取消</el-button
           >
@@ -320,6 +326,13 @@ export default {
     },
     openMulti() {
       this.MultiOn = !this.MultiOn;
+      this.checkedNumber = 0;
+    },
+    forwardMulti() {
+      if (this.MultiOn && this.checkedNumber != 0) {
+        alert("Undone");
+      }
+      this.MultiOn = false;
       this.checkedNumber = 0;
     },
     deleteMulti() {
