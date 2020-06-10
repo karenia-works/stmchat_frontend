@@ -3,23 +3,28 @@
         <el-container>
             <el-aside
                     width="300px"
-                    class="dark_medium_bg "
+
+                    class="dark_medium_bg demo-input-suffix"
+                    style="overflow-x: hidden; overflow-y: hidden"
             >
+              <vueScroll @handle-scroll="handleScroll">
+                <div class="search"  @click="openSearch">
                 <el-input
                         v-model="input"
                         placeholder="search"
                         class="dark_eee_bg"
+                        v-if="!searchShow"
                 >
                     <el-dropdown
                             slot="prepend"
                             @command="handleCommand"
                     >
-            <span class="el-dropdown-link">
+                    <span class="el-dropdown-link">
               <i
-                      class="dark_main_text el-icon-s-unfold el-icon--center el-icon-size"
+                      class="dark_main_text el-icon-s-unfold el-icon--center
+                      el-icon-size el-icon-backgroud"
               ></i>
             </span>
-
                         <el-dropdown-menu
                                 slot="dropdown"
                                 class="dark_medium_bg"
@@ -29,11 +34,11 @@
                                 New group
                             </el-dropdown-item>
                             <el-dropdown-item command="b" class="dark_main_text">
-                                <i  class="el-icon-s-custom el-icon-size"></i>
+                                <i class="el-icon-s-custom el-icon-size"></i>
                                 Contacts
                             </el-dropdown-item>
                             <el-dropdown-item command="c" class="dark_main_text">
-                                <i  class="el-icon-setting el-icon-size"></i>
+                                <i class="el-icon-setting el-icon-size"></i>
                                 Settings
                             </el-dropdown-item>
                             <el-dropdown-item command="d" class="dark_main_text">
@@ -48,54 +53,112 @@
                     </el-dropdown>
                 </el-input>
 
-                <!-- <el-card class="box-card " style="margin-left: 0px"> -->
-                <div
-                        v-for="(o, index) in tableData"
-                        v-bind:key="o"
-                        @click="handleclick(index), (o.unread = 0)"
-                        :class="active == index ? 'addclass' : ''"
-                        class="dark_main_text dark_deep_bg"
-                >
-                    <!-- <el-card body-style="{ padding: '0' }" style="height:100px"> -->
-                    <el-row type="flex" style="height:65px" align="middle">
-                        <el-col span="6" offset="2">
-                            <img
-                                    :src="o.head_pic"
-                                    class="round_icon img_size"
-                            />
-                        </el-col>
-                        <el-col span="12">
-                            <div  class="name_size">
-                                <span>{{ o.name }}</span>
-                            </div>
-                            <div
-                                    class="bottom clearfix margin-bottom:5px"
-                                    style="font-size:12px;color: dimgray"
-                            >
-                                <!-- <div >{{o.chat| ellipsis}}</div>-->
-                                <template>
-                                    <span class="dark_sub_text">{{ o.chat | ellipsis }}</span>
-                                </template>
-                            </div>
-                        </el-col>
-                        <el-col span="5">
-                            <div style="height:50px;font-size:12px;color:dimgray;">
-                                <div class="dark_sub_text">{{ o.time }}</div>
-                                <el-badge
-                                        :value="o.unread"
-                                        class="item"
-                                        style="margin-top:15px ;padding-left:10px;"
-                                        v-show="o.unread > 0"
-                                ></el-badge>
-                            </div>
-                        </el-col>
-                    </el-row>
-                    <!-- </el-card> -->
+                <!-- 搜索-->
                 </div>
+                <!-- <el-card class="box-card " style="margin-left: 0px">  v-on:input="inputChange"-->
+                <div class="search-header" v-if="searchShow">
+                    <el-input name="input" class="keyword"  v-model="searchWord" v-on:input="inputChange"
+                    >
+                        <el-button slot="append" icon="el-icon-error" style="font-size:18px" @click="closeSearch"></el-button>
+                    </el-input>
+                </div>
+
+                    <div
+                            v-for="(o, index) in sortableData"
+                            v-bind:key="o"
+                            @click="handleclick(index), (o.unread = 0)"
+                            :class="active == index ? 'addclass' : ''"
+                            class="dark_main_text dark_deep_bg"
+                            v-show="chatShow"
+                    >
+                        <!-- <el-card body-style="{ padding: '0' }" style="height:100px"> -->
+                        <el-row type="flex" style="height:65px" align="middle">
+                            <el-col span="6" offset="2">
+                                <img
+                                        :src="o.head_pic"
+                                        class="round_icon img_size"
+                                />
+                            </el-col>
+                            <el-col span="12">
+                                <div class="name_size">
+                                    <span>{{ o.name }}</span>
+                                </div>
+                                <div
+                                        class="bottom clearfix margin-bottom:5px"
+                                        style="font-size:12px;color: dimgray"
+                                >
+                                    <!-- <div >{{o.chat| ellipsis}}</div>-->
+                                    <template>
+                                    <span class="dark_sub_text" v-html="$options.filters.ellipsis(o.chat)">
+                                    </span>
+
+                                    </template>
+                                </div>
+                            </el-col>
+                            <el-col span="5">
+                                <div style="height:50px;font-size:12px;color:dimgray;">
+                                    <div class="dark_sub_text">{{ o.time }}</div>
+                                    <el-badge
+                                            :value="o.unread"
+                                            class="item"
+                                            style="margin-top:15px ;padding-left:10px;"
+                                            v-show="o.unread > 0"
+                                    ></el-badge>
+                                </div>
+                            </el-col>
+                        </el-row>
+                        <!-- </el-card> -->
+                    </div>
+                  <div
+                          v-for="(o, index) in selectableData"
+                          v-bind:key="o"
+                          @click="handleclick(index), (o.unread = 0)"
+                          :class="active == index ? 'addclass' : ''"
+                          class="dark_main_text dark_deep_bg"
+                          v-show="selectShow"
+                  >
+                      <!-- <el-card body-style="{ padding: '0' }" style="height:100px"> -->
+                      <el-row type="flex" style="height:65px" align="middle">
+                          <el-col span="6" offset="2">
+                              <img
+                                      :src="o.head_pic"
+                                      class="round_icon img_size"
+                              />
+                          </el-col>
+                          <el-col span="12">
+                              <div class="name_size">
+                                  <span>{{ o.name }}</span>
+                              </div>
+                              <div
+                                      class="bottom clearfix margin-bottom:5px"
+                                      style="font-size:12px;color: dimgray"
+                              >
+                                  <!-- <div >{{o.chat| ellipsis}}</div>-->
+                                  <template>
+                                    <span class="dark_sub_text" v-html="$options.filters.ellipsis(o.chat)">
+                                    </span>
+
+                                  </template>
+                              </div>
+                          </el-col>
+                          <el-col span="5">
+                              <div style="height:50px;font-size:12px;color:dimgray;">
+                                  <div class="dark_sub_text">{{ o.time }}</div>
+                                  <el-badge
+                                          :value="o.unread"
+                                          class="item"
+                                          style="margin-top:15px ;padding-left:10px;"
+                                          v-show="o.unread > 0"
+                                  ></el-badge>
+                              </div>
+                          </el-col>
+                      </el-row>
+                      <!-- </el-card> -->
+                  </div>
+                </vueScroll>
                 <!-- </el-card> -->
             </el-aside>
 
-            <el-container></el-container>
         </el-container>
     </div>
 </template>
@@ -113,9 +176,11 @@
         height: 700px;
         solid-color: #eeeeee;
     }
-    .el-icon-size{
+
+    .el-icon-size {
         font-size: 20px;
     }
+
     .round_icon {
         width: 34px;
         height: 34px;
@@ -125,14 +190,17 @@
         justify-content: center;
         overflow: hidden;
     }
-    .img_size{
+
+    .img_size {
         width: 45px;
-        height:45px
+        height: 45px
     }
-    .name_size{
-        padding-bottom:10px;
+
+    .name_size {
+        padding-bottom: 10px;
         font-size: 16px
     }
+
     .addclass {
         background-color: colors.theme-blue;
         color: colors.theme-light-grey;
@@ -178,6 +246,13 @@
             color: colors.dark-main-text;
             background-color: colors.dark-light;
         }
+
+        .el-icon-backgroud {
+            color: colors.theme-black;
+            background-color: colors.theme-grey;
+
+        }
+
     }
 </style>
 
@@ -189,7 +264,7 @@
                 head_pic: require("../assets/sample/avatar/pic_001.jpg"),
                 chat:
                     "假装@所有人\\n据可靠消息，不填文档的今晚六点将会被拉群\\n【腾讯文档】1721冯如杯项目统计https://docs.qq.com/sheet/DRU93eHZieUJFaHV4?c=E4A0A0",
-                time: "上午10:32",
+                time: "10:32",
                 unread: 15,
             };
             const item1 = {
@@ -197,14 +272,14 @@
                 head_pic: require("../assets/sample/avatar/pic_002.jpg"),
                 chat:
                     "教育部思政司拟于5月4日（明天）9:00在人民网新媒体平台推出“我们都是收信人”",
-                time: "下午8:31",
+                time: "20:31",
                 unread: 1,
             };
             const item2 = {
                 name: "如余得水",
                 head_pic: require("../assets/sample/avatar/pic_003.jpg"),
                 chat: "温馨提醒：\\n拉小黑屋的时间提前到22:00点了，参加",
-                time: "下午6:03",
+                time: "18:03",
                 unread: 0,
             };
             const item3 = {
@@ -212,29 +287,81 @@
                 head_pic: require("../assets/sample/avatar/pic_004.jpg"),
                 chat:
                     "2020全国大学生计算机系统能力大赛 —— 编译系统设计赛（华为毕昇杯）\\n主办单位",
-                time: "下午1:32",
+                time: "13:32",
                 unread: 0,
             };
             const item4 = {
                 name: "AlvinZH",
                 head_pic: require("../assets/sample/avatar/pic_005.jpg"),
                 chat: "在本学期上书院党校的同学请私戳我一下",
-                time: "下午8:37",
+                time: "20:37",
                 unread: 0,
             };
             const item6 = {
                 name: "逆光下的微笑",
                 head_pic: require("../assets/sample/avatar/pic_006.jpg"),
                 chat: "我们也是改几幅图的错",
-                time: "下午2:38",
+                time: "14:38",
+                unread: 0,
+            };
+            const item7 = {
+                name: "軒+",
+                head_pic: require("../assets/sample/avatar/pic_007.jpg"),
+                chat:
+                    "假装@所有人\\n据可靠消息，不填文档的今晚六点将会被拉群\\n【腾讯文档】1721冯如杯项目统计https://docs.qq.com/sheet/DRU93eHZieUJFaHV4?c=E4A0A0",
+                time: "12:32",
+                unread: 1,
+            };
+            const item8 = {
+                name: "Yelza+",
+                head_pic: require("../assets/sample/avatar/pic_008.jpg"),
+                chat:
+                    "教育部思政司拟于5月4日（明天）9:00在人民网新媒体平台推出“我们都是收信人”",
+                time: "23:31",
+                unread: 1,
+            };
+            const item9 = {
+                name: "如余得水+",
+                head_pic: require("../assets/sample/avatar/pic_009.jpg"),
+                chat: "温馨提醒：\\n拉小黑屋的时间提前到22:00点了，参加",
+                time: "18:03",
+                unread: 0,
+            };
+            const item10 = {
+                name: "Rynco Li+",
+                head_pic: require("../assets/sample/avatar/pic_010.jpg"),
+                chat:
+                    "2020全国大学生计算机系统能力大赛 —— 编译系统设计赛（华为毕昇杯）\\n主办单位",
+                time: "13:32",
+                unread: 0,
+            };
+            const item11 = {
+                name: "AlvinZH+",
+                head_pic: require("../assets/sample/avatar/pic_011.jpg"),
+                chat: "在本学期上书院党校的同学请私戳我一下",
+                time: "20:37",
+                unread: 0,
+            };
+            const item12 = {
+                name: "逆光下的微笑+",
+                head_pic: require("../assets/sample/avatar/pic_012.jpg"),
+                chat: "我们也是改几幅图的错",
+                time: "14:38",
                 unread: 0,
             };
             return {
                 input: "",
-                tableData: [item, item1, item2, item3, item4, item6, item, item1, item2, item3, item4, item6],
-                //: Array(20).fill(item),
+                tableData: [item, item1, item2, item3, item4, item6, item7, item8, item9, item10, item11, item12],
                 hiddenTableHeader: false,
                 active: -1,
+                messageProcess: 0,
+                searchWord:'',
+                searchStatus:false,
+                searchShow:false,
+                chatShow:true,
+                selectShow:false,
+                keyword:'',
+                selectableData:[]
             };
         },
         methods: {
@@ -257,17 +384,58 @@
                 this.active = index;
                 this.unread = 0;
             },
-            handleleave() {
+            handleScroll(vertical) {
+                let vp = vertical.process;
+                if (vp < 1 && vp > this.messageProcess) this.showGoDown = true;
+                else this.showGoDown = false;
+                this.messageProcess = vp;
             },
+            openSearch:function (e) {
+                this.searchShow=true;
+                this.chatShow=false;
+                this.selectShow=true;
+                //console.log(e);
+            },
+            closeSearch:function () {
+                this.searchShow=false;
+                this.chatShow=true;
+                this.selectShow=false;
+            },
+            // inputChange:function(e){
+            //     this.keyword=e.data;
+            //     this.searchStatus=false;
+            // },
+            select(){
+                this.selectableData.push(this.item);
+            }
+
         },
         filters: {
             ellipsis(value) {
+
                 if (!value) return "";
+                value = value.replace(/\\n/gm, " ");
                 if (value.length > 11) {
                     return value.slice(0, 11) + "...";
                 }
                 return value;
             },
         },
-    };
+        computed: {
+            //最终需要显示的数组
+            sortableData: function () {
+                return sortByTime(this.tableData, 'time')
+            }
+        }
+    }
+
+    function sortByTime(array, key) {
+        return array.sort(function (a, b) {
+            var x = a[key];
+            var y = b[key];
+            return ((x > y) ? -1 : ((x < y) ? 1 : 0));
+        })
+    }
+  
+
 </script>

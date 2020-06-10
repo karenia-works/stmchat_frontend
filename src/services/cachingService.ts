@@ -1,6 +1,10 @@
 import { UserProfile, GroupProfile } from "@/types/types";
 import axios from "axios";
 import { Lru } from "tiny-lru";
+import { injectable, inject, singleton } from "tsyringe";
+import { WsMessageService } from "./websocket";
+import { TYPES } from "./dependencyInjection";
+import { IServerConfig } from "./serverConfig";
 
 /**
  * Represents an async data caching service of type `T`, which
@@ -54,9 +58,21 @@ export class ProfilePool<T> implements ICachingDataPool<T> {
   }
 }
 
+@singleton()
 export class UserProfilePool extends ProfilePool<UserProfile> {
-  public constructor(limit: number) {
-    super(limit, "TODO: Endpoint");
+  public constructor(
+    @inject(TYPES.ServerConfig) serverConfig: IServerConfig,
+    ws: WsMessageService,
+  ) {
+    super(
+      1024,
+      serverConfig.apiBaseUrl + serverConfig.apiEndpoints.userProfile.get,
+    );
+    ws.userOnlineState.subscribe({
+      next: msg => {
+        this.updateUserOnlineStatus(msg.userId, msg.online);
+      },
+    });
   }
 
   public updateUserOnlineStatus(id: string, online: boolean) {
@@ -67,8 +83,12 @@ export class UserProfilePool extends ProfilePool<UserProfile> {
   }
 }
 
+@singleton()
 export class GroupProfilePool extends ProfilePool<GroupProfile> {
-  public constructor(limit: number) {
-    super(limit, "TODO: Endpoint");
+  public constructor(@inject(TYPES.ServerConfig) serverConfig: IServerConfig) {
+    super(
+      1024,
+      serverConfig.apiBaseUrl + serverConfig.apiEndpoints.groupProfile.get,
+    );
   }
 }
