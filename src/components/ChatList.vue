@@ -464,8 +464,10 @@
             },
         },
         computed: {
+
             //最终需要显示的数组
             sortableData: function () {
+                mesgNotice();
                 return sortByTime(this.tableData, 'time')
             }
         }
@@ -478,6 +480,16 @@
             return ((x > y) ? -1 : ((x < y) ? 1 : 0));
         })
     }
-
+    //桌面通知
+    function mesgNotice(){
+        if(window.Notification && Notification.permission !== "denied") {
+            Notification.requestPermission(function(status) {
+                var notice_ = new Notification('新的消息', { body: '您的STM有新的消息'});
+                notice_.onclick = function() {//单击消息提示框，进入浏览器页面
+                    window.focus();
+                }
+            });
+        }
+    }
 
 </script>

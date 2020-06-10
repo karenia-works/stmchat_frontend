@@ -6685,6 +6685,11 @@ punycode@^2.1.0, punycode@^2.1.1:
   resolved "https://registry.npm.taobao.org/punycode/download/punycode-2.1.1.tgz#b58b010ac40c22c5657616c8d2c2c02c7bf479ec"
   integrity sha1-tYsBCsQMIsVldhbI0sLALHv0eew=
 
+push.js@^1.0.12:
+  version "1.0.12"
+  resolved "https://registry.npm.taobao.org/push.js/download/push.js-1.0.12.tgz#5703a03f5d286cd46d58564cb27bc079898d26b1"
+  integrity sha1-VwOgP10obNRtWFZMsnvAeYmNJrE=
+
 q@^1.1.2:
   version "1.5.1"
   resolved "https://registry.npm.taobao.org/q/download/q-1.5.1.tgz#7e32f75b41381291d04611f1bf14109ac00651d7"
