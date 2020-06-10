@@ -146,7 +146,11 @@
 
             <!-- file message -->
             <div v-else-if="data.msg._t == 'file'">
-              <a :href="data.msg.file" class="file dark_main_text">
+              <a
+                :href="data.msg.file"
+                class="file dark_main_text"
+                :download="data.msg.filename"
+              >
                 <div class="file-icon icon24">
                   <i class="el-icon-document"></i>
                 </div>
@@ -179,7 +183,7 @@
         </div>
       </vueScroll>
     </div>
-    <div class="chat-bottom-bar dark_light_bg dark_main_text">
+    <div class="chat-bottom-bar dark_light_bg dark_main_text" onresize="resize">
       <div class="sendopt icon24">
         <i class="el-icon-paperclip"></i>
         <i class="el-icon-picture-outline"></i>
@@ -204,14 +208,17 @@
       </div>
     </div>
     <!-- 多选框调试 -->
-    <el-button @click="openMulti">多选键（菜单实现以后删除）</el-button>
+    <el-button @click="MultiOn = !MultiOn"
+      >多选键（菜单实现以后删除）</el-button
+    >
   </div>
 </template>
 
 <script lang="ts">
+//todo: quote input
 //todo: upload image/ file
-//todo: bottom-bar height
-//todo: desktop notifiction; notice sound
+// ? download file: in same site
+//todo: right click: forward, quote, copy, muti-select
 
 //todo: unread amount
 //todo: jump to message
@@ -219,9 +226,10 @@
 //// switch hotkey
 //// send empty warning
 //// online/offline
-//// quote
+//// quote style
 //// style for file
-//// foward
+//// foward style
+//// bottom-bar height
 
 // * 处理消息数据：格式和字段名；转发消息从对象中移出
 
@@ -230,8 +238,10 @@ import { ChatMessages } from "../assets/sample/wsSample";
 
 import moment from "moment";
 import { serviceProvider, TYPES } from "../services/dependencyInjection";
+import { ServerChatMsg } from "@/types/types";
 
-export default {
+import Vue from "vue";
+export default Vue.extend({
   // props: {
   //   showSender: Boolean,
   //   showAvatar: Boolean,
@@ -254,6 +264,10 @@ export default {
     //   this.connector = connector;
   },
   methods: {
+    resize(e: any) {
+      console.log("resize");
+      console.log(e);
+    },
     send() {
       if (this.sendMessage.length == 0) {
         this.showEmptyWarning = true;
@@ -264,7 +278,7 @@ export default {
         this.messages.push({
           msg: {
             _t: "text",
-            id: new Date().getTime(),
+            id: "1" + new Date().getTime(),
             time: new Date(),
             text: this.sendMessage,
             sender: this.me,
@@ -289,7 +303,7 @@ export default {
       }
     },
     handleScroll(vertical: any) {
-      let vp = vertical.process;
+      let vp: number = vertical.process;
       if (vp < 1 && vp > this.messageProcess) this.showGoDown = true;
       else this.showGoDown = false;
       this.messageProcess = vp;
@@ -308,59 +322,45 @@ export default {
         }
       }
     },
-    // 多选框方法
-    checkMulti(checked, msg) {
-      if (checked) {
-        // alert(msg.text);
-        this.checkedMessage[this.checkedNumber] = msg;
-        this.checkedNumber = this.checkedNumber + 1;
 
-        // alert(this.checkedMessage[this.checkedNumber - 1].text);
+    // 多选框方法
+    checkMulti(checked: boolean, msg: ServerChatMsg) {
+      if (checked) {
+        this.checkedMessage.push(msg);
       } else {
-        this.checkedNumber = this.checkedNumber - 1;
+        let index = this.checkedMessage.findIndex(o => o.id === msg.id);
+        this.checkedMessage.splice(index, 1);
       }
     },
     CancelMulti() {
       this.MultiOn = false;
-      this.checkedNumber = 0;
-    },
-    openMulti() {
-      this.MultiOn = !this.MultiOn;
-      this.checkedNumber = 0;
+      this.checkedMessage = [];
     },
     forwardMulti() {
-      if (this.MultiOn && this.checkedNumber != 0) {
-        alert("Undone");
-      }
-      this.MultiOn = false;
-      this.checkedNumber = 0;
+      this.checkedMessage.forEach(msg => {
+        this.forwardMsg(msg.id);
+      });
+      this.CancelMulti();
+    },
+    forwardMsg(id: string) {
+      console.log("forward msg" + id);
     },
     deleteMulti() {
-      if (this.MultiOn && this.checkedNumber != 0) {
-        while (this.checkedNumber) {
-          var index = this.findMessageIndex(
-            this.messages,
-            this.checkedMessage[this.checkedNumber - 1],
-          );
-          // alert(this.checkedMessage[this.checkedNumber - 1].text);
-          // alert(index);
-          if (index > -1) {
-            this.messages.splice(index, 1);
-          } else {
-            alert("delete error!");
-          }
-          this.checkedNumber = this.checkedNumber - 1;
-        }
-      }
-      this.MultiOn = false;
-      this.checkedNumber = 0;
+      this.checkedMessage.forEach(msg => {
+        this.deleteMsg(msg.id);
+      });
+      this.CancelMulti();
     },
-    findMessageIndex(msglist, msg) {
-      for (let i in msglist) {
-        if (msglist[i].msg.id == msg.id) {
-          return i;
-        }
+    deleteMsg(id: string) {
+      let index = this.messages.findIndex(o => o.msg.id === id);
+      if (index > -1) {
+        this.messages.splice(index, 1);
       }
+    },
+  },
+  computed: {
+    checkedNumber() {
+      return this.checkedMessage.length;
     },
   },
   data() {
@@ -401,9 +401,7 @@ export default {
 
       // 多选框取值
       MultiOn: false,
-      checkedNumber: 0,
-      checkedMessageLength: 40, // 多选长度
-      checkedMessage: new Array<object>(this.checkedMessageLength),
+      checkedMessage: [] as ServerChatMsg[],
     };
   },
   filters: {
@@ -427,7 +425,7 @@ export default {
       }
     },
   },
-};
+});
 </script>
 
 <style lang="stylus">
@@ -476,6 +474,7 @@ export default {
   padding: 10px 15px;
   border-radius: 7px 7px 0 7px;
   background-color: rgba(68, 71, 78, 0.5);
+  cursor: default;
   opacity: 0;
   transition: opacity 0.3s ease-in;
 
@@ -697,7 +696,7 @@ export default {
   display: flex;
   flex-direction: column;
   max-width: 750px;
-  height: 400px;
+  height: 600px;
 
   .chat-top-bar {
     flex-basis: 55px;
@@ -709,8 +708,9 @@ export default {
 
   .chat-messages {
     padding: 0;
-    height: 500px;
-    flex-shrink: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
   }
 
   .chat-bottom-bar {
@@ -779,37 +779,40 @@ export default {
 }
 
 // 多选框样式
-.self_multi{
-  margin-right : auto;
+.self_multi {
+  margin-right: auto;
 }
-.oppo_multi{
+
+.oppo_multi {
 }
-.multi_row{
-  padding: 5px
-  display:flex;
+
+.multi_row {
+  padding: 5px;
+  display: flex;
   justify-content: flex-start;
-  width:100%
+  width: 100%;
   align-items: center;
 
-  .multi_delete{
-    padding-top:8px
-    padding-bottom:8px
-    border:none
-    background-color : colors.theme-blue
-    color: white
-    .multi_button{
-      display:flex;
+  .multi_delete {
+    padding-top: 8px;
+    padding-bottom: 8px;
+    border: none;
+    background-color: colors.theme-blue;
+    color: white;
+
+    .multi_button {
+      display: flex;
       flex-direction: row;
-      .multi_num{
-        margin-left:5px
-        color:colors.theme-grey
+
+      .multi_num {
+        margin-left: 5px;
+        color: colors.theme-grey;
       }
     }
   }
 
-  .multi_cancel{
-    margin-left : auto;
+  .multi_cancel {
+    margin-left: auto;
   }
-
 }
 </style>
