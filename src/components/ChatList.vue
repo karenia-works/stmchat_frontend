@@ -7,69 +7,77 @@
                     class="dark_medium_bg demo-input-suffix"
                     style="overflow-x: hidden; overflow-y: hidden"
             >
-              <vueScroll @handle-scroll="handleScroll">
-                <div class="search"  @click="openSearch">
-                <el-input
-                        v-model="input"
-                        placeholder="search"
-                        class="dark_eee_bg"
-                        v-if="!searchShow"
-                >
-                    <el-dropdown
-                            slot="prepend"
-                            @command="handleCommand"
-                    >
-                    <span class="el-dropdown-link">
-              <i
-                      class="dark_main_text el-icon-s-unfold el-icon--center
-                      el-icon-size el-icon-backgroud"
-              ></i>
-            </span>
-                        <el-dropdown-menu
-                                slot="dropdown"
-                                class="dark_medium_bg"
+                <vueScroll @handle-scroll="handleScroll">
+                    <div class="search" @click="openSearch">
+                        <el-input
+                                v-model="input"
+                                placeholder="search"
+                                class="dark_eee_bg"
+                                v-if="!searchShow"
                         >
-                            <el-dropdown-item command="a" class="dark_main_text">
-                                <i class="el-icon-user-solid el-icon-size"></i>
-                                New group
-                            </el-dropdown-item>
-                            <el-dropdown-item command="b" class="dark_main_text">
-                                <i class="el-icon-s-custom el-icon-size"></i>
-                                Contacts
-                            </el-dropdown-item>
-                            <el-dropdown-item command="c" class="dark_main_text">
-                                <i class="el-icon-setting el-icon-size"></i>
-                                Settings
-                            </el-dropdown-item>
-                            <el-dropdown-item command="d" class="dark_main_text">
-                                <i class="el-icon-question el-icon-size"></i>
-                                STM FAQ
-                            </el-dropdown-item>
-                            <el-dropdown-item command="e" class="dark_main_text">
-                                <i class="el-icon-s-promotion el-icon-size"></i>
-                                About
-                            </el-dropdown-item>
-                        </el-dropdown-menu>
-                    </el-dropdown>
-                </el-input>
+                            <el-dropdown
+                                    slot="prepend"
+                                    @command="handleCommand"
+                            >
+                    <span class="el-dropdown-link">
+                        <i
+                                class="dark_main_text el-icon-s-unfold el-icon--center
+                      el-icon-size el-icon-backgroud"
+                        ></i>
+                   </span>
+                                <el-dropdown-menu
+                                        slot="dropdown"
+                                        class="dark_medium_bg"
+                                >
+                                    <el-dropdown-item command="a" class="dark_main_text">
+                                        <i class="el-icon-user-solid el-icon-size"></i>
+                                        New group
+                                    </el-dropdown-item>
+                                    <el-dropdown-item command="b" class="dark_main_text">
+                                        <i class="el-icon-s-custom el-icon-size"></i>
+                                        Contacts
+                                    </el-dropdown-item>
+                                    <el-dropdown-item command="c" class="dark_main_text">
+                                        <i class="el-icon-setting el-icon-size"></i>
+                                        Settings
+                                    </el-dropdown-item>
+                                    <el-dropdown-item command="d" class="dark_main_text">
+                                        <i class="el-icon-question el-icon-size"></i>
+                                        STM FAQ
+                                    </el-dropdown-item>
+                                    <el-dropdown-item command="e" class="dark_main_text">
+                                        <i class="el-icon-s-promotion el-icon-size"></i>
+                                        About
+                                    </el-dropdown-item>
+                                </el-dropdown-menu>
+                            </el-dropdown>
+                        </el-input>
 
-                <!-- 搜索-->
-                </div>
-                <!-- <el-card class="box-card " style="margin-left: 0px">  v-on:input="inputChange"-->
-                <div class="search-header" v-if="searchShow">
+                        <!-- 搜索-->
+                    </div>
+                    <!-- <el-card class="box-card " style="margin-left: 0px">  v-on:input="inputChange"-->
+                    <div class="search-header" v-if="searchShow">
+                        <el-input name="input"
+                                  class="keyword"
+                                  v-model="searchWord"
+                                  v-on:input="queryData"
+                                  placeholder="search"
+                                  clearable
+                        >
+                            <el-button slot="prepend"
+                                       type="primary"
+                                       @click="closeSearch"
+                                       class="el-button-new"
+                                       size="mini"
+                            >
+                                <i class="el-icon-back  el-icon--center"
+                                   style="font-size:18px"
+                                >
+                                </i>
+                            </el-button>
 
-                    <el-input name="input" class="keyword"  v-model="searchWord"
-                              v-on:input="inputChange"
-                              placeholder="search"
-                    >
-                        <el-button  slot="append" type="primary" style="font-size:18px; "  class="el-button" @click="queryData">搜索</el-button>
-                        <el-button  slot="prepend" type="primary"   @click="closeSearch" class="el-button-new"  size="mini">
-                            <i class="el-icon-back " style="font-size:18px">
-                            </i>
-                        </el-button>
-
-                    </el-input>
-                </div>
+                        </el-input>
+                    </div>
 
                     <div
                             v-for="(o, index) in sortableData"
@@ -117,52 +125,41 @@
                         </el-row>
                         <!-- </el-card> -->
                     </div>
-                  <div
-                          v-for="(o, index) in selectableData"
-                          v-bind:key="o"
-                          @click="handleclick(index), (o.unread = 0)"
-                          :class="active == index ? 'addclass' : ''"
-                          class="dark_main_text dark_deep_bg"
-                          v-show="selectShow"
-                  >
-                      <!-- <el-card body-style="{ padding: '0' }" style="height:100px"> -->
-                      <el-row type="flex" style="height:65px" align="middle">
-                          <el-col span="6" offset="2">
-                              <img
-                                      :src="o.head_pic"
-                                      class="round_icon img_size"
-                              />
-                          </el-col>
-                          <el-col span="12">
-                              <div class="name_size">
-                                  <span>{{ o.name }}</span>
-                              </div>
-                              <div
-                                      class="bottom clearfix margin-bottom:5px"
-                                      style="font-size:12px;color: dimgray"
-                              >
-                                  <!-- <div >{{o.chat| ellipsis}}</div>-->
-                                  <template>
+                    <div
+                            v-for="(o, index) in selectableData"
+                            v-bind:key="o"
+                            @click="handleclick(index), (o.unread = 0)"
+                            :class="active == index ? 'addclass' : ''"
+                            class="dark_main_text dark_deep_bg"
+                            v-show="selectShow"
+                    >
+                        <!-- <el-card body-style="{ padding: '0' }" style="height:100px"> -->
+                        <el-row type="flex" style="height:65px" align="middle">
+                            <el-col span="6" offset="2">
+                                <img
+                                        :src="o.head_pic"
+                                        class="round_icon img_size"
+                                />
+                            </el-col>
+                            <el-col span="12">
+                                <div class="name_size">
+                                    <span>{{ o.name }}</span>
+                                </div>
+                                <div
+                                        class="bottom clearfix margin-bottom:5px"
+                                        style="font-size:12px;color: dimgray"
+                                >
+                                    <!-- <div >{{o.chat| ellipsis}}</div>-->
+                                    <template>
                                     <span class="dark_sub_text" v-html="$options.filters.ellipsis(o.chat)">
                                     </span>
 
-                                  </template>
-                              </div>
-                          </el-col>
-                          <el-col span="5">
-                              <div style="height:50px;font-size:12px;color:dimgray;">
-                                  <div class="dark_sub_text">{{ o.time }}</div>
-                                  <el-badge
-                                          :value="o.unread"
-                                          class="item"
-                                          style="margin-top:15px ;padding-left:10px;"
-                                          v-show="o.unread > 0"
-                                  ></el-badge>
-                              </div>
-                          </el-col>
-                      </el-row>
-                      <!-- </el-card> -->
-                  </div>
+                                    </template>
+                                </div>
+                            </el-col>
+                        </el-row>
+                        <!-- </el-card> -->
+                    </div>
                 </vueScroll>
                 <!-- </el-card> -->
             </el-aside>
@@ -262,18 +259,20 @@
         }
 
     }
-    .el-button{
+
+    .el-button {
         height: 3.5rem;
         width: 4rem;
         margin-top: 0.6rem;
         border-radius: 4px;
 
     }
-    .el-button-new{
+
+    .el-button-new {
         height: 3.5rem;
         width: 1rem;
         margin-top: 0.6rem;
-        background-color :white
+        background-color: white
 
     }
 </style>
@@ -384,14 +383,14 @@
                 hiddenTableHeader: false,
                 active: -1,
                 messageProcess: 0,
-                searchWord:'',
-                searchStatus:false,
-                searchShow:false,
-                chatShow:true,
-                selectShow:false,
-                keyword:'',
-                selectableData:[],
-                noselectData:[itemfalse]
+                searchWord: '',
+                searchStatus: false,
+                searchShow: false,
+                chatShow: true,
+                selectShow: false,
+                keyword: '',
+                selectableData: [],
+                noselectData: [itemfalse]
             };
         },
         methods: {
@@ -420,35 +419,31 @@
                 else this.showGoDown = false;
                 this.messageProcess = vp;
             },
-            openSearch:function (e) {
-                this.searchShow=true;
-                this.chatShow=false;
-                this.selectShow=false;
+            openSearch: function (e) {
+                this.searchShow = true;
+                this.chatShow = false;
+                this.selectShow = false;
                 //console.log(e);
             },
-            closeSearch:function () {
-                this.searchShow=false;
-                this.chatShow=true;
-                this.selectShow=false;
-                this.searchWord="";
+            closeSearch: function () {
+                this.searchShow = false;
+                this.chatShow = true;
+                this.selectShow = false;
+                this.searchWord = "";
             },
-            inputChange:function(e){
-                this.keyword=e.data;
-                this.searchStatus=false;
-            },
-            queryData(){
+            queryData() {
                 //并没有输入关键字时，就不要再搜索了
-                this.selectShow=true;
-                if(this.searchWord===''||this.searchWord==null){
-                    this.selectableData=this.tableData;
+                this.selectShow = true;
+                if (this.searchWord === '' || this.searchWord == null) {
+                    this.selectableData = null;
                     return;
                 }
                 //搜索
-                let list=this.tableData.filter(item=>item.name.indexOf(this.searchWord)>=0);
-                if(list.length>=1)
-                this.selectableData=list;
+                let list = this.tableData.filter(item => item.name.indexOf(this.searchWord) >= 0);
+                if (list.length >= 1)
+                    this.selectableData = list;
                 else
-                this.selectableData=this.noselectData;
+                    this.selectableData = this.noselectData;
                 this.$forceUpdate()
             }
         },
@@ -480,12 +475,13 @@
             return ((x > y) ? -1 : ((x < y) ? 1 : 0));
         })
     }
+
     //桌面通知
-    function mesgNotice(){
-        if(window.Notification && Notification.permission !== "denied") {
-            Notification.requestPermission(function(status) {
-                var notice_ = new Notification('新的消息', { body: '您的STM有新的消息'});
-                notice_.onclick = function() {//单击消息提示框，进入浏览器页面
+    function mesgNotice() {
+        if (window.Notification && Notification.permission !== "denied") {
+            Notification.requestPermission(function (status) {
+                var notice_ = new Notification('新的消息', {body: '您的STM有新的消息'});
+                notice_.onclick = function () {//单击消息提示框，进入浏览器页面
                     window.focus();
                 }
             });
