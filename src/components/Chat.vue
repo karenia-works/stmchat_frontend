@@ -5,17 +5,37 @@
     </div>-->
     <div class="chat-top-bar dark_main_text dark_light_bg">
       <div class="chatinfo" :class="chatinfo.type">
-        <template v-if="chatinfo.type == 'private'">
+        <template v-if="chatinfo.type == 'private' && !MultiOn">
           <span>{{ chatinfo.user.name }}</span>
           <span class="info" :class="chatinfo.user.status">{{
             chatinfo.user.status
           }}</span>
         </template>
-        <template v-if="chatinfo.type == 'group'">
+        <template v-if="chatinfo.type == 'group' && !MultiOn">
           <span>{{ chatinfo.group.name }}</span>
           <span class="info">{{ chatinfo.group.member }} members</span>
         </template>
       </div>
+      <!-- 多选框 - 功能栏 -->
+      <template v-if="MultiOn">
+        <div class="multi_row">
+          <el-button class="multi_delete" @click="deleteMulti"
+            ><div class="multi_button">
+              删除
+              <div class="multi_num">{{ checkedNumber }}</div>
+            </div></el-button
+          >
+          <el-button class="multi_delete" @click="forwardMulti"
+            ><div class="multi_button">
+              转发
+              <div class="multi_num">{{ checkedNumber }}</div>
+            </div></el-button
+          >
+          <el-button class="multi_cancel" type="text" @click="CancelMulti"
+            >取消</el-button
+          >
+        </div>
+      </template>
       <!-- <div class="chatopt icon24">
         <i class="el-icon-more"></i>
       </div>-->
@@ -36,6 +56,14 @@
           class="msg"
           :class="{ self: data.msg.sender.name == me.name }"
         >
+          <!-- 多选框-对方 -->
+          <el-col :span="1" v-if="data.msg.sender.name != me.name && MultiOn">
+            <el-checkbox
+              class="oppo_multi"
+              v-if="data.msg.sender.name != me.name"
+              @change="checked => checkMulti(checked, data.msg)"
+            ></el-checkbox
+          ></el-col>
           <el-avatar
             :src="data.msg.sender.avatar"
             v-if="showAvatar"
@@ -140,6 +168,14 @@
               </span>
             </div>
           </div>
+
+          <!-- 多选框-自己 -->
+          <div class="self_multi">
+            <el-checkbox
+              v-if="data.msg.sender.name == me.name && MultiOn"
+              @change="checked => checkMulti(checked, data.msg)"
+            ></el-checkbox>
+          </div>
         </div>
       </vueScroll>
     </div>
@@ -167,6 +203,8 @@
         ></i>
       </div>
     </div>
+    <!-- 多选框调试 -->
+    <el-button @click="openMulti">多选键（菜单实现以后删除）</el-button>
   </div>
 </template>
 
@@ -270,6 +308,60 @@ export default {
         }
       }
     },
+    // 多选框方法
+    checkMulti(checked, msg) {
+      if (checked) {
+        // alert(msg.text);
+        this.checkedMessage[this.checkedNumber] = msg;
+        this.checkedNumber = this.checkedNumber + 1;
+
+        // alert(this.checkedMessage[this.checkedNumber - 1].text);
+      } else {
+        this.checkedNumber = this.checkedNumber - 1;
+      }
+    },
+    CancelMulti() {
+      this.MultiOn = false;
+      this.checkedNumber = 0;
+    },
+    openMulti() {
+      this.MultiOn = !this.MultiOn;
+      this.checkedNumber = 0;
+    },
+    forwardMulti() {
+      if (this.MultiOn && this.checkedNumber != 0) {
+        alert("Undone");
+      }
+      this.MultiOn = false;
+      this.checkedNumber = 0;
+    },
+    deleteMulti() {
+      if (this.MultiOn && this.checkedNumber != 0) {
+        while (this.checkedNumber) {
+          var index = this.findMessageIndex(
+            this.messages,
+            this.checkedMessage[this.checkedNumber - 1],
+          );
+          // alert(this.checkedMessage[this.checkedNumber - 1].text);
+          // alert(index);
+          if (index > -1) {
+            this.messages.splice(index, 1);
+          } else {
+            alert("delete error!");
+          }
+          this.checkedNumber = this.checkedNumber - 1;
+        }
+      }
+      this.MultiOn = false;
+      this.checkedNumber = 0;
+    },
+    findMessageIndex(msglist, msg) {
+      for (let i in msglist) {
+        if (msglist[i].msg.id == msg.id) {
+          return i;
+        }
+      }
+    },
   },
   data() {
     return {
@@ -306,6 +398,12 @@ export default {
       },
 
       messages: ChatMessages,
+
+      // 多选框取值
+      MultiOn: false,
+      checkedNumber: 0,
+      checkedMessageLength: 40, // 多选长度
+      checkedMessage: new Array<object>(this.checkedMessageLength),
     };
   },
   filters: {
@@ -678,5 +776,40 @@ export default {
     color: colors.dark-main-text;
     background-color: colors.dark-light;
   }
+}
+
+// 多选框样式
+.self_multi{
+  margin-right : auto;
+}
+.oppo_multi{
+}
+.multi_row{
+  padding: 5px
+  display:flex;
+  justify-content: flex-start;
+  width:100%
+  align-items: center;
+
+  .multi_delete{
+    padding-top:8px
+    padding-bottom:8px
+    border:none
+    background-color : colors.theme-blue
+    color: white
+    .multi_button{
+      display:flex;
+      flex-direction: row;
+      .multi_num{
+        margin-left:5px
+        color:colors.theme-grey
+      }
+    }
+  }
+
+  .multi_cancel{
+    margin-left : auto;
+  }
+
 }
 </style>

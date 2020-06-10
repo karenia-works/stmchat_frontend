@@ -7,7 +7,7 @@
             <el-col :span="4">
               <div>
                 <el-button class="set_title top_btn" type="text"
-                  >Settings</el-button
+                  >设置</el-button
                 >
               </div>
             </el-col>
@@ -18,21 +18,24 @@
                   v-on:click="edit_on"
                   class="func_btn top_btn"
                   type="text"
-                  >Edit</el-button
+                  >编辑</el-button
                 >
                 <el-button
                   v-show="editmode"
                   v-on:click="save_on"
                   class="func_btn top_btn"
                   type="text"
-                  >Save</el-button
+                  >保存</el-button
                 >
               </div>
             </el-col>
             <el-col :span="4">
               <div>
-                <el-button class="func_btn top_btn" type="text"
-                  >Close</el-button
+                <el-button
+                  class="func_btn top_btn"
+                  type="text"
+                  v-on:click="closeWindow"
+                  >关闭</el-button
                 >
               </div>
             </el-col>
@@ -82,11 +85,11 @@
             <el-col :span="12" :offset="2">
               <div class="name_part top_pad" type="justify" align="start">
                 <div class="content">{{ phonenum }}</div>
-                <div class="comment">phone number</div>
+                <div class="comment">电话号码</div>
               </div>
               <div class="name_part top_pad" type="justify" align="start">
                 <div class="content">@{{ username }}</div>
-                <div class="comment">username</div>
+                <div class="comment">用户名</div>
               </div>
             </el-col>
           </el-row>
@@ -109,9 +112,10 @@
                   justify="space-between"
                   align="middle"
                 >
-                  <div class="content">Desktop Notifications</div>
+                  <div class="content">全局提醒</div>
                   <el-switch
-                    v-model="value1"
+                    v-model="valueDesktopNotifications"
+                    @change="changeDesktopNotifications"
                     active-color="#13ce66"
                     inactive-color="#ff4949"
                   ></el-switch>
@@ -122,9 +126,10 @@
                   justify="space-between"
                   align="middle"
                 >
-                  <div class="content">Background Notifications</div>
+                  <div class="content">背景提醒</div>
                   <el-switch
-                    v-model="value2"
+                    v-model="valueBackgroundNotifications"
+                    @change="changeBackgroundNotifications"
                     active-color="#13ce66"
                     inactive-color="#ff4949"
                   ></el-switch>
@@ -135,9 +140,10 @@
                   justify="space-between"
                   align="middle"
                 >
-                  <div class="content">Message preview</div>
+                  <div class="content">消息预览</div>
                   <el-switch
-                    v-model="value3"
+                    v-model="valueMessagepreview"
+                    @change="changeMessagepreview"
                     active-color="#13ce66"
                     inactive-color="#ff4949"
                   ></el-switch>
@@ -149,15 +155,19 @@
                     justify="space-between"
                     align="middle"
                   >
-                    <div class="content">Sound</div>
+                    <div class="content">声音</div>
                     <el-switch
-                      v-model="value4"
+                      v-model="valueSound"
+                      @change="changeSound"
                       active-color="#13ce66"
                       inactive-color="#ff4949"
                     ></el-switch>
                   </el-row>
                   <div class="block">
-                    <el-slider v-model="value_block"></el-slider>
+                    <el-slider
+                      v-model="soundDegree"
+                      @change="changeSoundDegree"
+                    ></el-slider>
                   </div>
                 </el-col>
               </div>
@@ -175,19 +185,29 @@
               </div>
             </el-col>
             <el-col :span="19" :offset="2" align="start">
-              <div class="content top_pad">Hot Key</div>
+              <div class="content top_pad">快捷键</div>
               <el-col :span="19" align="start">
-                <el-radio class="radio_pad" v-model="radio" label="1">
-                  <strong>Enter</strong> - Send Message,
+                <el-radio
+                  class="radio_pad"
+                  v-model="radio"
+                  @change="changeToRadio1"
+                  label="1"
+                >
+                  <strong>Enter</strong> - 发送消息,
                   <br />
                   <strong>Shift + Enter</strong>
-                  - new line
+                  - 换行
                 </el-radio>
-                <el-radio class="radio_pad" v-model="radio" label="2">
-                  <strong>Ctrl + Enter</strong> - Send Message,
+                <el-radio
+                  class="radio_pad"
+                  v-model="radio"
+                  @change="changeToRadio2"
+                  label="2"
+                >
+                  <strong>Ctrl + Enter</strong> - 发送消息,
                   <br />
                   <strong>Enter</strong>
-                  - new line
+                  - 换行
                 </el-radio>
               </el-col>
             </el-col>
@@ -198,7 +218,9 @@
           <!-- 登出 -->
 
           <div>
-            <el-button class="top_btn" type="text">Log Out</el-button>
+            <el-button class="top_btn" type="text" v-on:click="logOut"
+              >退出账户</el-button
+            >
           </div>
 
           <!-- main结束 -->
@@ -352,17 +374,24 @@ export default {
       phonenum: "+86 13918128942",
       username: "skuld_yi",
       editmode: false,
-      value1: true,
-      value2: true,
-      value3: true,
-      value4: true,
+      valueDesktopNotifications: true,
+      valueBackgroundNotifications: true,
+      valueMessagepreview: true,
+      valueSound: true,
       radio: "1",
-      value_block: 50,
+      soundDegree: 50,
     };
   },
   methods: {
     formatTooltip(val) {
       return val / 100;
+    },
+    closeWindow() {
+      this.$emit("closed");
+    },
+    logOut() {
+      alert("已成功退出账户");
+      this.$router.push({ path: "Login" });
     },
     edit_on() {
       this.changename = this.nickname;
@@ -372,10 +401,38 @@ export default {
       if (this.changename == "") {
         alert("昵称不能为空！");
         this.editmode = false;
+      } else if (this.changename == this.nickname) {
+        alert("昵称不能与之前昵称相同！");
+        this.editmode = false;
       } else {
         this.nickname = this.changename;
+        alert('昵称已成功变更为 "' + this.changename + '"');
         this.editmode = false;
+        this.$emit("saved");
       }
+    },
+    changeDesktopNotifications() {
+      alert(this.valueDesktopNotifications ? "全局提醒： 开" : "全局提醒： 关");
+    },
+    changeBackgroundNotifications() {
+      alert(
+        this.valueBackgroundNotifications ? "背景提醒： 开" : "背景提醒： 关",
+      );
+    },
+    changeMessagepreview() {
+      alert(this.valueMessagepreview ? "消息预览： 开" : "消息提醒： 关");
+    },
+    changeSound() {
+      alert(this.valueSound ? "声音提醒： 开" : "声音提醒： 关");
+    },
+    changeSoundDegree() {
+      alert("音量大小： " + this.soundDegree);
+    },
+    changeToRadio1() {
+      alert("已改为：回车键发送消息");
+    },
+    changeToRadio2() {
+      alert("已改为：回车键换行");
     },
   },
 };
