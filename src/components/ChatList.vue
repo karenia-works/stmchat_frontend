@@ -57,9 +57,17 @@
                 </div>
                 <!-- <el-card class="box-card " style="margin-left: 0px">  v-on:input="inputChange"-->
                 <div class="search-header" v-if="searchShow">
-                    <el-input name="input" class="keyword"  v-model="searchWord" v-on:input="inputChange"
+
+                    <el-input name="input" class="keyword"  v-model="searchWord"
+                              v-on:input="inputChange"
+                              placeholder="search"
                     >
-                        <el-button slot="append" icon="el-icon-error" style="font-size:18px" @click="closeSearch"></el-button>
+                        <el-button  slot="append" type="primary" style="font-size:18px; "  class="el-button" @click="queryData">搜索</el-button>
+                        <el-button  slot="prepend" type="primary"   @click="closeSearch" class="el-button-new"  size="mini">
+                            <i class="el-icon-back " style="font-size:18px">
+                            </i>
+                        </el-button>
+
                     </el-input>
                 </div>
 
@@ -254,6 +262,20 @@
         }
 
     }
+    .el-button{
+        height: 3.5rem;
+        width: 4rem;
+        margin-top: 0.6rem;
+        border-radius: 4px;
+
+    }
+    .el-button-new{
+        height: 3.5rem;
+        width: 1rem;
+        margin-top: 0.6rem;
+        background-color :white
+
+    }
 </style>
 
 <script>
@@ -349,6 +371,13 @@
                 time: "14:38",
                 unread: 0,
             };
+            const itemfalse = {
+                name: "无匹陪对象",
+                head_pic: require("../assets/sample/avatar/pic_150.jpg"),
+                chat: "",
+                time: "",
+                unread: 0,
+            };
             return {
                 input: "",
                 tableData: [item, item1, item2, item3, item4, item6, item7, item8, item9, item10, item11, item12],
@@ -361,7 +390,8 @@
                 chatShow:true,
                 selectShow:false,
                 keyword:'',
-                selectableData:[]
+                selectableData:[],
+                noselectData:[itemfalse]
             };
         },
         methods: {
@@ -393,22 +423,34 @@
             openSearch:function (e) {
                 this.searchShow=true;
                 this.chatShow=false;
-                this.selectShow=true;
+                this.selectShow=false;
                 //console.log(e);
             },
             closeSearch:function () {
                 this.searchShow=false;
                 this.chatShow=true;
                 this.selectShow=false;
+                this.searchWord="";
             },
-            // inputChange:function(e){
-            //     this.keyword=e.data;
-            //     this.searchStatus=false;
-            // },
-            select(){
-                this.selectableData.push(this.item);
+            inputChange:function(e){
+                this.keyword=e.data;
+                this.searchStatus=false;
+            },
+            queryData(){
+                //并没有输入关键字时，就不要再搜索了
+                this.selectShow=true;
+                if(this.searchWord===''||this.searchWord==null){
+                    this.selectableData=this.tableData;
+                    return;
+                }
+                //搜索
+                let list=this.tableData.filter(item=>item.name.indexOf(this.searchWord)>=0);
+                if(list.length>=1)
+                this.selectableData=list;
+                else
+                this.selectableData=this.noselectData;
+                this.$forceUpdate()
             }
-
         },
         filters: {
             ellipsis(value) {
@@ -436,6 +478,6 @@
             return ((x > y) ? -1 : ((x < y) ? 1 : 0));
         })
     }
-  
+
 
 </script>
