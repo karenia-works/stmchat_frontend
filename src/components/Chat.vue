@@ -50,135 +50,21 @@
         @click="jumpToMessage(-1)"
       ></el-button>
       <vueScroll ref="chat-messages" @handle-scroll="handleScroll">
-        <div
-          v-for="data in messages"
-          :key="data.msg.id"
-          class="msg"
-          :class="{ self: data.msg.sender.name == me.name }"
-        >
-          <!-- 多选框-对方 -->
-          <el-col :span="1" v-if="data.msg.sender.name != me.name && MultiOn">
+        <div v-for="data in messages" :key="data.msg.id">
+          <!-- 多选框 -->
+          <el-col :span="1" v-if="MultiOn">
             <el-checkbox
-              class="oppo_multi"
-              v-if="data.msg.sender.name != me.name"
               @change="checked => checkMulti(checked, data.msg)"
             ></el-checkbox
           ></el-col>
-          <el-avatar
-            :src="data.msg.sender.avatar"
-            v-if="showAvatar"
-          ></el-avatar>
 
-          <div class="msgbody dark_main_text" :class="'type-' + data.msg._t">
-            <!-- forwardFrom -->
+          <div class="msg" :class="{ self: data.msg.sender.name == me.name }">
+            <el-avatar
+              :src="data.msg.sender.avatar"
+              v-if="showAvatar"
+            ></el-avatar>
 
-            <div class="bodytop">
-              <div class="sendername" v-if="showSender">
-                {{ data.msg.sender.name }}
-              </div>
-              <!-- replyTo -->
-              <div v-if="data.msg.replyTo" class="quote">
-                <el-image
-                  v-if="data.msg.replyTo._t == 'image'"
-                  :src="data.msg.replyTo.image"
-                ></el-image>
-                <div>
-                  <div class="sendername">
-                    {{ data.msg.replyTo.sender.name }}
-                  </div>
-                  <div class="quote-text">
-                    <template v-if="data.msg.replyTo._t == 'text'">
-                      {{ data.msg.replyTo.text }}
-                    </template>
-                    <template v-else-if="data.msg.replyTo._t == 'image'">
-                      [图片]
-                      <span v-if="data.msg.replyTo.caption"
-                        >, {{ data.msg.replyTo.caption }}</span
-                      >
-                    </template>
-                    <template v-else-if="data.msg.replyTo._t == 'file'">
-                      {{ data.msg.replyTo.filename }}
-                      <span v-if="data.msg.replyTo.caption"
-                        >, {{ data.msg.replyTo.caption }}</span
-                      >
-                    </template>
-                  </div>
-                </div>
-              </div>
-
-              <!-- forwardFrom -->
-              <div class="sendername" v-if="data.msg.forwardFrom">
-                Forwarded from {{ data.msg.forwardFrom.sender.name }}
-              </div>
-            </div>
-
-            <!-- message body -->
-            <!-- text message -->
-            <div v-if="data.msg._t == 'text'" class="msg-text">
-              <span>{{ data.msg.text }}</span>
-              <span class="time info">
-                {{ data.msg.time | msgTime }}
-              </span>
-            </div>
-
-            <!-- image message -->
-            <div
-              v-else-if="data.msg._t == 'image'"
-              :class="{ 'image-only': !data.msg.caption }"
-            >
-              <el-image
-                :src="data.msg.image"
-                :preview-src-list="[data.msg.image]"
-                :class="{
-                  noSender:
-                    !showSender && !data.msg.forwardFrom && !data.msg.replyTo,
-                }"
-                lazy
-              ></el-image>
-              <div class="msg-text" v-if="data.msg.caption">
-                <span>{{ data.msg.caption }}</span>
-                <span class="time info">
-                  {{ data.msg.time | msgTime }}
-                </span>
-              </div>
-              <div v-else class="time">{{ data.msg.time | msgTime }}</div>
-            </div>
-
-            <!-- file message -->
-            <div v-else-if="data.msg._t == 'file'">
-              <a
-                :href="data.msg.file"
-                class="file dark_main_text"
-                :download="data.msg.filename"
-              >
-                <div class="file-icon icon24">
-                  <i class="el-icon-document"></i>
-                </div>
-                <div>
-                  <div class="file-name">{{ data.msg.filename }}</div>
-                  <div class="info">{{ data.msg.size | fileSize }}</div>
-                </div>
-              </a>
-
-              <div class="msg-text" v-if="data.msg.caption">
-                <span>{{ data.msg.caption }}</span>
-                <span class="time info">
-                  {{ data.msg.time | msgTime }}
-                </span>
-              </div>
-
-              <span class="time1 info" v-else>
-                {{ data.msg.time | msgTime }}
-              </span>
-            </div>
-          </div>
-
-          <!-- 多选框-自己 -->
-          <div class="self_multi">
-            <el-checkbox
-              v-if="data.msg.sender.name == me.name && MultiOn"
-              @change="checked => checkMulti(checked, data.msg)"
-            ></el-checkbox>
+            <Message :msg="data.msg" :showSender="showSender"></Message>
           </div>
         </div>
       </vueScroll>
@@ -266,9 +152,10 @@
 import { WsMessageService } from "../services/websocket";
 import { ChatMessages } from "../assets/sample/wsSample";
 
-import moment from "moment";
+// import moment from "moment";
 import { serviceProvider, TYPES } from "../services/dependencyInjection";
 import { ServerChatMsg } from "@/types/types";
+import Message from "./Message.vue";
 
 import Vue from "vue";
 export default Vue.extend({
@@ -276,6 +163,9 @@ export default Vue.extend({
   //   showSender: Boolean,
   //   showAvatar: Boolean,
   // },
+  components: {
+    Message,
+  },
   watch: {
     messages(val) {
       let pos = this.chatPosition();
@@ -294,10 +184,6 @@ export default Vue.extend({
     //   this.connector = connector;
   },
   methods: {
-    resize(e: any) {
-      console.log("resize");
-      console.log(e);
-    },
     send() {
       if (this.sendMessage.length == 0) {
         this.showEmptyWarning = true;
@@ -448,27 +334,6 @@ export default Vue.extend({
       checkedMessage: [] as ServerChatMsg[],
     };
   },
-  filters: {
-    msgTime(time: number) {
-      let m = moment(time);
-      if (m.isBefore(moment(), "year"))
-        return moment(time).format("YYYY/M/D H:mm");
-      else if (m.isBefore(moment(), "day"))
-        return moment(time).format("M/D H:mm");
-      else return moment(time).format("H:mm");
-    },
-    fileSize(size: number): string {
-      if (size < 1000) {
-        return size + " B";
-      } else if ((size /= 1024) < 1000) {
-        return size.toFixed(2) + " KiB";
-      } else if ((size /= 1024) < 1000) {
-        return size.toFixed(2) + " MiB";
-      } else {
-        return size.toFixed(2) + " GiB";
-      }
-    },
-  },
 });
 </script>
 
@@ -572,127 +437,6 @@ export default Vue.extend({
 .sendername {
   color: colors.theme-blue;
   font-weight: bold;
-}
-
-.msgbody {
-  background-color: white;
-  border-radius: 7px;
-  max-width: 400px;
-  font-size: 14px;
-
-  .msg-text {
-    white-space: pre-wrap;
-    word-wrap: break-word;
-    text-align: justify;
-    line-height: 24px;
-
-    .time {
-      margin-left: 8px;
-      float: right;
-      line-height: 12px;
-      padding-top: 7px;
-    }
-  }
-}
-
-.msgbody.type-text {
-  padding: 7px 10px;
-}
-
-.msgbody.type-image {
-  position: relative;
-
-  .bodytop {
-    margin: 7px 10px 3px;
-  }
-
-  .msg-text {
-    margin: 0 10px 7px;
-  }
-
-  .el-image {
-    max-width: 400px;
-    max-height: 250px;
-
-    &.noSender {
-      border-top-left-radius: 7px;
-      border-top-right-radius: 7px;
-      margin-top: -6px;
-    }
-  }
-
-  .image-only {
-    .el-image {
-      border-bottom-left-radius: 7px;
-      border-bottom-right-radius: 7px;
-      margin-bottom: -4px;
-    }
-
-    .time {
-      position: absolute;
-      font-size: 12px;
-      padding: 3px 10px;
-      right: 8px;
-      bottom: 8px;
-      border-radius: 7px;
-      color: white;
-      background-color: rgba(0, 0, 0, 0.3);
-      opacity: 0;
-      transition: opacity 0.1s ease-in;
-    }
-
-    &:hover {
-      .time {
-        opacity: 1;
-      }
-    }
-  }
-}
-
-.msgbody.type-file {
-  padding: 7px 10px;
-
-  .bodytop {
-    margin-bottom: -3px;
-  }
-
-  .file {
-    display: flex;
-    margin-top: 11px;
-    text-decoration: none;
-
-    // color: colors.theme-black;
-    .file-name {
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      width: 180px;
-      margin-bottom: 5px;
-    }
-  }
-
-  .time1 {
-    float: right;
-    margin-top: -6px;
-  }
-
-  .msg-text {
-    margin-top: 6px;
-  }
-
-  .file-icon {
-    width: 44px;
-    height: 44px;
-    border-radius: 50px;
-    background-color: colors.theme-blue;
-    margin-right: 8px;
-    color: colors.theme-light-grey;
-
-    i {
-      position: relative;
-      left: 10px;
-    }
-  }
 }
 
 .quote {
@@ -844,11 +588,8 @@ export default Vue.extend({
 }
 
 // 多选框样式
-.self_multi {
-  margin-right: auto;
-}
-
-.oppo_multi {
+.el-col {
+  margin-left: 20px;
 }
 
 .multi_row {
