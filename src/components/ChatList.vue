@@ -371,7 +371,7 @@
                 unread: 0,
             };
             const itemfalse = {
-                name: "无匹陪对象",
+                name: "无匹配对象",
                 head_pic: require("../assets/sample/avatar/pic_150.jpg"),
                 chat: "",
                 time: "",
