@@ -183,28 +183,57 @@
         </div>
       </vueScroll>
     </div>
-    <div class="chat-bottom-bar dark_light_bg dark_main_text" onresize="resize">
-      <div class="sendopt icon24">
-        <i class="el-icon-paperclip"></i>
-        <i class="el-icon-picture-outline"></i>
-      </div>
-      <el-input
-        type="textarea"
-        :autosize="{ maxRows: 8 }"
-        placeholder="请输入内容"
-        v-model="sendMessage"
-        resize="none"
-        @keydown.native="enterInput"
-      ></el-input>
-      <div class="sendicon icon24" slot="reference">
-        <div class="emptyWarning" :class="{ show: showEmptyWarning }">
-          不能发送空消息
+    <div class="chat-bottom-bar dark_light_bg dark_main_text">
+      <div v-if="quoteMsg" class="quote-bar">
+        <div class="quote">
+          <el-image
+            v-if="quoteMsg._t == 'image'"
+            :src="quoteMsg.image"
+          ></el-image>
+          <div>
+            <div class="sendername">
+              {{ quoteMsg.sender.name }}
+            </div>
+            <div class="quote-text">
+              <template v-if="quoteMsg._t == 'text'">
+                {{ quoteMsg.text }}
+              </template>
+              <template v-else-if="quoteMsg._t == 'image'">
+                [图片]
+                <span v-if="quoteMsg.caption">, {{ quoteMsg.caption }}</span>
+              </template>
+              <template v-else-if="quoteMsg._t == 'file'">
+                {{ quoteMsg.filename }}
+                <span v-if="quoteMsg.caption">, {{ quoteMsg.caption }}</span>
+              </template>
+            </div>
+          </div>
         </div>
-        <i
-          class="el-icon-s-promotion"
-          :class="{ iconforbid: sendMessage.length == 0 }"
-          @click="send()"
-        ></i>
+        <i class="el-icon-close" @click="quoteMsg = null"></i>
+      </div>
+      <div class="input-bar">
+        <div class="sendopt icon24">
+          <i class="el-icon-paperclip"></i>
+          <i class="el-icon-picture-outline"></i>
+        </div>
+        <el-input
+          type="textarea"
+          :autosize="{ maxRows: 8 }"
+          placeholder="请输入内容"
+          v-model="sendMessage"
+          resize="none"
+          @keydown.native="enterInput"
+        ></el-input>
+        <div class="sendicon icon24" slot="reference">
+          <div class="emptyWarning" :class="{ show: showEmptyWarning }">
+            不能发送空消息
+          </div>
+          <i
+            class="el-icon-s-promotion"
+            :class="{ iconforbid: sendMessage.length == 0 }"
+            @click="send()"
+          ></i>
+        </div>
       </div>
     </div>
     <!-- 多选框调试 -->
@@ -215,21 +244,22 @@
 </template>
 
 <script lang="ts">
-//todo: quote input
+//todo: right click: forward, quote, copy, muti-select
 //todo: upload image/ file
 // ? download file: in same site
-//todo: right click: forward, quote, copy, muti-select
 
-//todo: unread amount
-//todo: jump to message
+//// unread amount
+//// jump to message
 
-//// switch hotkey
-//// send empty warning
-//// online/offline
+//// quote input
+//// bottom-bar height
+//// muti-selected
+//// foward style
 //// quote style
 //// style for file
-//// foward style
-//// bottom-bar height
+//// online/offline
+//// send empty warning
+//// switch hotkey
 
 // * 处理消息数据：格式和字段名；转发消息从对象中移出
 
@@ -398,6 +428,20 @@ export default Vue.extend({
       },
 
       messages: ChatMessages,
+      quoteMsg: {
+        _t: "image",
+        id: "12343",
+        sender: {
+          name: "lynz",
+          avatar:
+            "https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png",
+        },
+        time: new Date("2019-05-20 23:55:10"),
+        image:
+          "https://img11.360buyimg.com/n1/jfs/t14497/67/1017638125/136874/65c4ecc3/5a422c37N1b36f52c.jpg",
+        caption:
+          "gugugugugugugugugugugugugugugugugugugugugugugugugugugugugugugugugugugugugugugugugugugugugugugugu",
+      },
 
       // 多选框取值
       MultiOn: false,
@@ -429,7 +473,11 @@ export default Vue.extend({
 </script>
 
 <style lang="stylus">
-.chat-bottom-bar {
+.input-bar {
+  padding: 6px 0;
+  display: flex;
+  align-items: flex-end;
+
   .sendopt {
     width: 60px;
 
@@ -455,6 +503,25 @@ export default Vue.extend({
   }
 }
 
+.quote-bar {
+  padding-top: 6px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  i {
+    z-index: 99;
+  }
+
+  .quote {
+    font-size: 14px;
+
+    .quote-text {
+      max-width: 400px;
+    }
+  }
+}
+
 .goBtn {
   position: absolute;
   z-index: 99;
@@ -477,6 +544,7 @@ export default Vue.extend({
   cursor: default;
   opacity: 0;
   transition: opacity 0.3s ease-in;
+  z-index: 10;
 
   &.show {
     opacity: 1;
@@ -501,16 +569,16 @@ export default Vue.extend({
   }
 }
 
+.sendername {
+  color: colors.theme-blue;
+  font-weight: bold;
+}
+
 .msgbody {
   background-color: white;
   border-radius: 7px;
   max-width: 400px;
   font-size: 14px;
-
-  .sendername {
-    color: colors.theme-blue;
-    font-weight: bold;
-  }
 
   .msg-text {
     white-space: pre-wrap;
@@ -714,10 +782,7 @@ export default Vue.extend({
   }
 
   .chat-bottom-bar {
-    padding: 6px 20px;
-    display: flex;
-    align-items: flex-end;
-    flex-shrink: 0;
+    padding: 0 20px;
   }
 }
 
