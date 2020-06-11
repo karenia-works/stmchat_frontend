@@ -360,7 +360,7 @@ export default Vue.extend({
   },
   computed: {
     checkedNumber() {
-      return this.checkedMessage.length;
+      return (this as any).checkedMessage.length;
     },
   },
   data() {
