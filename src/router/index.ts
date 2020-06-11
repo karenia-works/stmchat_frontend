@@ -9,7 +9,6 @@ import Chat from "@/components/Chat.vue";
 import ChatList from "@/components/ChatList.vue";
 import Setting from "@/components/Setting.vue";
 
-
 Vue.use(VueRouter);
 
 const routes = [
