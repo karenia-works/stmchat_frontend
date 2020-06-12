@@ -20,18 +20,16 @@
       <!-- 多选框功能栏 -->
       <template v-if="MultiOn">
         <div class="multi_row">
-          <el-button class="multi_delete" @click="deleteMulti"
-            ><div class="multi_button">
-              删除
-              <div class="multi_num">{{ checkedNumber }}</div>
-            </div></el-button
+          <el-button
+            type="primary"
+            class="multi_button"
+            @click="showDelete = true"
           >
-          <el-button class="multi_delete" @click="forwardMulti"
-            ><div class="multi_button">
-              转发
-              <div class="multi_num">{{ checkedNumber }}</div>
-            </div></el-button
-          >
+            删除 <span class="multi_num">{{ checkedNumber }}</span>
+          </el-button>
+          <el-button type="primary" class="multi_button" @click="forwardMulti">
+            转发 <span class="multi_num">{{ checkedNumber }}</span>
+          </el-button>
           <el-button class="multi_cancel" type="text" @click="CancelMulti"
             >取消</el-button
           >
@@ -87,24 +85,42 @@
             <Message
               :msg="data.msg"
               :showSender="showSender"
-              @contextmenu.native.prevent="openMenu($event, data.msg)"
+              @contextmenu.native.prevent="
+                if (!MultiOn) openMenu($event, data.msg);
+              "
             ></Message>
           </div>
         </div>
       </vueScroll>
 
       <!-- 删除消息确认 -->
-      <el-dialog title="删除消息" :visible.sync="showDelete" width="30%" center>
-        <span>是否删除此条消息？</span>
+      <el-dialog title="删除消息" :visible.sync="showDelete" width="30%">
+        <span v-if="!MultiOn">是否删除此条消息？</span>
+        <span v-else>是否删除所选消息？</span>
         <span slot="footer" class="dialog-footer">
-          <el-button @click="showDelete = false">取 消</el-button>
           <el-button
+            @click="showDelete = false"
+            type="text"
+            style="margin-right: 10px;"
+            >取消</el-button
+          >
+          <el-button
+            v-if="!MultiOn"
             type="primary"
             @click="
               deleteMsg(menuMsg.id);
               showDelete = false;
             "
-            >确 定</el-button
+            >确定</el-button
+          >
+          <el-button
+            v-else
+            type="primary"
+            @click="
+              deleteMulti();
+              showDelete = false;
+            "
+            >确定</el-button
           >
         </span>
       </el-dialog>
@@ -657,26 +673,17 @@ export default Vue.extend({
 
 .multi_row {
   padding: 5px;
-  display: flex;
-  justify-content: flex-start;
   width: 100%;
+  display: flex;
+  justify-content: center;
   align-items: center;
 
-  .multi_delete {
-    padding-top: 8px;
-    padding-bottom: 8px;
-    border: none;
-    background-color: colors.theme-blue;
-    color: white;
+  .multi_button {
+    padding: 8px 20px;
 
-    .multi_button {
-      display: flex;
-      flex-direction: row;
-
-      .multi_num {
-        margin-left: 5px;
-        color: colors.theme-grey;
-      }
+    .multi_num {
+      margin-left: 5px;
+      color: colors.theme-grey;
     }
   }
 
