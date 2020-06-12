@@ -1,5 +1,5 @@
 <template>
-  <div class="chat">
+  <div class="chat" @click="showMsgMenu = false">
     <!-- <div class="wrapper">
       <div v-for="msg in list" :key="msg.msg.id">{{ msg }}</div>
     </div>-->
@@ -16,7 +16,8 @@
           <span class="info">{{ chatinfo.group.member }} members</span>
         </template>
       </div>
-      <!-- 多选框 - 功能栏 -->
+
+      <!-- 多选框功能栏 -->
       <template v-if="MultiOn">
         <div class="multi_row">
           <el-button class="multi_delete" @click="deleteMulti"
@@ -40,7 +41,9 @@
         <i class="el-icon-more"></i>
       </div>-->
     </div>
+
     <div class="chat-messages dark_deep_bg">
+      <!-- 置底按钮 -->
       <el-button
         type="primary"
         icon="el-icon-arrow-down"
@@ -49,6 +52,23 @@
         class="goBtn"
         @click="jumpToMessage(-1)"
       ></el-button>
+
+      <!-- 右键菜单 -->
+      <el-card
+        v-if="menuMsg"
+        class="msg-menu"
+        :class="{ open: showMsgMenu }"
+        :style="{ left: msgMenuPos.x + 'px', top: msgMenuPos.y + 'px' }"
+        :body-style="{ padding: '0' }"
+      >
+        <div class="menu-item" @click="quoteMsg = menuMsg">回复</div>
+        <div class="menu-item" @click="forwardMsg(menuMsg.id)">转发</div>
+        <div class="menu-item" @click="MultiOn = true">多选</div>
+        <div class="menu-item delete" @click="showDelete = true">
+          删除
+        </div>
+      </el-card>
+
       <vueScroll ref="chat-messages" @handle-scroll="handleScroll">
         <div v-for="data in messages" :key="data.msg.id">
           <!-- 多选框 -->
@@ -64,11 +84,32 @@
               v-if="showAvatar"
             ></el-avatar>
 
-            <Message :msg="data.msg" :showSender="showSender"></Message>
+            <Message
+              :msg="data.msg"
+              :showSender="showSender"
+              @contextmenu.native.prevent="openMenu($event, data.msg)"
+            ></Message>
           </div>
         </div>
       </vueScroll>
+
+      <!-- 删除消息确认 -->
+      <el-dialog title="删除消息" :visible.sync="showDelete" width="30%" center>
+        <span>是否删除此条消息？</span>
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="showDelete = false">取 消</el-button>
+          <el-button
+            type="primary"
+            @click="
+              deleteMsg(menuMsg.id);
+              showDelete = false;
+            "
+            >确 定</el-button
+          >
+        </span>
+      </el-dialog>
     </div>
+
     <div class="chat-bottom-bar dark_light_bg dark_main_text">
       <div v-if="quoteMsg" class="quote-bar">
         <div class="quote">
@@ -122,21 +163,17 @@
         </div>
       </div>
     </div>
-    <!-- 多选框调试 -->
-    <el-button @click="MultiOn = !MultiOn"
-      >多选键（菜单实现以后删除）</el-button
-    >
   </div>
 </template>
 
 <script lang="ts">
-//todo: right click: forward, quote, copy, muti-select
 //todo: upload image/ file
 // ? download file: in same site
 
 //// unread amount
 //// jump to message
 
+//// right click: forward, quote, copy, muti-select
 //// quote input
 //// bottom-bar height
 //// muti-selected
@@ -239,6 +276,13 @@ export default Vue.extend({
       }
     },
 
+    openMenu(e: any, msg: ServerChatMsg) {
+      this.msgMenuPos.x = e.clientX - 5;
+      this.msgMenuPos.y = e.clientY - 60;
+      this.showMsgMenu = true;
+      this.menuMsg = msg;
+    },
+
     // 多选框方法
     checkMulti(checked: boolean, msg: ServerChatMsg) {
       if (checked) {
@@ -287,6 +331,16 @@ export default Vue.extend({
       connector: null,
       showGoDown: false,
       showEmptyWarning: false,
+      //menu
+      showMsgMenu: false,
+      menuMsg: null,
+      msgMenuPos: {
+        x: 0,
+        y: 0,
+      },
+      quoteMsg: null,
+      showDelete: false,
+
       list: [],
       sendMessage: "",
       me: {
@@ -312,22 +366,7 @@ export default Vue.extend({
         soundDegree: 100,
         hotKey: "enterSend", //"enterNewline"
       },
-
       messages: ChatMessages,
-      quoteMsg: {
-        _t: "image",
-        id: "12343",
-        sender: {
-          name: "lynz",
-          avatar:
-            "https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png",
-        },
-        time: new Date("2019-05-20 23:55:10"),
-        image:
-          "https://img11.360buyimg.com/n1/jfs/t14497/67/1017638125/136874/65c4ecc3/5a422c37N1b36f52c.jpg",
-        caption:
-          "gugugugugugugugugugugugugugugugugugugugugugugugugugugugugugugugugugugugugugugugugugugugugugugugu",
-      },
 
       // 多选框取值
       MultiOn: false,
@@ -368,6 +407,30 @@ export default Vue.extend({
   }
 }
 
+.quote {
+  border-left: 3px colors.theme-blue solid;
+  padding-left: 8px;
+  margin: 3px 0 5px;
+  color: colors.dark-sub-text;
+  display: flex;
+  font-size: 14px;
+
+  .el-image {
+    height: 43px;
+    width: 43px;
+    border-radius: 3px;
+    margin-right: 5px;
+    opacity: 0.8;
+  }
+
+  .quote-text {
+    // todo: quote width definited by message
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
 .quote-bar {
   padding-top: 6px;
   display: flex;
@@ -378,12 +441,8 @@ export default Vue.extend({
     z-index: 99;
   }
 
-  .quote {
-    font-size: 14px;
-
-    .quote-text {
-      max-width: 400px;
-    }
+  .quote-text {
+    width: 400px;
   }
 }
 
@@ -392,6 +451,34 @@ export default Vue.extend({
   z-index: 99;
   right: 16px;
   bottom: 16px;
+}
+
+.msg-menu {
+  height: 0;
+  overflow: hidden;
+  position: absolute;
+  transition: height 0.1s ease-out;
+  z-index: 100;
+
+  .menu-item {
+    width: 80px;
+    text-align: center;
+    font-size: 14px;
+    line-height: 30px;
+    transition: background-color 0.2s ease-out;
+
+    &.delete {
+      border-top: 1px solid colors.theme-light-grey;
+    }
+
+    &:hover {
+      background-color: rgba(64, 158, 255, 0.2);
+    }
+  }
+
+  &.open {
+    height: 121px;
+  }
 }
 
 .emptyWarning {
@@ -429,7 +516,7 @@ export default Vue.extend({
     margin-top: 5px;
 
     &.online {
-      color: $color-highlight-text;
+      color: colors.theme-blue;
     }
   }
 }
@@ -437,30 +524,6 @@ export default Vue.extend({
 .sendername {
   color: colors.theme-blue;
   font-weight: bold;
-}
-
-.quote {
-  border-left: 3px colors.theme-blue solid;
-  padding-left: 8px;
-  margin: 3px 0 5px;
-  color: colors.dark-sub-text;
-  display: flex;
-
-  .el-image {
-    height: 43px;
-    width: 43px;
-    border-radius: 3px;
-    margin-right: 5px;
-    opacity: 0.8;
-  }
-
-  .quote-text {
-    // todo: quote width definited by message
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 200px;
-  }
 }
 
 .chat-messages {
