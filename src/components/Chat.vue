@@ -7,9 +7,11 @@
       <div class="chatinfo" :class="chatinfo.type">
         <template v-if="chatinfo.type == 'private' && !MultiOn">
           <span>{{ chatinfo.user.name }}</span>
-          <span class="info" :class="chatinfo.user.status">{{
+          <span class="info" :class="chatinfo.user.status">
+            {{
             chatinfo.user.status
-          }}</span>
+            }}
+          </span>
         </template>
         <template v-if="chatinfo.type == 'group' && !MultiOn">
           <span>{{ chatinfo.group.name }}</span>
@@ -20,19 +22,15 @@
       <!-- 多选框功能栏 -->
       <template v-if="MultiOn">
         <div class="multi_row">
-          <el-button
-            type="primary"
-            class="multi_button"
-            @click="showDelete = true"
-          >
-            删除 <span class="multi_num">{{ checkedNumber }}</span>
+          <el-button type="primary" class="multi_button" @click="showDelete = true">
+            删除
+            <span class="multi_num">{{ checkedNumber }}</span>
           </el-button>
           <el-button type="primary" class="multi_button" @click="forwardMulti">
-            转发 <span class="multi_num">{{ checkedNumber }}</span>
+            转发
+            <span class="multi_num">{{ checkedNumber }}</span>
           </el-button>
-          <el-button class="multi_cancel" type="text" @click="CancelMulti"
-            >取消</el-button
-          >
+          <el-button class="multi_cancel" type="text" @click="CancelMulti">取消</el-button>
         </div>
       </template>
       <!-- <div class="chatopt icon24">
@@ -62,25 +60,18 @@
         <div class="menu-item" @click="quoteMsg = menuMsg">回复</div>
         <div class="menu-item" @click="forwardMsg(menuMsg.id)">转发</div>
         <div class="menu-item" @click="MultiOn = true">多选</div>
-        <div class="menu-item delete" @click="showDelete = true">
-          删除
-        </div>
+        <div class="menu-item delete" @click="showDelete = true">删除</div>
       </el-card>
 
       <vueScroll ref="chat-messages" @handle-scroll="handleScroll">
         <div v-for="data in messages" :key="data.msg.id">
           <!-- 多选框 -->
           <el-col :span="1" v-if="MultiOn">
-            <el-checkbox
-              @change="checked => checkMulti(checked, data.msg)"
-            ></el-checkbox
-          ></el-col>
+            <el-checkbox @change="checked => checkMulti(checked, data.msg)"></el-checkbox>
+          </el-col>
 
           <div class="msg" :class="{ self: data.msg.sender.name == me.name }">
-            <el-avatar
-              :src="data.msg.sender.avatar"
-              v-if="showAvatar"
-            ></el-avatar>
+            <el-avatar :src="data.msg.sender.avatar" v-if="showAvatar"></el-avatar>
 
             <Message
               :msg="data.msg"
@@ -98,12 +89,7 @@
         <span v-if="!MultiOn">是否删除此条消息？</span>
         <span v-else>是否删除所选消息？</span>
         <span slot="footer" class="dialog-footer">
-          <el-button
-            @click="showDelete = false"
-            type="text"
-            style="margin-right: 10px;"
-            >取消</el-button
-          >
+          <el-button @click="showDelete = false" type="text" style="margin-right: 10px;">取消</el-button>
           <el-button
             v-if="!MultiOn"
             type="primary"
@@ -111,8 +97,7 @@
               deleteMsg(menuMsg.id);
               showDelete = false;
             "
-            >确定</el-button
-          >
+          >确定</el-button>
           <el-button
             v-else
             type="primary"
@@ -120,8 +105,7 @@
               deleteMulti();
               showDelete = false;
             "
-            >确定</el-button
-          >
+          >确定</el-button>
         </span>
       </el-dialog>
     </div>
@@ -129,18 +113,11 @@
     <div class="chat-bottom-bar dark_light_bg dark_main_text">
       <div v-if="quoteMsg" class="quote-bar">
         <div class="quote">
-          <el-image
-            v-if="quoteMsg._t == 'image'"
-            :src="quoteMsg.image"
-          ></el-image>
+          <el-image v-if="quoteMsg._t == 'image'" :src="quoteMsg.image"></el-image>
           <div>
-            <div class="sendername">
-              {{ quoteMsg.sender.name }}
-            </div>
+            <div class="sendername">{{ quoteMsg.sender.name }}</div>
             <div class="quote-text">
-              <template v-if="quoteMsg._t == 'text'">
-                {{ quoteMsg.text }}
-              </template>
+              <template v-if="quoteMsg._t == 'text'">{{ quoteMsg.text }}</template>
               <template v-else-if="quoteMsg._t == 'image'">
                 [图片]
                 <span v-if="quoteMsg.caption">, {{ quoteMsg.caption }}</span>
@@ -168,9 +145,7 @@
           @keydown.native="enterInput"
         ></el-input>
         <div class="sendicon icon24" slot="reference">
-          <div class="emptyWarning" :class="{ show: showEmptyWarning }">
-            不能发送空消息
-          </div>
+          <div class="emptyWarning" :class="{ show: showEmptyWarning }">不能发送空消息</div>
           <i
             class="el-icon-s-promotion"
             :class="{ iconforbid: sendMessage.length == 0 }"
@@ -349,7 +324,7 @@ export default Vue.extend({
       showEmptyWarning: false,
       //menu
       showMsgMenu: false,
-      menuMsg: null,
+      menuMsg: undefined as ServerChatMsg | undefined,
       msgMenuPos: {
         x: 0,
         y: 0,
@@ -394,266 +369,267 @@ export default Vue.extend({
 
 <style lang="stylus">
 .input-bar {
-  padding: 6px 0;
-  display: flex;
-  align-items: flex-end;
+  padding: 6px 0
+  display: flex
+  align-items: flex-end
 
   .sendopt {
-    width: 60px;
+    width: 60px
 
     & i:first-child {
-      margin-right: 12px;
+      margin-right: 12px
     }
   }
 
   .el-textarea {
-    width: auto;
-    flex-grow: 1;
-    margin: 0 12px;
+    width: auto
+    flex-grow: 1
+    margin: 0 12px
 
     ::-webkit-scrollbar {
-      display: none;
+      display: none
     }
   }
 
   .icon24 {
-    height: 33px;
-    line-height: 33px;
-    position: relative;
+    height: 33px
+    line-height: 33px
+    position: relative
   }
 }
 
 .quote {
-  border-left: 3px colors.theme-blue solid;
-  padding-left: 8px;
-  margin: 3px 0 5px;
-  color: colors.dark-sub-text;
-  display: flex;
-  font-size: 14px;
+  border-left: 3px colors.theme-blue solid
+  padding-left: 8px
+  margin: 3px 0 5px
+  color: colors.dark-sub-text
+  display: flex
+  font-size: 14px
 
   .el-image {
-    height: 43px;
-    width: 43px;
-    border-radius: 3px;
-    margin-right: 5px;
-    opacity: 0.8;
+    height: 43px
+    width: 43px
+    border-radius: 3px
+    margin-right: 5px
+    opacity: 0.8
   }
 
   .quote-text {
     // todo: quote width definited by message
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    white-space: nowrap
+    overflow: hidden
+    text-overflow: ellipsis
   }
 }
 
 .quote-bar {
-  padding-top: 6px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  padding-top: 6px
+  display: flex
+  justify-content: space-between
+  align-items: center
 
   i {
-    z-index: 99;
+    z-index: 99
   }
 
   .quote-text {
-    width: 400px;
+    width: 400px
   }
 }
 
 .goBtn {
-  position: absolute;
-  z-index: 99;
-  right: 16px;
-  bottom: 16px;
+  position: absolute
+  z-index: 99
+  right: 16px
+  bottom: 16px
 }
 
 .msg-menu {
-  height: 0;
-  overflow: hidden;
-  position: absolute;
-  transition: height 0.1s ease-out;
-  z-index: 100;
+  height: 0
+  overflow: hidden
+  position: absolute
+  transition: height 0.1s ease-out
+  z-index: 100
 
   .menu-item {
-    width: 80px;
-    text-align: center;
-    font-size: 14px;
-    line-height: 30px;
-    transition: background-color 0.2s ease-out;
+    width: 80px
+    text-align: center
+    font-size: 14px
+    line-height: 30px
+    transition: background-color 0.2s ease-out
 
     &.delete {
-      border-top: 1px solid colors.theme-light-grey;
+      border-top: 1px solid colors.theme-light-grey
     }
 
     &:hover {
-      background-color: rgba(64, 158, 255, 0.2);
+      background-color: rgba(64, 158, 255, 0.2)
     }
   }
 
   &.open {
-    height: 121px;
+    height: 121px
   }
 }
 
 .emptyWarning {
-  position: absolute;
-  bottom: 50px;
-  right: 0;
-  border: 1px colors.dark-sub-text solid;
-  color: colors.dark-sub-text;
-  font-size: 14px;
-  width: 100px;
-  line-height: 14px;
-  padding: 10px 15px;
-  border-radius: 7px 7px 0 7px;
-  background-color: rgba(68, 71, 78, 0.5);
-  cursor: default;
-  opacity: 0;
-  transition: opacity 0.3s ease-in;
-  z-index: 10;
+  position: absolute
+  bottom: 50px
+  right: 0
+  border: 1px colors.dark-sub-text solid
+  color: colors.dark-sub-text
+  font-size: 14px
+  width: 100px
+  line-height: 14px
+  padding: 10px 15px
+  border-radius: 7px 7px 0 7px
+  background-color: rgba(68, 71, 78, 0.5)
+  cursor: default
+  opacity: 0
+  transition: opacity 0.3s ease-in
+  z-index: 10
 
   &.show {
-    opacity: 1;
+    opacity: 1
   }
 }
 
 .chatinfo {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
+  display: flex
+  flex-direction: column
+  justify-content: center
 
   span {
-    line-height: 14px;
+    line-height: 14px
   }
 
   .info {
-    margin-top: 5px;
+    margin-top: 5px
 
     &.online {
-      color: colors.theme-blue;
+      color: colors.theme-blue
     }
   }
 }
 
 .sendername {
-  color: colors.theme-blue;
-  font-weight: bold;
+  color: colors.theme-blue
+  font-weight: bold
 }
 
 .chat-messages {
-  position: relative;
+  position: relative
 
   .msg {
-    display: flex;
-    margin: 6px 20px;
+    display: flex
+    margin: 6px 20px
 
     .el-avatar {
-      margin-left: 0;
-      margin-right: 12px;
+      margin-left: 0
+      margin-right: 12px
     }
 
     &.self {
-      align-self: flex-end;
-      flex-direction: row-reverse;
+      align-self: flex-end
+      flex-direction: row-reverse
 
       .el-avatar {
-        margin-right: 0;
-        margin-left: 12px;
+        margin-right: 0
+        margin-left: 12px
       }
     }
   }
 }
 
 .info {
-  color: colors.dark-sub-text;
-  font-size: 12px;
+  color: colors.dark-sub-text
+  font-size: 12px
 }
 
 .icon24 {
-  font-size: 24px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
+  font-size: 24px
+  cursor: pointer
+  display: flex
+  align-items: center
 }
 
 .iconforbid {
-  color: gray;
-  cursor: default;
+  color: gray
+  cursor: default
 }
 
 .chat {
-  display: flex;
-  flex-direction: column;
-  max-width: 750px;
-  height: 600px;
+  display: flex
+  flex-direction: column
+  max-width: 750px
+  height: 600px
 
   .chat-top-bar {
-    flex-basis: 55px;
-    display: flex;
-    justify-content: space-between;
-    padding: 0 20px;
-    flex-shrink: 0;
+    flex-basis: 55px
+    display: flex
+    justify-content: space-between
+    padding: 0 20px
+    flex-shrink: 0
   }
 
   .chat-messages {
-    padding: 0;
-    display: flex;
-    flex-direction: column;
-    min-height: 0;
+    padding: 0
+    display: flex
+    flex-direction: column
+    min-height: 0
   }
 
   .chat-bottom-bar {
-    padding: 0 20px;
+    padding: 0 20px
   }
 }
 
-.chat-top-bar, .chat-bottom-bar {
-  background-color: colors.theme-grey;
+.chat-top-bar,
+.chat-bottom-bar {
+  background-color: colors.theme-grey
 }
 
 .chat-messages {
-  background-color: colors.theme-light-grey;
+  background-color: colors.theme-light-grey
 }
 
 @media (prefers-color-scheme: dark) {
   .dark_light_bg {
-    background-color: colors.dark-light;
-    border-color: colors.dark-medium;
+    background-color: colors.dark-light
+    border-color: colors.dark-medium
   }
 
   .dark_medium_bg {
-    background-color: colors.dark-medium;
-    border-color: colors.dark-light;
+    background-color: colors.dark-medium
+    border-color: colors.dark-light
   }
 
   .dark_deep_bg {
-    background-color: colors.dark-deep;
+    background-color: colors.dark-deep
   }
 
   .dark_sub_text {
-    color: colors.dark-sub-text;
+    color: colors.dark-sub-text
   }
 
   .dark_main_text {
-    color: colors.dark-main-text;
+    color: colors.dark-main-text
   }
 
   .chat-messages {
     .msg {
       .msgbody {
-        background-color: colors.dark-medium;
+        background-color: colors.dark-medium
 
         .sendername {
-          color: colors.theme-blue;
+          color: colors.theme-blue
         }
 
         .msg-text {
-          color: colors.dark-main-text;
+          color: colors.dark-main-text
 
           .time {
-            color: colors.dark-sub-text;
+            color: colors.dark-sub-text
           }
         }
       }
@@ -661,34 +637,34 @@ export default Vue.extend({
   }
 
   .el-textarea__inner {
-    color: colors.dark-main-text;
-    background-color: colors.dark-light;
+    color: colors.dark-main-text
+    background-color: colors.dark-light
   }
 }
 
 // 多选框样式
 .el-col {
-  margin-left: 20px;
+  margin-left: 20px
 }
 
 .multi_row {
-  padding: 5px;
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  padding: 5px
+  width: 100%
+  display: flex
+  justify-content: center
+  align-items: center
 
   .multi_button {
-    padding: 8px 20px;
+    padding: 8px 20px
 
     .multi_num {
-      margin-left: 5px;
-      color: colors.theme-grey;
+      margin-left: 5px
+      color: colors.theme-grey
     }
   }
 
   .multi_cancel {
-    margin-left: auto;
+    margin-left: auto
   }
 }
 </style>
