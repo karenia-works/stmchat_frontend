@@ -1,6 +1,11 @@
 export interface IServerConfig {
   environment: "development" | "production" | "test";
   wsEndpoint: string;
+  auth: {
+    clientId: string;
+    clientSecret: string;
+    tokenEndpoint: string;
+  };
   apiBaseUrl: string;
   apiEndpoints: {
     userProfile: {
@@ -25,6 +30,11 @@ let _cfg: IServerConfig = {
   environment: environment,
   wsEndpoint: "/ws",
   apiBaseUrl: "/api/v1",
+  auth: {
+    clientId: "",
+    clientSecret: "",
+    tokenEndpoint: "/connect/token",
+  },
   apiEndpoints: {
     userProfile: {
       get: "/user",
