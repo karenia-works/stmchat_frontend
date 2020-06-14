@@ -157,25 +157,19 @@
       <!-- 输入 -->
       <div class="input-bar">
         <div class="sendopt icon24">
-          <i class="el-icon-paperclip"></i>
           <el-upload
-            class="upload-demo"
             action="https://jsonplaceholder.typicode.com/posts/"
-            accept="image/png, image/jpeg"
+            :accept="uploadType == 'image' ? 'image/png, image/jpeg' : ''"
             :show-file-list="false"
+            :before-upload="beforeUpload"
+            :on-success="handleUploadSuccess"
             :on-error="handleUploadError"
-            :before-upload="
-              () => {
-                showUpload = true;
-              }
-            "
-            :on-success="
-              (res, file) => {
-                this.imageUrl = URL.createObjectURL(file.raw);
-              }
-            "
           >
-            <i class="el-icon-picture-outline"></i>
+            <i class="el-icon-paperclip" @click="uploadType = 'file'"></i>
+            <i
+              class="el-icon-picture-outline"
+              @click="uploadType = 'image'"
+            ></i>
           </el-upload>
         </div>
         <el-input
@@ -198,24 +192,31 @@
         </div>
       </div>
 
-      <el-dialog
-        :visible.sync="showUpload"
-        width="40%"
-        class="up-dialog"
-        fit="cover"
-      >
-        <div class="image-wrapper">
-          <el-image :src="imageUrl">
+      <el-dialog :visible="showUpload" width="40%" class="up-dialog">
+        <div class="image-wrapper" v-if="uploadType == 'image'">
+          <el-image :src="upUrl" fit="cover">
             <div slot="error" class="icon24">
               <i class="el-icon-loading"></i>
             </div>
           </el-image>
         </div>
+        <div v-else-if="showUpload && uploadType == 'file'" class="file">
+          <div class="file-icon icon24">
+            <i class="el-icon-loading" v-if="uploading"></i>
+            <i class="el-icon-document" v-else></i>
+          </div>
+          <div class="file-info">
+            <div class="file-name">{{ fileInfo.name }}</div>
+            <div class="info">{{ fileInfo.size | fileSize }}</div>
+          </div>
+        </div>
+
         <el-input
           placeholder="请输入内容"
           v-model="sendMessage"
           @keydown.native="enterInput"
         ></el-input>
+
         <span slot="footer" class="dialog-footer">
           <el-button
             @click="showUpload = false"
@@ -223,7 +224,9 @@
             style="margin-right: 10px;"
             >取消</el-button
           >
-          <el-button type="primary" @click="send">发送</el-button>
+          <el-button type="primary" @click="send" :disabled="uploading"
+            >发送</el-button
+          >
         </span>
       </el-dialog>
     </div>
@@ -277,19 +280,19 @@ export default Vue.extend({
   beforeMount: function() {},
   methods: {
     send() {
-      if (this.showUpload && this.imageUrl) {
+      if (this.showUpload && this.upUrl) {
         this.messages.push({
           msg: {
             _t: "image",
             id: "1" + new Date().getTime(),
             time: new Date(),
-            image: this.imageUrl,
+            image: this.upUrl,
             caption: this.sendMessage,
             sender: this.me,
           },
         });
         this.sendMessage = "";
-        this.imageUrl = "";
+        this.upUrl = "";
         this.showUpload = false;
       } else {
         if (this.sendMessage.length == 0) {
@@ -310,6 +313,7 @@ export default Vue.extend({
           this.sendMessage = "";
         }
       }
+      this.jumpToMessage(-1);
     },
     chatPosition() {
       let vs: any = this.$refs["chat-messages"];
@@ -355,14 +359,23 @@ export default Vue.extend({
     },
 
     // upload image
+    beforeUpload(file) {
+      this.fileInfo = {
+        name: file.name,
+        size: file.size,
+      };
+      this.showUpload = true;
+      this.uploading = true;
+    },
     handleUploadError() {
       // ProgressEvent 找不着错误消息提示
       this.$message.error("图片上传失败");
       this.showUpload = false;
     },
-    // handleImageSuccess(res, file) {
-    //   this.imageUrl = URL.createObjectURL(file.raw);
-    // },
+    handleUploadSuccess(res, file) {
+      this.uploading = false;
+      this.upUrl = URL.createObjectURL(file.raw);
+    },
 
     // 多选框方法
     checkMulti(checked: boolean, msg: ServerChatMsg) {
@@ -426,11 +439,13 @@ export default Vue.extend({
       showDelete: false,
 
       //upload
-      imageUrl: "",
+      showUpload: false,
+      uploadType: "",
+      upUrl: "",
       // "https://img11.360buyimg.com/n1/jfs/t14497/67/1017638125/136874/65c4ecc3/5a422c37N1b36f52c.jpg",
       // "https://www.spirit-animals.com/wp-content/uploads/2013/04/Dove-1-1090x380.jpg",
-      showUpload: false,
-      // onProgress: false,
+      fileInfo: null,
+      uploading: false,
 
       list: [],
       sendMessage: "",
@@ -463,6 +478,20 @@ export default Vue.extend({
       MultiOn: false,
       checkedMessage: [] as ServerChatMsg[],
     };
+  },
+
+  filters: {
+    fileSize(size: number): string {
+      if (size < 1000) {
+        return size + " B";
+      } else if ((size /= 1024) < 1000) {
+        return size.toFixed(2) + " KiB";
+      } else if ((size /= 1024) < 1000) {
+        return size.toFixed(2) + " MiB";
+      } else {
+        return size.toFixed(2) + " GiB";
+      }
+    },
   },
 });
 </script>
@@ -551,11 +580,43 @@ export default Vue.extend({
     max-height: 300px;
     min-height: 100px;
     overflow: hidden;
-    margin-bottom: 16px;
     border-radius: 4px;
   }
 
-  .el-image {
+  .file {
+    // color: colors.theme-black;
+    .file-name {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      width: 250px;
+    }
+
+    .file-info {
+      height: 44px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .file-icon {
+      float: left;
+      width: 44px;
+      height: 44px;
+      border-radius: 50px;
+      background-color: colors.theme-blue;
+      margin-right: 12px;
+      color: colors.theme-light-grey;
+
+      i {
+        position: relative;
+        left: 10px;
+      }
+    }
+  }
+
+  .el-input {
+    margin-top: 16px;
   }
 }
 
