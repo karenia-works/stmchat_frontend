@@ -17,7 +17,11 @@ export interface ICachingDataPool<T> {
 }
 
 export class ProfilePool<T> implements ICachingDataPool<T> {
-  public constructor(protected limit: number, protected endpoint: string) {
+  public constructor(
+    protected limit: number,
+    protected getDataEndpoint: string,
+    protected setDataEndpoint: (id: string) => string,
+  ) {
     this.cache = new Lru(limit);
   }
 
@@ -25,7 +29,7 @@ export class ProfilePool<T> implements ICachingDataPool<T> {
 
   private async lookUpUser(id: string): Promise<T | undefined> {
     // TODO: get data from backend
-    let userResp = await axios.get<T>(this.endpoint);
+    let userResp = await axios.get<T>(this.getDataEndpoint);
     let user = userResp.data;
     this.cache.set(id, user);
     return user;
@@ -47,9 +51,13 @@ export class ProfilePool<T> implements ICachingDataPool<T> {
     this.getData(id, true);
   }
 
-  public updateData(id: string, data: T): Promise<void> {
+  public async updateData(
+    id: string,
+    data: T,
+    writeThrough: boolean = true,
+  ): Promise<void> {
     this.cache.set(id, data);
-    return Promise.resolve();
+    await axios.post(this.setDataEndpoint(id), data);
   }
 
   public removeData(id: string): Promise<void> {
@@ -67,6 +75,9 @@ export class UserProfilePool extends ProfilePool<UserProfile> {
     super(
       1024,
       serverConfig.apiBaseUrl + serverConfig.apiEndpoints.userProfile.get,
+      id =>
+        serverConfig.apiBaseUrl +
+        serverConfig.apiEndpoints.userProfile.single.replace("{name}", id),
     );
     ws.userOnlineState.subscribe({
       next: msg => {
@@ -89,6 +100,9 @@ export class GroupProfilePool extends ProfilePool<GroupProfile> {
     super(
       1024,
       serverConfig.apiBaseUrl + serverConfig.apiEndpoints.groupProfile.get,
+      id =>
+        serverConfig.apiBaseUrl +
+        serverConfig.apiEndpoints.groupProfile.single.replace("{name}", id),
     );
   }
 }

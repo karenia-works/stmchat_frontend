@@ -114,6 +114,7 @@ export interface ClientMessage {
 
 export interface ClientChatMessage extends ClientMessage {
   _t: "chat";
+  chatId: string;
   msg: ClientChatMsg;
 }
 
