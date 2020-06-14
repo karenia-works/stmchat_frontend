@@ -1,158 +1,154 @@
 <template>
-  <div id="app">
-    <el-container>
-      <el-aside
-        width="350px"
-        class="dark_medium_bg demo-input-suffix"
-        style="overflow-x: hidden; overflow-y: hidden"
-      >
-        <vueScroll @handle-scroll="handleScroll">
-          <div class="search" @click="openSearch">
-            <el-input
-              v-model="input"
-              placeholder="search"
-              class="dark_eee_bg"
-              v-if="!searchShow"
-            >
-              <el-dropdown slot="prepend" @command="handleCommand">
-                <span class="el-dropdown-link">
-                  <i
-                    class="dark_main_text el-icon-s-unfold el-icon--center
+  <div>
+    <el-container
+      class="dark_medium_bg demo-input-suffix el-aside-container"
+      style="overflow-x: hidden; overflow-y: hidden;width:100%"
+    >
+      <vueScroll @handle-scroll="handleScroll">
+        <div class="search" @click="openSearch">
+          <el-input
+            v-model="input"
+            placeholder="search"
+            class="dark_eee_bg"
+            v-if="!searchShow"
+          >
+            <el-dropdown slot="prepend" @command="handleCommand">
+              <span class="el-dropdown-link">
+                <i
+                  class="dark_main_text el-icon-s-unfold el-icon--center
                       el-icon-size el-icon-backgroud"
-                  ></i>
-                </span>
-                <el-dropdown-menu slot="dropdown" class="dark_medium_bg">
-                  <el-dropdown-item command="a" class="dark_main_text">
-                    <i class="el-icon-user-solid el-icon-size"></i>
-                    New group
-                  </el-dropdown-item>
-                  <el-dropdown-item command="b" class="dark_main_text">
-                    <i class="el-icon-s-custom el-icon-size"></i>
-                    Contacts
-                  </el-dropdown-item>
-                  <el-dropdown-item command="c" class="dark_main_text">
-                    <i class="el-icon-setting el-icon-size"></i>
-                    Settings
-                  </el-dropdown-item>
-                  <el-dropdown-item command="d" class="dark_main_text">
-                    <i class="el-icon-question el-icon-size"></i>
-                    STM FAQ
-                  </el-dropdown-item>
-                  <el-dropdown-item command="e" class="dark_main_text">
-                    <i class="el-icon-s-promotion el-icon-size"></i>
-                    About
-                  </el-dropdown-item>
-                </el-dropdown-menu>
-              </el-dropdown>
-            </el-input>
+                ></i>
+              </span>
+              <el-dropdown-menu slot="dropdown" class="dark_medium_bg">
+                <el-dropdown-item command="a" class="dark_main_text">
+                  <i class="el-icon-user-solid el-icon-size"></i>
+                  New group
+                </el-dropdown-item>
+                <el-dropdown-item command="b" class="dark_main_text">
+                  <i class="el-icon-s-custom el-icon-size"></i>
+                  Contacts
+                </el-dropdown-item>
+                <el-dropdown-item command="c" class="dark_main_text">
+                  <i class="el-icon-setting el-icon-size"></i>
+                  Settings
+                </el-dropdown-item>
+                <el-dropdown-item command="d" class="dark_main_text">
+                  <i class="el-icon-question el-icon-size"></i>
+                  STM FAQ
+                </el-dropdown-item>
+                <el-dropdown-item command="e" class="dark_main_text">
+                  <i class="el-icon-s-promotion el-icon-size"></i>
+                  About
+                </el-dropdown-item>
+              </el-dropdown-menu>
+            </el-dropdown>
+          </el-input>
 
-            <!-- 搜索-->
-          </div>
-          <!-- <el-card class="box-card " style="margin-left: 0px">  v-on:input="inputChange"-->
-          <div class="search-header" v-if="searchShow">
-            <el-input
-              name="input"
-              class="keyword"
-              v-model="searchWord"
-              v-on:input="queryData"
-              placeholder="search"
-              clearable
+          <!-- 搜索-->
+        </div>
+        <!-- <el-card class="box-card " style="margin-left: 0px">  v-on:input="inputChange"-->
+        <div class="search-header" v-if="searchShow">
+          <el-input
+            name="input"
+            class="keyword"
+            v-model="searchWord"
+            v-on:input="queryData"
+            placeholder="search"
+            clearable
+          >
+            <el-button
+              slot="prepend"
+              type="primary"
+              @click="closeSearch"
+              class="el-button-new"
+              size="mini"
             >
-              <el-button
-                slot="prepend"
-                type="primary"
-                @click="closeSearch"
-                class="el-button-new"
-                size="mini"
-              >
-                <i class="el-icon-back  el-icon--center" style="font-size:18px">
-                </i>
-              </el-button>
-            </el-input>
-          </div>
+              返回
+            </el-button>
+          </el-input>
+        </div>
 
-          <div
-            v-for="(o, index) in sortableData"
-            v-bind:key="o"
-            @click="handleclick(index), (o.unread = 0)"
-            :class="active == index ? 'addclass' : ''"
-            class="dark_main_text dark_deep_bg"
-            v-show="chatShow"
-          >
-            <!-- <el-card body-style="{ padding: '0' }" style="height:100px"> -->
-            <el-row type="flex" style="height:65px" align="middle">
-              <el-col span="6" offset="2">
-                <img :src="o.head_pic" class="round_icon img_size" />
-              </el-col>
-              <el-col span="12">
-                <div class="name_size">
-                  <span>{{ o.name }}</span>
-                </div>
-                <div
-                  class="bottom clearfix margin-bottom:5px"
-                  style="font-size:12px;color: dimgray"
-                >
-                  <!-- <div >{{o.chat| ellipsis}}</div>-->
-                  <template>
-                    <span
-                      class="dark_sub_text"
-                      v-html="$options.filters.ellipsis(o.chat)"
-                    >
-                    </span>
-                  </template>
-                </div>
-              </el-col>
-              <el-col span="5">
-                <div style="height:50px;font-size:12px;color:dimgray;">
-                  <div class="dark_sub_text">{{ o.time }}</div>
-                  <el-badge
-                    :value="o.unread"
-                    class="item"
-                    style="margin-top:15px ;padding-left:10px;"
-                    v-show="o.unread > 0"
-                  ></el-badge>
-                </div>
-              </el-col>
-            </el-row>
-            <!-- </el-card> -->
-          </div>
-          <div
-            v-for="(o, index) in selectableData"
-            v-bind:key="o"
-            @click="handleclick(index), (o.unread = 0)"
-            :class="active == index ? 'addclass' : ''"
-            class="dark_main_text dark_deep_bg"
-            v-show="selectShow"
-          >
-            <!-- <el-card body-style="{ padding: '0' }" style="height:100px"> -->
-            <el-row type="flex" style="height:65px" align="middle">
-              <el-col span="6" offset="2">
-                <img :src="o.head_pic" class="round_icon img_size" />
-              </el-col>
-              <el-col span="12">
-                <div class="name_size">
-                  <span>{{ o.name }}</span>
-                </div>
-                <div
-                  class="bottom clearfix margin-bottom:5px"
-                  style="font-size:12px;color: dimgray"
-                >
-                  <!-- <div >{{o.chat| ellipsis}}</div>-->
-                  <template>
-                    <span
-                      class="dark_sub_text"
-                      v-html="$options.filters.ellipsis(o.chat)"
-                    >
-                    </span>
-                  </template>
-                </div>
-              </el-col>
-            </el-row>
-            <!-- </el-card> -->
-          </div>
-        </vueScroll>
-        <!-- </el-card> -->
-      </el-aside>
+        <div
+          v-for="(o, index) in sortableData"
+          v-bind:key="o"
+          @click="handleclick(index), (o.unread = 0)"
+          :class="active == index ? 'addclass' : ''"
+          class="dark_main_text dark_deep_bg"
+          v-show="chatShow"
+        >
+          <!-- <el-card body-style="{ padding: '0' }" style="height:100px"> -->
+          <el-row type="flex" style="height:65px" align="middle">
+            <el-col span="6" offset="2">
+              <img :src="o.head_pic" class="round_icon img_size" />
+            </el-col>
+            <el-col span="12">
+              <div class="name_size">
+                <span>{{ o.name }}</span>
+              </div>
+              <div
+                class="bottom clearfix margin-bottom:5px"
+                style="font-size:12px;color: dimgray"
+              >
+                <!-- <div >{{o.chat| ellipsis}}</div>-->
+                <template>
+                  <span
+                    class="dark_sub_text"
+                    v-html="$options.filters.ellipsis(o.chat)"
+                  >
+                  </span>
+                </template>
+              </div>
+            </el-col>
+            <el-col span="5">
+              <div style="height:50px;font-size:12px;color:dimgray;">
+                <div class="dark_sub_text">{{ o.time }}</div>
+                <el-badge
+                  :value="o.unread"
+                  class="item"
+                  style="margin-top:15px ;padding-left:10px;"
+                  v-show="o.unread > 0"
+                ></el-badge>
+              </div>
+            </el-col>
+          </el-row>
+          <!-- </el-card> -->
+        </div>
+        <div
+          v-for="(o, index) in selectableData"
+          v-bind:key="o"
+          @click="handleclick(index), (o.unread = 0)"
+          :class="active == index ? 'addclass' : ''"
+          class="dark_main_text dark_deep_bg"
+          v-show="selectShow"
+        >
+          <!-- <el-card body-style="{ padding: '0' }" style="height:100px"> -->
+          <el-row type="flex" style="height:65px" align="middle">
+            <el-col span="6" offset="2">
+              <img :src="o.head_pic" class="round_icon img_size" />
+            </el-col>
+            <el-col span="12">
+              <div class="name_size">
+                <span>{{ o.name }}</span>
+              </div>
+              <div
+                class="bottom clearfix margin-bottom:5px"
+                style="font-size:12px;color: dimgray"
+              >
+                <!-- <div >{{o.chat| ellipsis}}</div>-->
+                <template>
+                  <span
+                    class="dark_sub_text"
+                    v-html="$options.filters.ellipsis(o.chat)"
+                  >
+                  </span>
+                </template>
+              </div>
+            </el-col>
+          </el-row>
+          <!-- </el-card> -->
+        </div>
+      </vueScroll>
+      <!-- </el-card> -->
     </el-container>
   </div>
 </template>
@@ -162,12 +158,12 @@
   color: dimgray;
 }
 
-.el-aside {
+.el-aside-container {
   background-color: white;
 }
 
 .el-container {
-  height: 640px;
+  height: 650px;
   solid-color: #eeeeee;
 }
 
@@ -246,17 +242,10 @@
   }
 }
 
-.el-button {
-  height: 3.5rem;
-  width: 4rem;
-  margin-top: 0.6rem;
-  border-radius: 4px;
-}
-
 .el-button-new {
-  height: 3.5rem;
-  width: 1rem;
-  margin-top: 0.6rem;
+  height: 0.5rem;
+  width: 3.8 rem;
+  margin-top: 0 rem;
   background-color: white;
 }
 </style>
@@ -395,15 +384,15 @@ export default {
       console.log("111");
 
       if (command == "a") {
-        this.$emit("chatListCommand","a");
+        this.$emit("chatListCommand", "a");
       } else if (command == "b") {
-        this.$emit("chatListCommand","b");
+        this.$emit("chatListCommand", "b");
       } else if (command == "c") {
-        this.$emit("chatListCommand","c");
+        this.$emit("chatListCommand", "c");
       } else if (command == "d") {
-        this.$emit("chatListCommand","d");
+        this.$emit("chatListCommand", "d");
       } else if (command == "e") {
-        this.$emit("chatListCommand","e");
+        this.$emit("chatListCommand", "e");
       }
     },
     handleclick(index) {

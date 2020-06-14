@@ -1,19 +1,26 @@
 <template>
-  <el-row style="height:500px">
-    <div>
-      <el-input v-model="input" placeholder="Search" style="height:35px">
-        <i slot="prefix" class="el-input__icon el-icon-search"></i>
-      </el-input>
-    </div>
-    <hr class="hr111 dark_hr" />
-    <userlist></userlist>
-    <userlist></userlist>
-    <userlist></userlist>
-    <userlist></userlist>
-    <userlist></userlist>
-    <userlist></userlist>
-    <userlist></userlist>
-  </el-row>
+  <vueScroll @handle-scroll="handleScroll">
+    <el-row class="userSearch-row">
+      <div>
+        <el-input v-model="input" placeholder="Search" class="userSearch-input">
+          <i slot="prefix" class="el-input__icon el-icon-search"></i>
+        </el-input>
+      </div>
+      <hr class="hr111 dark_hr" />
+      <userlist></userlist>
+      <userlist></userlist>
+      <userlist></userlist>
+      <userlist></userlist>
+      <userlist></userlist>
+      <userlist></userlist>
+      <userlist></userlist>
+      <userlist></userlist>
+      <userlist></userlist>
+      <userlist></userlist>
+      <userlist></userlist>
+      <userlist></userlist>
+    </el-row>
+  </vueScroll>
 </template>
 <script>
 export default {
@@ -27,8 +34,13 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
-.el-input input {
+.userSearch-input input {
   border: none;
+  height:35px;
+}
+.userSearch-row {
+  height:100%;
+  max-height: 520px;
 }
 
 .hr111 {

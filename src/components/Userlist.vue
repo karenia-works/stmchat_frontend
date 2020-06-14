@@ -1,6 +1,6 @@
 <template>
   <el-container>
-    <el-aside width="70px">
+    <el-aside width="50px">
       <el-avatar :size="50" :src="circleUrl"></el-avatar>
     </el-aside>
     <el-container height="400">

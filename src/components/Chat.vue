@@ -1,5 +1,5 @@
 <template>
-  <div class="chat" @click="showMsgMenu = false">
+  <div class="chat" @click="showMsgMenu = false" style="width:100%">
     <!-- <div class="wrapper">
       <div v-for="msg in list" :key="msg.msg.id">{{ msg }}</div>
     </div>-->
@@ -561,8 +561,8 @@ export default Vue.extend({
 .chat {
   display: flex
   flex-direction: column
-  max-width: 750px
-  height: 600px
+  width: 850px
+  height: 650px
 
   .chat-top-bar {
     flex-basis: 55px

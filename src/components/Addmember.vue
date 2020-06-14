@@ -1,14 +1,14 @@
 <template>
-  <el-card class="box-card dark_medium_bg">
+  <el-card class="box-card dark_medium_bg" style="height:100%">
     <el-container>
-      <el-header height="25px">
+      <el-header style="height:20%">
         <span class="dark_main_text">添加小组成员</span>
         <span class="mem-num dark_sub_text">1/200000</span>
       </el-header>
-      <el-main height="600px">
+      <el-main style="height:60%">
         <user></user>
       </el-main>
-      <el-footer height="35px">
+      <el-footer style="height:20%">
         <el-button
           style="float: right"
           type="text"
@@ -59,8 +59,10 @@ export default {
 }
 
 .box-card {
-  width: 350px;
   margin-left: 0px;
+  width:100%;
+  border-radius: 0px;
+  max-height:650px;
 }
 
 .mem-num {

@@ -1,5 +1,5 @@
 <template>
-  <el-container class="home-container">
+  <el-container>
     <el-header class="home-header dark_light_bg dark_main_text">
       STM-Chat---STM for Lighter Communication</el-header
     >
@@ -13,11 +13,11 @@
       >
         <Setting></Setting>
       </el-dialog>
-      <el-row>
+      <el-row class="home-row">
         <el-col :span="3"><div class="grid-content-home"></div></el-col>
         <el-col :span="16" class="home-col"
           ><el-container width="50%">
-            <el-aside width="35%">
+            <el-aside width="35%" style="overflow-x: hidden;">
               <Setting
                 v-show="showSetting"
                 v-on:closed="closed"
@@ -42,10 +42,9 @@
               >
               </Addmember>
             </el-aside>
-            <el-main background-color=red>
+            <el-container width="65%">
               <Chat></Chat>
-            </el-main>
-          </el-container
+            </el-container> </el-container
         ></el-col>
       </el-row>
     </el-main>
@@ -59,10 +58,7 @@
   text-align: left;
   line-height: 60px;
 }
-.home-container {
-  height: 755px;
-  border: 1px solid #eee;
-}
+
 .home-main {
   background-color: #a9f1e8;
   color: #333;
@@ -76,12 +72,12 @@
 .home-col {
   border-radius: 4px;
   min-height=36px;
-  background-color:white;
 }
 .grid-content-home {
   border-radius: 4px;
   min-height: 36px;
 }
+
 
 @media (prefers-color-scheme: dark) {
   .dark_light_bg {
