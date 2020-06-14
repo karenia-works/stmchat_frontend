@@ -1,5 +1,5 @@
 <template>
-  <el-container style="padding:10px;height: 755px; border: 1px solid #eee">
+  <el-container style="padding: 10px; height: 755px; border: 1px solid #eee;">
     <el-header class="dark_light_bg dark_main_text"
       >STM-Chat---STM for Lighter Communication</el-header
     >
@@ -9,46 +9,28 @@
           <div class="grid-content"></div>
         </el-col>
         <el-col :span="12">
-          <div>
-            <el-card class="dark_medium_bg">
-              <div slot="header">
-                <el-steps
-                  :active="active"
-                  finish-status="success"
-                  simple
-                  style="margin-top: 1px"
-                  class="dark_light_bg"
-                >
-                  <el-step title="基本信息"></el-step>
-                  <el-step title="验证绑定"></el-step>
-                  <el-step title="获取ID"></el-step>
-                </el-steps>
-                <el-link
-                  :underline="false"
-                  style="float:right"
-                  v-on:click="ToLogin"
-                  class="dark_main_text"
-                  >已有账户？直接登录</el-link
-                >
-              </div>
-              <el-row v-show="active0">
-                <el-col :span="5">
-                  <div class="grid-content"></div>
-                </el-col>
-                <el-col :span="12">
+          <el-card class="box-card dark_medium_bg" shadow="always">
+            <div slot="header" class="dark_main_text">
+              Welcome to STM-Chat
+              <el-link
+                :underline="false"
+                style="float: right;"
+                v-on:click="ToLogin"
+                class="dark_main_text"
+                >已有账户？即刻登录</el-link
+              >
+            </div>
+            <el-row>
+              <el-col :span="5">
+                <div class="grid-content"></div>
+              </el-col>
+              <el-col :span="12">
+                <div class="demo-input-suffix">
                   <el-input
-                    placeholder="昵称"
+                    placeholder="用户名"
                     prefix-icon="el-icon-user-solid"
                     clearable
-                    v-model="userName"
-                    class="a"
-                  ></el-input>
-
-                  <el-input
-                    placeholder="手机号"
-                    prefix-icon="el-icon-phone-outline"
-                    clearable
-                    v-model="userNumber"
+                    v-model="userID"
                   ></el-input>
 
                   <el-input
@@ -59,70 +41,19 @@
                   ></el-input>
 
                   <el-button
-                    style="margin-top: 12px;"
-                    v-on:click="next"
-                    class="dark_light_bg dark_main_text"
-                    >下一步</el-button
+                    type="primary"
+                    v-on:click="register"
+                    class="dark_light_bg"
+                    >注册</el-button
                   >
-                </el-col>
-                <el-col :span="5">
-                  <div class="grid-content"></div>
-                </el-col>
-              </el-row>
-
-              <el-row v-show="active1">
-                <el-col :span="5">
-                  <div class="grid-content"></div>
-                </el-col>
-                <el-col :span="12">
-                  <el-input
-                    prefix-icon="el-icon-phone-outline"
-                    :disabled="true"
-                    v-model="userNumber"
-                  ></el-input>
-
-                  <el-input
-                    placeholder="已发送短信验证码，请查收并输入"
-                    prefix-icon="el-icon-s-promotion"
-                    v-model="queryCode"
-                  ></el-input>
-
-                  <el-button
-                    style="margin-top: 12px;"
-                    v-on:click="next"
-                    class="dark_light_bg dark_main_text"
-                    >下一步</el-button
-                  >
-                </el-col>
-                <el-col :span="5">
-                  <div class="grid-content"></div>
-                </el-col>
-              </el-row>
-
-              <el-row v-show="active2">
-                <el-col :span="4">
-                  <div class="grid-content"></div>
-                </el-col>
-                <el-col :span="14">
-                  <p class="dark_main_text">
-                    注册成功，您可使用手机号或系统分配ID进行登录以及密码的找回。
-                    <br />系统分配ID为XXXXXX
-                  </p>
-                  <el-button
-                    style="margin-top: 12px;"
-                    v-on:click="next"
-                    class="dark_light_bg dark_main_text"
-                    >下一步</el-button
-                  >
-                </el-col>
-                <el-col :span="4">
-                  <div class="grid-content"></div>
-                </el-col>
-              </el-row>
-            </el-card>
-          </div>
+                </div>
+              </el-col>
+              <el-col :span="6">
+                <div class="grid-content"></div>
+              </el-col>
+            </el-row>
+          </el-card>
         </el-col>
-
         <el-col :span="6">
           <div class="grid-content"></div>
         </el-col>
@@ -131,94 +62,24 @@
   </el-container>
 </template>
 
-<script>
-export default {
-  data() {
-    return {
-      queryCode: "",
-      active: 1,
-      active0: true,
-      active1: false,
-      active2: false,
-      userName: "",
-      userNumber: "",
-      userPasswd: "",
-      getUserNumber: this.userNumber,
-    };
-  },
-
-  methods: {
-    next() {
-      if (this.active++ > 2) this.$router.push({ path: "/Login" });
-      if (this.active == 2) {
-        this.active0 = false;
-        this.active1 = true;
-      } else if (this.active == 3) {
-        this.active1 = false;
-        this.active2 = true;
-      }
-    },
-    ToLogin() {
-      this.$router.push({ path: "/Login" });
-    },
-    succeed() {
-      this.$message({
-        message: "验证码通过",
-        type: "success",
-      });
-    },
-    wrongCode() {
-      this.$message({
-        message: "验证码错误，请核实后再次填写",
-        type: "warning",
-      });
-    },
-    warning() {
-      this.$message({
-        message: "该手机号码已有绑定账户",
-        type: "warning",
-      });
-    },
-
-    register() {
-      if (
-        this.userName == "" ||
-        this.userPasswd == "" ||
-        this.getUserNumber == ""
-      ) {
-        alert("基本信息不得为空");
-      } else {
-        let data = { username: this.userName, password: this.userPasswd };
-        this.$http.post("", data).then(res => {
-          console.log(res);
-          if (res.data == "ok") {
-            //
-          }
-        });
-      }
-    },
-  },
-};
-</script>
-
 <style lang="stylus" scoped>
 .el-header, .el-footer {
   background-color: colors.theme-green;
-  color: colors.theme-black;
+  color :colors.theme-black
   text-align: left;
   line-height: 60px;
 }
 
 .el-main {
   background-color: colors.theme-light-green;
-  color: colors.theme-black;
+  color :colors.theme-black
   text-align: center;
   line-height: 70px;
 }
 
-.grid-content {
-  border-radius: 4px;
-  min-height: 36px;
+.box-card {
+  width: 700px;
+  align: center;
 }
 
 .el-row {
@@ -233,8 +94,9 @@ export default {
   border-radius: 4px;
 }
 
-.box-card {
-  text-align: center;
+.grid-content {
+  border-radius: 4px;
+  min-height: 36px;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -261,3 +123,45 @@ export default {
   }
 }
 </style>
+
+<script>
+export default {
+  methods: {
+    register() {
+      if (this.userName == "" || this.userPasswd == "") {
+        alert("基本信息不得为空");
+      } else {
+        let data = { username: this.userName, password: this.userPasswd };
+        this.$http.post("", data).then((res) => {
+          console.log(res);
+          if (res.data == "ok") {
+            //
+          }
+        });
+      }
+    },
+    ToLogin() {
+      this.$router.push({ path: "/Login" });
+    },
+    succeed() {
+      this.$message({
+        message: "注册成功",
+        type: "success",
+      });
+      this.$router.push({ path: "/Login" });
+    },
+    warning() {
+      this.$message({
+        message: "用户名重复",
+        type: "warning",
+      });
+    },
+  },
+  data() {
+    return {
+      userID: "",
+      userPasswd: "",
+    };
+  },
+};
+</script>

@@ -1,5 +1,5 @@
 <template>
-  <el-container style="padding:10px;height: 755px; border: 1px solid #eee">
+  <el-container style="padding: 10px; height: 755px; border: 1px solid #eee;">
     <el-header class="dark_light_bg dark_main_text"
       >STM-Chat---STM for Lighter Communication</el-header
     >
@@ -14,7 +14,7 @@
               Welcome to STM-Chat
               <el-link
                 :underline="false"
-                style="float:right"
+                style="float: right;"
                 v-on:click="ToRegister"
                 class="dark_main_text"
                 >暂无账户？马上注册</el-link
@@ -24,10 +24,10 @@
               <el-col :span="5">
                 <div class="grid-content"></div>
               </el-col>
-              <el-col :span="12">
+              <el-col :span="15">
                 <div class="demo-input-suffix">
                   <el-input
-                    placeholder="用户ID/手机号"
+                    placeholder="用户名"
                     prefix-icon="el-icon-user-solid"
                     clearable
                     v-model="userID"
@@ -54,7 +54,7 @@
             </el-row>
           </el-card>
         </el-col>
-        <el-col :span="6">
+        <el-col :span="3">
           <div class="grid-content"></div>
         </el-col>
       </el-row>
@@ -78,6 +78,7 @@
 }
 
 .box-card {
+  width: 700px;
   align: center;
 }
 
@@ -131,7 +132,7 @@ export default {
         alert("请输入用户名或密码");
       } else {
         let data = { userID: this.userID, userPasswd: this.userPasswd };
-        this.$http.post("", data).then(res => {
+        this.$http.post("", data).then((res) => {
           console.log(res);
           if (res.data == -1) {
             this.tip = "账户不存在";
@@ -146,7 +147,7 @@ export default {
             this.showTip = true;
             // setCookie("username", this.username, 1000 * 60);
             setTimeout(
-              function() {
+              function () {
                 this.$router.push({ path: "/test" });
               }.bind(this),
               1000,

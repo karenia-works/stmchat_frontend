@@ -1,18 +1,18 @@
 <template>
   <el-card class="box-card dark_medium_bg">
     <el-container>
-      <el-header height="15px" class="dark_main_text">
-        <span>Contacts</span>
+      <el-header height="25px" class="dark_main_text">
+        <span>通讯录</span>
       </el-header>
-      <el-main height="600px">
+      <el-main>
         <user></user>
       </el-main>
-      <el-footer height="30px">
-        <el-button style="float: left" type="text" class="dark_main_text"
-          >ADD CONTACT</el-button
+      <el-footer height="35px">
+        <el-button style="float: left" type="text" class="dark_main_text" @click="addContacts"
+          >添加新联系人</el-button
         >
-        <el-button style="float: right" type="text" class="dark_main_text"
-          >CLOSE</el-button
+        <el-button style="float: right" type="text" class="dark_main_text" @click="close"
+          >关闭</el-button
         >
       </el-footer>
     </el-container>
@@ -22,6 +22,14 @@
 <script>
 export default {
   name: "Contacts",
+  methods:{
+    close(){
+      this.$emit('contactClose');
+    },
+    addContacts(){
+      this.$emit('addContacts');
+    },
+  }
 };
 </script>
 
@@ -43,8 +51,8 @@ export default {
 }
 
 .box-card {
-  width: 400px;
-  margin-left: 50px;
+  width: 350px;
+  margin-left: 0px;
 }
 
 @media (prefers-color-scheme: dark) {

@@ -8,10 +8,16 @@ import Contacts from "@/components/Contacts.vue";
 import Chat from "@/components/Chat.vue";
 import ChatList from "@/components/ChatList.vue";
 import Setting from "@/components/Setting.vue";
+import STM_Chat from "@/components/STM_Chat.vue";
 
 Vue.use(VueRouter);
 
 const routes = [
+  {
+    path: "/STM-Chat",
+    name: "stm chat main page",
+    component: STM_Chat,
+  },
   {
     path: "/Login",
     name: "Login",

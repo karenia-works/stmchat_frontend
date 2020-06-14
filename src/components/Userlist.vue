@@ -3,7 +3,7 @@
     <el-aside width="70px">
       <el-avatar :size="50" :src="circleUrl"></el-avatar>
     </el-aside>
-    <el-container>
+    <el-container height="400">
       <el-header height="30px" class="dark_main_text">Header</el-header>
       <el-footer height="20px" class="dark_sub_text">Footer</el-footer>
     </el-container>

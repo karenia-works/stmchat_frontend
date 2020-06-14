@@ -2,7 +2,7 @@
   <div id="app">
     <el-container>
       <el-aside
-        width="300px"
+        width="350px"
         class="dark_medium_bg demo-input-suffix"
         style="overflow-x: hidden; overflow-y: hidden"
       >
@@ -167,7 +167,7 @@
 }
 
 .el-container {
-  height: 700px;
+  height: 640px;
   solid-color: #eeeeee;
 }
 
@@ -395,15 +395,15 @@ export default {
       console.log("111");
 
       if (command == "a") {
-        this.$router.push({ path: "/Setgroup" });
+        this.$emit("chatListCommand","a");
       } else if (command == "b") {
-        this.$router.push({ path: "/Contacts" });
+        this.$emit("chatListCommand","b");
       } else if (command == "c") {
-        this.$router.push({ path: "/setting" });
+        this.$emit("chatListCommand","c");
       } else if (command == "d") {
-        this.$router.push({ path: "/STM FAQ" });
+        this.$emit("chatListCommand","d");
       } else if (command == "e") {
-        this.$router.push({ path: "/About" });
+        this.$emit("chatListCommand","e");
       }
     },
     handleclick(index) {

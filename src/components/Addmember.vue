@@ -1,22 +1,27 @@
 <template>
   <el-card class="box-card dark_medium_bg">
     <el-container>
-      <el-header height="15px">
-        <span class="dark_main_text">Add Members</span>
+      <el-header height="25px">
+        <span class="dark_main_text">添加小组成员</span>
         <span class="mem-num dark_sub_text">1/200000</span>
       </el-header>
       <el-main height="600px">
         <user></user>
       </el-main>
-      <el-footer height="30px">
-        <el-button style="float: right" type="text" class="dark_main_text"
-          >CANCEL</el-button
+      <el-footer height="35px">
+        <el-button
+          style="float: right"
+          type="text"
+          class="dark_main_text"
+          @click="cancel"
+          >取消</el-button
         >
         <el-button
           style="float: right;margin-right:20px"
           type="text"
           class="dark_main_text"
-          >CREATE</el-button
+          @click="create"
+          >创建小组</el-button
         >
       </el-footer>
     </el-container>
@@ -26,6 +31,14 @@
 <script>
 export default {
   name: "Addmember",
+  methods: {
+    create() {
+      this.$emit("create");
+    },
+    cancel() {
+      this.$emit("cancel");
+    },
+  },
 };
 </script>
 <style lang="stylus" scoped>
@@ -46,8 +59,8 @@ export default {
 }
 
 .box-card {
-  width: 400px;
-  margin-left: 50px;
+  width: 350px;
+  margin-left: 0px;
 }
 
 .mem-num {

@@ -268,8 +268,8 @@ export default Vue.extend({
     },
 
     openMenu(e: any, msg: ServerChatMsg) {
-      this.msgMenuPos.x = e.clientX - 5;
-      this.msgMenuPos.y = e.clientY - 60;
+      this.msgMenuPos.x = e.clientX - 605;
+      this.msgMenuPos.y = e.clientY - 150;
       this.showMsgMenu = true;
       this.menuMsg = msg;
     },
