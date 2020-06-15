@@ -2,6 +2,7 @@ import Axios, { AxiosRequestConfig } from "axios";
 import { singleton, inject } from "tsyringe";
 import { TYPES } from "./dependencyInjection";
 import { IServerConfig } from "./serverConfig";
+import { Subject } from "rxjs";
 
 export function interceptAuthorizationData(
   state: LoginState,
@@ -16,16 +17,20 @@ export function interceptAuthorizationData(
 
 const LOCAL_STORAGE_ACCESS_TOKEN_KEY: string = "access_token";
 
-export class LoginState {
-  public constructor() {}
+export class LoginState extends Subject<boolean> {
+  public constructor() {
+    super();
+    this.setupInterceptor();
+  }
 
   public storeToken() {
     if (this.token !== undefined)
       window.localStorage.setItem(LOCAL_STORAGE_ACCESS_TOKEN_KEY, this.token);
   }
+
   public loadToken() {
     let token = window.localStorage.getItem(LOCAL_STORAGE_ACCESS_TOKEN_KEY);
-    if (token !== null) this.token = token;
+    if (token !== null) this.setToken(token);
   }
 
   token?: string;
@@ -38,10 +43,12 @@ export class LoginState {
 
   public setToken(token: string) {
     this.token = token;
+    this.next(true);
   }
 
   public clearToken() {
     this.token = undefined;
+    this.next(false);
   }
 
   public isLoggedIn() {

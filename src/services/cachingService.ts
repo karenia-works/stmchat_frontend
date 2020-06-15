@@ -5,6 +5,7 @@ import { injectable, inject, singleton } from "tsyringe";
 import { WsMessageService } from "./websocket";
 import { TYPES } from "./dependencyInjection";
 import { IServerConfig } from "./serverConfig";
+import { LoginService } from "./loginService";
 
 /**
  * Represents an async data caching service of type `T`, which
@@ -71,6 +72,7 @@ export class UserProfilePool extends ProfilePool<UserProfile> {
   public constructor(
     @inject(TYPES.ServerConfig) serverConfig: IServerConfig,
     ws: WsMessageService,
+    private loginService: LoginService,
   ) {
     super(
       1024,
@@ -90,6 +92,14 @@ export class UserProfilePool extends ProfilePool<UserProfile> {
     let result = this.cache.get(id);
     if (result !== undefined) {
       result.state = online;
+    }
+  }
+
+  public async getMyProfile(refresh: boolean): Promise<UserProfile | null> {
+    if (!this.loginService.loginState.isLoggedIn()) {
+      return null;
+    } else {
+      throw new Error("Not implemented");
     }
   }
 }
