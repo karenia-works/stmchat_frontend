@@ -1,6 +1,6 @@
 import { injectable, inject } from "tsyringe";
 import { IServerConfig } from "./serverConfig";
-import { TYPES } from "./dependencyInjection";
+import { TYPES, serviceProvider } from "./dependencyInjection";
 import Axios from "axios";
 
 @injectable()
@@ -33,4 +33,9 @@ export class FileUploader {
 
     return response.data;
   }
+}
+
+export function getFileUri(fileId: string): string {
+  let serverConfig = serviceProvider.resolve<IServerConfig>(TYPES.ServerConfig);
+  return serverConfig.getFile.replace("{name}", fileId);
 }

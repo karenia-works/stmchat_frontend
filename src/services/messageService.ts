@@ -15,7 +15,7 @@ import { GroupProfilePool } from "./cachingService";
 
 @singleton()
 export class ChatMessageService {
-  public constructor(wss: WsMessageService) {
+  public constructor(private wss: WsMessageService) {
     var chatSubject = wss.chatMessageSubject;
     chatSubject.subscribe({
       next: this.onNextMessage,
@@ -59,6 +59,15 @@ export class ChatMessageService {
     this.createOrModifyMsgList(chatId, arr => {
       arr.splice(0, 0, ...messages);
     });
+  }
+
+  public async sendMessage(msg: ClientChatMsg, chatId: string) {
+    let clientMsg: ClientChatMessage = {
+      _t: "chat",
+      msg: msg,
+      chatId: chatId,
+    };
+    this.wss.sendMessage(clientMsg);
   }
 }
 

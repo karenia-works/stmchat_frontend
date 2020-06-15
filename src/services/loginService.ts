@@ -5,10 +5,10 @@ import { IServerConfig } from "./serverConfig";
 import { Subject } from "rxjs";
 
 export function interceptAuthorizationData(
-  state: LoginState,
+  getToken: () => string | undefined,
   cfg: AxiosRequestConfig,
 ): AxiosRequestConfig {
-  let token = state.token;
+  let token = getToken;
   if (token !== undefined) {
     cfg.headers["Authorization"] = `Bearer ${token}`;
   }
@@ -33,11 +33,11 @@ export class LoginState extends Subject<boolean> {
     if (token !== null) this.setToken(token);
   }
 
-  token?: string;
+  private token?: string;
 
   public setupInterceptor() {
     Axios.interceptors.request.use(cfg =>
-      interceptAuthorizationData(this, cfg),
+      interceptAuthorizationData(() => this.token, cfg),
     );
   }
 
@@ -87,7 +87,7 @@ export class LoginService {
     @inject(TYPES.ServerConfig) private config: IServerConfig,
   ) {}
 
-  _loginState: LoginState = new LoginState();
+  private _loginState: LoginState = new LoginState();
 
   public get loginState() {
     return this._loginState;
