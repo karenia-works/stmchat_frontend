@@ -4,6 +4,8 @@ import {
   ServerChatMsg,
   ServerUnreadCountMessage,
   GroupProfile,
+  ClientChatMessage,
+  ClientChatMsg,
 } from "@/types/types";
 import { WsMessageService } from "./websocket";
 import { TYPES } from "./dependencyInjection";
@@ -13,7 +15,7 @@ import { GroupProfilePool } from "./cachingService";
 
 @singleton()
 export class ChatMessageService {
-  public constructor(wss: WsMessageService) {
+  public constructor(private wss: WsMessageService) {
     var chatSubject = wss.chatMessageSubject;
     chatSubject.subscribe({
       next: this.onNextMessage,
@@ -58,6 +60,15 @@ export class ChatMessageService {
       arr.splice(0, 0, ...messages);
     });
   }
+
+  public async sendMessage(msg: ClientChatMsg, chatId: string) {
+    let clientMsg: ClientChatMessage = {
+      _t: "chat",
+      msg: msg,
+      chatId: chatId,
+    };
+    this.wss.sendMessage(clientMsg);
+  }
 }
 
 export interface MessageListItem {
@@ -73,7 +84,7 @@ export interface MessageListItem {
  */
 export class MessageListService {
   public constructor(
-    wss: WsMessageService,
+    private wss: WsMessageService,
     private groupProfileService: GroupProfilePool,
   ) {
     wss.chatMessageSubject.subscribe({ next: this.onNewChatMessage });
@@ -157,5 +168,14 @@ export class MessageListService {
       }
     }
     this.messageMapChanged();
+  }
+
+  public async sendMessage(msg: ClientChatMsg, chatId: string) {
+    let clientMsg: ClientChatMessage = {
+      _t: "chat",
+      msg: msg,
+      chatId: chatId,
+    };
+    this.wss.sendMessage(clientMsg);
   }
 }
