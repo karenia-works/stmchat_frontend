@@ -4,21 +4,23 @@
       <div v-for="msg in list" :key="msg.msg.id">{{ msg }}</div>
     </div>-->
     <div class="chat-top-bar dark_main_text dark_light_bg">
-      <div class="chatinfo" :class="chatinfo.type">
-        <template v-if="chatinfo.type == 'private' && !MultiOn">
-          <span>{{ chatinfo.user.name }}</span>
-          <span class="info" :class="chatinfo.user.status">
-            {{ chatinfo.user.status }}
-          </span>
-        </template>
-        <template v-if="chatinfo.type == 'group' && !MultiOn">
-          <span>{{ chatinfo.group.name }}</span>
-          <span class="info">{{ chatinfo.group.member }} members</span>
-        </template>
-      </div>
+      <template v-if="!MultiOn">
+        <div class="chatinfo" :class="chatinfo.type">
+          <template v-if="chatinfo.isFriend">
+            <span>{{ chatname }}</span>
+            <span class="info online">
+              online
+            </span>
+          </template>
+          <template v-else>
+            <span>{{ chatname }}</span>
+            <span class="info">{{ chatinfo.members.length }} members</span>
+          </template>
+        </div>
+      </template>
 
       <!-- 多选框功能栏 -->
-      <template v-if="MultiOn">
+      <template v-else>
         <div class="multi_row">
           <el-button
             type="primary"
@@ -68,25 +70,30 @@
       </el-card>
 
       <vueScroll ref="chat-messages" @handle-scroll="handleScroll">
-        <div v-for="data in messages" :key="data.msg.id">
+        <div v-for="msg in messages" :key="msg.id">
           <!-- 多选框 -->
           <el-col :span="1" v-if="MultiOn">
             <el-checkbox
-              @change="checked => checkMulti(checked, data.msg)"
+              @change="checked => checkMulti(checked, msg)"
             ></el-checkbox>
           </el-col>
 
-          <div class="msg" :class="{ self: data.msg.sender.name == me.name }">
+          <div
+            class="msg"
+            :class="{ self: msg.sender.username == me.username }"
+          >
             <el-avatar
-              :src="data.msg.sender.avatar"
+              :src="msg.sender.avatarUrl"
               v-if="showAvatar"
             ></el-avatar>
 
             <Message
-              :msg="data.msg"
+              :msg="msg"
               :showSender="showSender"
               @contextmenu.native.prevent="
-                if (!MultiOn) openMenu($event, data.msg);
+                () => {
+                  if (!MultiOn) openMenu($event, msg);
+                }
               "
             ></Message>
           </div>
@@ -133,9 +140,10 @@
           <el-image
             v-if="quoteMsg._t == 'image'"
             :src="quoteMsg.image"
+            lazy
           ></el-image>
           <div>
-            <div class="sendername">{{ quoteMsg.sender.name }}</div>
+            <div class="sendername">{{ quoteMsg.sender.username }}</div>
             <div class="quote-text">
               <template v-if="quoteMsg._t == 'text'">{{
                 quoteMsg.text
@@ -234,12 +242,11 @@
 </template>
 
 <script lang="ts">
-//todo: upload image/ file
+//todo: uploading async
+//todo: quote text / jump to message
+
+//// upload image/ file
 // ? download file: in same site
-
-//// unread amount
-//// jump to message
-
 //// right click: forward, quote, copy, muti-select
 //// quote input
 //// bottom-bar height
@@ -282,14 +289,12 @@ export default Vue.extend({
     send() {
       if (this.showUpload && this.upUrl) {
         this.messages.push({
-          msg: {
-            _t: "image",
-            id: "1" + new Date().getTime(),
-            time: new Date(),
-            image: this.upUrl,
-            caption: this.sendMessage,
-            sender: this.me,
-          },
+          _t: "image",
+          id: "1" + new Date().getTime(),
+          time: new Date(),
+          image: this.upUrl,
+          caption: this.sendMessage,
+          sender: this.me,
         });
         this.sendMessage = "";
         this.upUrl = "";
@@ -302,13 +307,11 @@ export default Vue.extend({
           }, 1500);
         } else {
           this.messages.push({
-            msg: {
-              _t: "text",
-              id: "1" + new Date().getTime(),
-              time: new Date(),
-              text: this.sendMessage,
-              sender: this.me,
-            },
+            _t: "text",
+            id: "1" + new Date().getTime(),
+            time: new Date(),
+            text: this.sendMessage,
+            sender: this.me,
           });
           this.sendMessage = "";
         }
@@ -416,8 +419,16 @@ export default Vue.extend({
     },
   },
   computed: {
-    checkedNumber() {
+    checkedNumber(): number {
       return (this as any).checkedMessage.length;
+    },
+    chatname(): string {
+      if (!this.chatinfo.isFriend) return this.chatinfo.name;
+
+      // private chat
+      let names = this.chatinfo.name.split("+");
+      if (names[0] == this.me.username) return names[1];
+      else return names[0];
     },
   },
   data() {
@@ -441,8 +452,9 @@ export default Vue.extend({
       //upload
       showUpload: false,
       uploadType: "",
-      upUrl: "",
-      // "https://img11.360buyimg.com/n1/jfs/t14497/67/1017638125/136874/65c4ecc3/5a422c37N1b36f52c.jpg",
+      upUrl:
+        // "",
+        "https://img11.360buyimg.com/n1/jfs/t14497/67/1017638125/136874/65c4ecc3/5a422c37N1b36f52c.jpg",
       // "https://www.spirit-animals.com/wp-content/uploads/2013/04/Dove-1-1090x380.jpg",
       fileInfo: null,
       uploading: false,
@@ -450,20 +462,20 @@ export default Vue.extend({
       list: [],
       sendMessage: "",
       me: {
-        name: "skuld",
-        avatar:
-          "https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg",
+        id: "5ee5feeeac7ecb0001782b5d",
+        username: "wang",
+        avatarUrl:
+          "https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcSu56NCKGJ-esUMKb0jsKcm7639FoqaXJK1_sSWvhQmi6fZwNcA&usqp=CAU",
+        friends: ["li", "yang"],
+        groups: ["kruodis"],
       },
       chatinfo: {
-        type: "private",
-        user: {
-          name: "咕咕咕",
-          status: "online",
-        },
-        group: {
-          name: "kaiche",
-          member: 10,
-        },
+        id: "5ee5feefac7ecb0001782b61",
+        name: "wang+li",
+        isFriend: true,
+        owner: "wang",
+        members: ["wang", "li"],
+        chatlog: "5ee5feefac7ecb0001782b62",
       },
       configs: {
         desktopNotifictions: true,
