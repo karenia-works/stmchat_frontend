@@ -136,7 +136,7 @@ export interface UserProfile {
   backgroundNotification: boolean;
   soundOn: boolean;
   soundDegree: number;
-  hotkey: number;
+  hotkey: "enterNewline" | "enterSend";
 }
 
 export interface GroupProfile {

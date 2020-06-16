@@ -29,7 +29,6 @@ export class ProfilePool<T> implements ICachingDataPool<T> {
   cache: Lru<T>;
 
   private async lookUpUser(id: string): Promise<T | undefined> {
-    // TODO: get data from backend
     let userResp = await axios.get<T>(this.getDataEndpoint);
     let user = userResp.data;
     this.cache.set(id, user);
@@ -58,7 +57,9 @@ export class ProfilePool<T> implements ICachingDataPool<T> {
     writeThrough: boolean = true,
   ): Promise<void> {
     this.cache.set(id, data);
-    await axios.post(this.setDataEndpoint(id), data);
+    if (writeThrough) {
+      await axios.post(this.setDataEndpoint(id), data);
+    }
   }
 
   public removeData(id: string): Promise<void> {
