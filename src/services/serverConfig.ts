@@ -46,7 +46,13 @@ let _cfg: IServerConfig = {
     },
     file: { post: "/file", get: "/file/id" },
   },
-  getFile: "/file/{name}",
+  getFile: "{name}",
 };
+
+if (environment == "development") {
+  _cfg.wsEndpoint = "ws://yuuna.srv.karenia.cc/ws";
+  _cfg.apiBaseUrl = "http://yuuna.srv.karenia.cc/api/v1";
+  _cfg.getFile = "http://yuuna.srv.karenia.cc{name}";
+}
 
 export const serverConfig: IServerConfig = _cfg;

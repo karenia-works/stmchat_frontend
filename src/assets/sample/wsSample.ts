@@ -1,3 +1,5 @@
+import { ServerChatMsg, ServerChatMessage } from "@/types/types";
+
 export const ChatMessages = [
   {
     msg: {

@@ -83,9 +83,7 @@ interface UserLoginData {
 
 @singleton()
 export class LoginService {
-  public constructor(
-    @inject(TYPES.ServerConfig) private config: IServerConfig,
-  ) {}
+  public constructor(@inject("server_config") private config: IServerConfig) {}
 
   private _loginState: LoginState = new LoginState();
 

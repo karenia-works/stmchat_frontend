@@ -71,7 +71,7 @@ export class ProfilePool<T> implements ICachingDataPool<T> {
 @singleton()
 export class UserProfilePool extends ProfilePool<UserProfile> {
   public constructor(
-    @inject(TYPES.ServerConfig) serverConfig: IServerConfig,
+    @inject("server_config") serverConfig: IServerConfig,
     ws: WsMessageService,
     private loginService: LoginService,
   ) {
@@ -107,7 +107,7 @@ export class UserProfilePool extends ProfilePool<UserProfile> {
 
 @singleton()
 export class GroupProfilePool extends ProfilePool<GroupProfile> {
-  public constructor(@inject(TYPES.ServerConfig) serverConfig: IServerConfig) {
+  public constructor(@inject("server_config") serverConfig: IServerConfig) {
     super(
       1024,
       serverConfig.apiBaseUrl + serverConfig.apiEndpoints.groupProfile.get,

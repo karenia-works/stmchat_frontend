@@ -6,7 +6,7 @@ import Axios from "axios";
 @injectable()
 export class FileUploader {
   public constructor(
-    @inject(TYPES.ServerConfig) private endpoints: IServerConfig,
+    @inject("server_config") private endpoints: IServerConfig,
   ) {}
 
   public async uploadFile(
@@ -18,7 +18,7 @@ export class FileUploader {
       form.append("file", f);
     }
 
-    let response = await Axios.post<string[]>(
+    let response = await Axios.post<{ fileResultList: string[] }>(
       this.endpoints.apiBaseUrl + this.endpoints.apiEndpoints.file.post,
       form,
       {
@@ -30,12 +30,12 @@ export class FileUploader {
         },
       },
     );
-
-    return response.data;
+    if (response.status >= 300) throw new Error(JSON.stringify(response));
+    return response.data.fileResultList;
   }
 }
 
 export function getFileUri(fileId: string): string {
-  let serverConfig = serviceProvider.resolve<IServerConfig>(TYPES.ServerConfig);
+  let serverConfig = serviceProvider.resolve<IServerConfig>("server_config");
   return serverConfig.getFile.replace("{name}", fileId);
 }
