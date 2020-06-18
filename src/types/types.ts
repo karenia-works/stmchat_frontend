@@ -114,6 +114,7 @@ export interface ClientMessage {
 
 export interface ClientChatMessage extends ClientMessage {
   _t: "chat";
+  chatId: string;
   msg: ClientChatMsg;
 }
 
@@ -135,7 +136,7 @@ export interface UserProfile {
   backgroundNotification: boolean;
   soundOn: boolean;
   soundDegree: number;
-  hotkey: number;
+  hotkey: "enterNewline" | "enterSend";
 }
 
 export interface GroupProfile {

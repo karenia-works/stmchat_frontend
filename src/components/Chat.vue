@@ -140,14 +140,13 @@
           <el-image
             v-if="quoteMsg._t == 'image'"
             :src="quoteMsg.image"
-            lazy
           ></el-image>
           <div>
             <div class="sendername">{{ quoteMsg.sender.username }}</div>
             <div class="quote-text">
-              <template v-if="quoteMsg._t == 'text'">{{
-                quoteMsg.text
-              }}</template>
+              <template v-if="quoteMsg._t == 'text'">
+                {{ quoteMsg.text }}
+              </template>
               <template v-else-if="quoteMsg._t == 'image'">
                 [图片]
                 <span v-if="quoteMsg.caption">, {{ quoteMsg.caption }}</span>
@@ -170,6 +169,7 @@
             :accept="uploadType == 'image' ? 'image/png, image/jpeg' : ''"
             :show-file-list="false"
             :before-upload="beforeUpload"
+            :http-request="handleUpload"
             :on-success="handleUploadSuccess"
             :on-error="handleUploadError"
           >
@@ -269,6 +269,7 @@ import { ServerChatMsg } from "@/types/types";
 import Message from "./Message.vue";
 
 import Vue from "vue";
+import { FileUploader, getFileUri } from "../services/fileUploader";
 export default Vue.extend({
   // props: {
   //   showSender: Boolean,
@@ -362,7 +363,7 @@ export default Vue.extend({
     },
 
     // upload image
-    beforeUpload(file) {
+    beforeUpload(file: any) {
       this.fileInfo = {
         name: file.name,
         size: file.size,
@@ -370,14 +371,27 @@ export default Vue.extend({
       this.showUpload = true;
       this.uploading = true;
     },
+    async handleUpload(options: any) {
+      console.log(options);
+      let uploader = serviceProvider.resolve<FileUploader>(FileUploader);
+      // try {
+      let res = await uploader.uploadFile([options.file]);
+      console.log("onHandleUpload", res);
+      // options.onSuccess(res[0]);
+      return res[0];
+      // } catch (e) {
+      //   options.onError(e);
+      // }
+    },
     handleUploadError() {
       // ProgressEvent 找不着错误消息提示
       this.$message.error("图片上传失败");
       this.showUpload = false;
     },
-    handleUploadSuccess(res, file) {
+    handleUploadSuccess(res: string, file: { raw: File }) {
+      console.log("uploadSuccess", res);
       this.uploading = false;
-      this.upUrl = URL.createObjectURL(file.raw);
+      this.upUrl = getFileUri(res);
     },
 
     // 多选框方法
@@ -441,7 +455,7 @@ export default Vue.extend({
       showEmptyWarning: false,
       //menu
       showMsgMenu: false,
-      menuMsg: undefined as ServerChatMsg | undefined,
+      menuMsg: null as ServerChatMsg | null,
       msgMenuPos: {
         x: 0,
         y: 0,
@@ -456,7 +470,7 @@ export default Vue.extend({
         // "",
         "https://img11.360buyimg.com/n1/jfs/t14497/67/1017638125/136874/65c4ecc3/5a422c37N1b36f52c.jpg",
       // "https://www.spirit-animals.com/wp-content/uploads/2013/04/Dove-1-1090x380.jpg",
-      fileInfo: null,
+      fileInfo: null as null | { name: string; size: number },
       uploading: false,
 
       list: [],
