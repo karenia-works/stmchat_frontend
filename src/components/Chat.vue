@@ -70,7 +70,7 @@
       </el-card>
 
       <vueScroll ref="chat-messages" @handle-scroll="handleScroll">
-        <div v-for="msg in messages" :key="msg.id">
+        <div v-for="msg in list" :key="msg.id">
           <!-- 多选框 -->
           <el-col :span="1" v-if="MultiOn">
             <el-checkbox
@@ -78,12 +78,9 @@
             ></el-checkbox>
           </el-col>
 
-          <div
-            class="msg"
-            :class="{ self: msg.sender.username == me.username }"
-          >
+          <div class="msg" :class="{ self: msg.sender == me.username }">
             <el-avatar
-              :src="msg.sender.avatarUrl"
+              :src="name2avatar[msg.sender]"
               v-if="showAvatar"
             ></el-avatar>
 
@@ -142,7 +139,7 @@
             :src="quoteMsg.image"
           ></el-image>
           <div>
-            <div class="sendername">{{ quoteMsg.sender.username }}</div>
+            <div class="sendername">{{ quoteMsg.sender }}</div>
             <div class="quote-text">
               <template v-if="quoteMsg._t == 'text'">
                 {{ quoteMsg.text }}
@@ -262,6 +259,7 @@
 
 import { WsMessageService } from "../services/websocket";
 import { ChatMessages } from "../assets/sample/wsSample";
+import { ChatMsgs } from "../assets/sample/wsChat";
 
 // import moment from "moment";
 import { serviceProvider, TYPES } from "../services/dependencyInjection";
@@ -286,10 +284,72 @@ export default Vue.extend({
     },
   },
   beforeMount: function() {},
+
+  data() {
+    return {
+      // style config
+      showSender: true,
+      showAvatar: true,
+      showGoDown: false,
+      showEmptyWarning: false,
+      showDelete: false,
+      messageProcess: 0,
+
+      // chat messages
+      connector: null,
+      messages: ChatMessages,
+      list: ChatMsgs as ServerChatMsg[],
+      sendMessage: "",
+
+      // right click menu
+      showMsgMenu: false,
+      menuMsg: null as ServerChatMsg | null,
+      msgMenuPos: {
+        x: 0,
+        y: 0,
+      },
+      quoteMsg: null,
+
+      //upload
+      showUpload: false,
+      uploadType: "",
+      upUrl: "",
+      fileInfo: null as null | { name: string; size: number },
+      uploading: false,
+
+      // data cache
+      name2avatar: {
+        wang: "https://www.gx8899.com/uploads/allimg/180118/3-1P11P92057.jpg",
+        li:
+          "https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcSeKy1XelUk53kiE3EfnxfppDz5n3hYaseeK8O8KdzmBl7oOH5o&usqp=CAU",
+      },
+      me: {
+        id: "5ee5feeeac7ecb0001782b5d",
+        username: "wang",
+        friends: ["li", "yang"],
+        groups: ["kruodis"],
+      },
+      chatinfo: {
+        id: "5ee5feefac7ecb0001782b61",
+        name: "wang+li",
+        isFriend: true,
+        owner: "wang",
+        members: ["wang", "li"],
+        chatlog: "5ee5feefac7ecb0001782b62",
+      },
+      configs: {
+        hotKey: "enterSend", //"enterNewline"
+      },
+
+      // multi select
+      MultiOn: false,
+      checkedMessage: [] as ServerChatMsg[],
+    };
+  },
   methods: {
     send() {
       if (this.showUpload && this.upUrl) {
-        this.messages.push({
+        console.log({
           _t: "image",
           id: "1" + new Date().getTime(),
           time: new Date(),
@@ -307,7 +367,7 @@ export default Vue.extend({
             this.showEmptyWarning = false;
           }, 1500);
         } else {
-          this.messages.push({
+          console.log({
             _t: "text",
             id: "1" + new Date().getTime(),
             time: new Date(),
@@ -414,7 +474,7 @@ export default Vue.extend({
       this.CancelMulti();
     },
     forwardMsg(id: string) {
-      console.log("forward msg" + id);
+      console.log("forward msg", id);
     },
     deleteMulti() {
       this.checkedMessage.forEach(msg => {
@@ -423,10 +483,11 @@ export default Vue.extend({
       this.CancelMulti();
     },
     deleteMsg(id: string) {
-      let index = this.messages.findIndex(o => o.msg.id === id);
-      if (index > -1) {
-        this.messages.splice(index, 1);
-      }
+      console.log("delete msg", id);
+      // let index = this.messages.findIndex(o => o.msg.id === id);
+      // if (index > -1) {
+      //   this.messages.splice(index, 1);
+      // }
     },
     func() {
       console.log("hi");
@@ -444,66 +505,6 @@ export default Vue.extend({
       if (names[0] == this.me.username) return names[1];
       else return names[0];
     },
-  },
-  data() {
-    return {
-      messageProcess: 0,
-      showSender: true,
-      showAvatar: true,
-      connector: null,
-      showGoDown: false,
-      showEmptyWarning: false,
-      //menu
-      showMsgMenu: false,
-      menuMsg: null as ServerChatMsg | null,
-      msgMenuPos: {
-        x: 0,
-        y: 0,
-      },
-      quoteMsg: null,
-      showDelete: false,
-
-      //upload
-      showUpload: false,
-      uploadType: "",
-      upUrl:
-        // "",
-        "https://img11.360buyimg.com/n1/jfs/t14497/67/1017638125/136874/65c4ecc3/5a422c37N1b36f52c.jpg",
-      // "https://www.spirit-animals.com/wp-content/uploads/2013/04/Dove-1-1090x380.jpg",
-      fileInfo: null as null | { name: string; size: number },
-      uploading: false,
-
-      list: [],
-      sendMessage: "",
-      me: {
-        id: "5ee5feeeac7ecb0001782b5d",
-        username: "wang",
-        avatarUrl:
-          "https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcSu56NCKGJ-esUMKb0jsKcm7639FoqaXJK1_sSWvhQmi6fZwNcA&usqp=CAU",
-        friends: ["li", "yang"],
-        groups: ["kruodis"],
-      },
-      chatinfo: {
-        id: "5ee5feefac7ecb0001782b61",
-        name: "wang+li",
-        isFriend: true,
-        owner: "wang",
-        members: ["wang", "li"],
-        chatlog: "5ee5feefac7ecb0001782b62",
-      },
-      configs: {
-        desktopNotifictions: true,
-        backgroundNotifictions: true,
-        soundOn: true,
-        soundDegree: 100,
-        hotKey: "enterSend", //"enterNewline"
-      },
-      messages: ChatMessages,
-
-      // 多选框取值
-      MultiOn: false,
-      checkedMessage: [] as ServerChatMsg[],
-    };
   },
 
   filters: {

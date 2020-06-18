@@ -4,7 +4,7 @@
 
     <div class="bodytop">
       <div class="sendername" v-if="showSender">
-        {{ msg.sender.username }}
+        {{ msg.sender }}
       </div>
       <!-- replyTo -->
       <div v-if="msg.replyTo" class="quote">
@@ -15,7 +15,7 @@
         ></el-image>
         <div>
           <div class="sendername">
-            {{ msg.replyTo.sender.username }}
+            {{ msg.replyTo.sender }}
           </div>
           <div class="quote-text">
             <template v-if="msg.replyTo._t == 'text'">
@@ -39,7 +39,7 @@
 
       <!-- forwardFrom -->
       <div class="sendername" v-if="msg.forwardFrom">
-        Forwarded from {{ msg.forwardFrom.sender.username }}
+        Forwarded from {{ msg.forwardFrom.userId }}
       </div>
     </div>
 
