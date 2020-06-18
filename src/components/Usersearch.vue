@@ -99,8 +99,8 @@ export default {
   border-style: solid;
   border-radius: 1px;
   border-width: 1px;
-  border-color: #333;
-  background-color: #333;
+  border-color: colors.theme-black;
+  background-color: colors.theme-black;
 }
 
 

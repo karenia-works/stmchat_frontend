@@ -8,12 +8,15 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
+    "app-root-path": "^3.0.0",
     "axios": "^0.19.2",
     "core-js": "^3.6.5",
     "element-ui": "^2.4.5",
     "moment": "^2.26.0",
+    "push.js": "^1.0.12",
     "rxjs": "^6.5.5",
     "tiny-lru": "^7.0.4",
+    "tsyringe": "^4.3.0",
     "vue": "^2.6.11",
     "vue-class-component": "^7.2.3",
     "vue-property-decorator": "^8.4.2",

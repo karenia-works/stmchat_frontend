@@ -1,5 +1,5 @@
 <template>
-  <el-card class="box-card dark_midium_bg">
+  <el-card class="box-card dark_medium_bg">
     <el-container>
       <el-header height="15px">
         <span class="dark_main_text">Add Members</span>
@@ -9,8 +9,15 @@
         <user></user>
       </el-main>
       <el-footer height="30px">
-        <el-button style="float: right" type="text" class="dark_main_text">CANCEL</el-button>
-        <el-button style="float: right;margin-right:20px" type="text" class="dark_main_text">CREATE</el-button>
+        <el-button style="float: right" type="text" class="dark_main_text"
+          >CANCEL</el-button
+        >
+        <el-button
+          style="float: right;margin-right:20px"
+          type="text"
+          class="dark_main_text"
+          >CREATE</el-button
+        >
       </el-footer>
     </el-container>
   </el-card>
@@ -45,7 +52,7 @@ export default {
 
 .mem-num {
   font-size: 13px;
-  color: #999;
+  color: colors.theme-grey;
   margin-left: 20px;
 }
 
@@ -55,25 +62,25 @@ export default {
 
 @media (prefers-color-scheme: dark) {
   .dark_light_bg {
-    background-color: #606266;
-    border-color: #44474E;
+    background-color: colors.dark-light;
+    border-color: colors.dark-medium;
   }
 
-  .dark_midium_bg {
-    background-color: #44474E;
-    border-color: #606266;
+  .dark_medium_bg {
+    background-color: colors.dark-medium;
+    border-color: colors.dark-light;
   }
 
   .dark_deep_bg {
-    background-color: #303133;
+    background-color: colors.dark-deep;
   }
 
   .dark_sub_text {
-    color: #909399;
+    color: colors.dark-sub-text;
   }
 
   .dark_main_text {
-    color: #E4E7ED;
+    color: colors.dark-main-text;
   }
 }
 </style>
