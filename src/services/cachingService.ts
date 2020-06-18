@@ -6,6 +6,7 @@ import { WsMessageService } from "./websocket";
 import { TYPES } from "./dependencyInjection";
 import { IServerConfig } from "./serverConfig";
 import { LoginService } from "./loginService";
+import { Subject } from "rxjs";
 
 /**
  * Represents an async data caching service of type `T`, which
@@ -23,16 +24,28 @@ export class ProfilePool<T> implements ICachingDataPool<T> {
     protected getDataEndpoint: string,
     protected setDataEndpoint: (id: string) => string,
   ) {
-    this.cache = new Lru(limit);
+    this.cache = new Map();
   }
 
-  cache: Lru<T>;
+  cache: Map<string, T>;
+  pending: Map<string, Subject<T>> = new Map();
 
   private async lookUpUser(id: string): Promise<T | undefined> {
-    let userResp = await axios.get<T>(this.getDataEndpoint);
-    let user = userResp.data;
-    this.cache.set(id, user);
-    return user;
+    if (this.pending.has(id)) {
+      let pending = this.pending.get(id);
+      let t = await pending.toPromise();
+      return t;
+    } else {
+      let pending = new Subject<T>();
+      let pendingRequest = axios.get<T>(this.getDataEndpoint);
+      this.pending.set(id, pending);
+      let userResp = await pendingRequest;
+      let user = userResp.data;
+      this.cache.set(id, user);
+      pending.next(user);
+      this.pending.delete(id);
+      return user;
+    }
   }
 
   public async getData(
