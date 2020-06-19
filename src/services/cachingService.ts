@@ -32,7 +32,7 @@ export class ProfilePool<T> implements ICachingDataPool<T> {
 
   private async lookUpUser(id: string): Promise<T | undefined> {
     if (this.pending.has(id)) {
-      let pending = this.pending.get(id);
+      let pending = this.pending.get(id)!;
       let t = await pending.toPromise();
       return t;
     } else {
