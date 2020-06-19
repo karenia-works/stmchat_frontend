@@ -193,7 +193,7 @@
           </el-row>
           <el-row type="flex" align="top">
             <div class="usrlist">
-              <user></user>
+              <user />
             </div>
           </el-row>
 
@@ -206,17 +206,10 @@
 </template>
 
 <script>
-import Usersearch from "@/components/Usersearch.vue";
-
-export default {
-  name: "Setting",
-  components: {
-    user: Usersearch,
-  },
-};
+export default {};
 </script>
 
-<style lang="stylus" scoped="">
+<style lang="stylus" scoped>
 .el-header {
   text-align: center;
 }

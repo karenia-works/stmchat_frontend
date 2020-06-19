@@ -6,7 +6,7 @@
         <span class="mem-num dark_sub_text">1/200000</span>
       </el-header>
       <el-main height="600px">
-        <user @func="getMsgFormSon"></user>
+        <user @selectUser="getMsgFormSon"></user>
       </el-main>
       <el-footer height="30px">
         <el-button
@@ -29,17 +29,12 @@
 </template>
 
 <script>
-import Usersearch from "./Usersearch.vue";
-
 export default {
   name: "Addmember",
   data() {
     return {
       msgFormSon: "this is msg",
     };
-  },
-  components: {
-    user: Usersearch,
   },
   methods: {
     create() {

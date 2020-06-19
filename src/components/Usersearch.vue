@@ -8,7 +8,7 @@
     <hr />
 
     <div v-for="item in queryList" :key="item.usrId">
-      <el-container @click.native="$emit('selectUser', item.userId)">
+      <el-container @click.native="$emit('selectUser', item.usrId)">
         <el-aside width="70px">
           <el-avatar :size="50" :src="item.circleUrl"></el-avatar>
         </el-aside>

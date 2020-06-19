@@ -5,7 +5,7 @@
         <span>Contacts</span>
       </el-header>
       <el-main height="600px">
-        <user @func="getMsgFormSon"></user>
+        <user @selectUser="getMsgFormSon"></user>
       </el-main>
       <el-footer height="30px">
         <el-button style="float: left" type="text" class="dark_main_text"
@@ -24,25 +24,14 @@
 </template>
 
 <script>
-import Usersearch from "@/components/Usersearch.vue";
-
 export default {
   name: "Contacts",
-  components: {
-    user: Usersearch,
-  },
-  data() {
-    return {
-      msgFormSon: "this is msg",
-    };
-  },
   methods: {
     close() {
       this.$emit("contactClose");
     },
     getMsgFormSon(data) {
-      this.msgFormSon = data;
-      console.log(this.msgFormSon);
+      console.log(data);
     },
   },
 };

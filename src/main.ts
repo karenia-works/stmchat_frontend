@@ -7,6 +7,7 @@ import store from "./store";
 import ElementUI from "element-ui";
 import "element-ui/lib/theme-chalk/index.css";
 import vuescroll from "vuescroll";
+import Usersearch from "@/components/Usersearch.vue";
 
 Vue.config.productionTip = false;
 Vue.use(ElementUI);
@@ -20,6 +21,7 @@ Vue.use(vuescroll, {
   },
   name: "vueScroll",
 });
+Vue.component("user", Usersearch);
 
 new Vue({
   router,
