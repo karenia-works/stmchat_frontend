@@ -23,7 +23,11 @@
         </el-container>
       </el-main>
       <el-footer height="30px">
-        <el-button style="float: right" type="text" class="dark_main_text"
+        <el-button
+          style="float: right"
+          type="text"
+          class="dark_main_text"
+          @click="cancelGroup"
           >CANCEL</el-button
         >
         <el-button
@@ -31,6 +35,7 @@
           type="text"
           v-on:click="goadd"
           class="dark_main_text"
+          @click="createGroup"
           >NEXT</el-button
         >
         <router-view></router-view>
@@ -55,6 +60,12 @@ export default Vue.extend({
   methods: {
     goadd() {
       this.$router.push({ path: "/Addmember" });
+    },
+    createGroup() {
+      this.$emit("createGroup");
+    },
+    cancelGroup() {
+      this.$emit("cancelGroup");
     },
   },
 });
