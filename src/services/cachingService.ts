@@ -21,8 +21,8 @@ export interface ICachingDataPool<T> {
 export class ProfilePool<T> implements ICachingDataPool<T> {
   public constructor(
     protected limit: number,
-    protected getDataEndpoint: string,
-    protected setDataEndpoint: (id: string) => string,
+    protected baseDataEndpoint: string,
+    protected singleDataEndpoint: (id: string) => string,
   ) {
     this.cache = new Map();
   }
@@ -37,7 +37,7 @@ export class ProfilePool<T> implements ICachingDataPool<T> {
       return t;
     } else {
       let pending = new Subject<T>();
-      let pendingRequest = axios.get<T>(this.getDataEndpoint);
+      let pendingRequest = axios.get<T>(this.singleDataEndpoint(id));
       this.pending.set(id, pending);
       let userResp = await pendingRequest;
       let user = userResp.data;
@@ -71,7 +71,7 @@ export class ProfilePool<T> implements ICachingDataPool<T> {
   ): Promise<void> {
     this.cache.set(id, data);
     if (writeThrough) {
-      await axios.post(this.setDataEndpoint(id), data);
+      await axios.post(this.singleDataEndpoint(id), data);
     }
   }
 

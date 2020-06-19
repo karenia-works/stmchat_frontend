@@ -8,7 +8,7 @@ export function interceptAuthorizationData(
   getToken: () => string | undefined,
   cfg: AxiosRequestConfig,
 ): AxiosRequestConfig {
-  let token = getToken;
+  let token = getToken();
   if (token !== undefined) {
     cfg.headers["Authorization"] = `Bearer ${token}`;
   }

@@ -49,6 +49,8 @@ export class WsMessageService {
 
   private readonly connection_state: Subject<boolean> = new Subject();
 
+  private wait_time: number = 500;
+
   /** 所有消息 */
   public get messageSubject() {
     return this.msg;
@@ -81,12 +83,14 @@ export class WsMessageService {
 
   protected onWebsocketOpen(ws: WebSocket, err: Event) {
     this.connection_state.next(true);
+    this.wait_time = 500;
+    console.log("Connected to websocket");
   }
 
   protected onWebsocketClose(ws: WebSocket, err: CloseEvent) {
     this.connection_state.next(false);
     console.warn("Disconnected from websocket", ws.url);
-    this.connectWebsocket(this.dest);
+    this.reconnectWebsocket(this.dest);
   }
 
   protected onWebsocketMessage(ws: WebSocket, ev: MessageEvent) {
@@ -116,7 +120,22 @@ export class WsMessageService {
   protected onWebsocketError(_ws: WebSocket, err: Event) {
     this.connection_state.next(false);
     this.chat_msg.error(err);
-    console.error("Failed to connect to websocket", _ws.url);
-    this.connectWebsocket(this.dest);
+    console.error("Failed to connect to websocket", _ws.url, err);
+    // this.reconnectWebsocket(this.dest);
+  }
+
+  protected reconnectWebsocket(dest: string) {
+    const max_wait_time = 32000;
+    if (this.wait_time < max_wait_time) {
+      this.wait_time = Math.min(this.wait_time * 2, max_wait_time);
+    } else {
+      this.wait_time = max_wait_time;
+    }
+    console.warn(
+      `Cannot connect to websocket. Retrying in ${this.wait_time / 1000}s`,
+    );
+    setTimeout(() => {
+      this.connectWebsocket(dest);
+    }, this.wait_time);
   }
 }
