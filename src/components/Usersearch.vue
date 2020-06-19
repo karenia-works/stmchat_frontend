@@ -1,7 +1,7 @@
 <template>
   <el-row style="height:500px">
     <div>
-      <el-input v-model="selectVal" placeholder="Search" style="height:35px">
+      <el-input v-model="selectVal" placeholder="搜索" style="height:35px">
         <i slot="prefix" class="el-input__icon el-icon-search"></i>
       </el-input>
     </div>
@@ -28,21 +28,9 @@ export default {
   data() {
     return {
       selectVal: "",
-      items: [
-        {
-          circleUrl:
-            "https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png",
-          usrId: "name1",
-        },
-        {
-          circleUrl:
-            "https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png",
-          usrId: "name2",
-        },
-      ],
     };
   },
-
+  props: ['items'],
   computed: {
     queryList() {
       return this.items.filter(item => item.usrId.indexOf(this.selectVal) > -1);

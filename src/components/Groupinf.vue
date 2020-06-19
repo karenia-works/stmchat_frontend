@@ -193,7 +193,7 @@
           </el-row>
           <el-row type="flex" align="top">
             <div class="usrlist">
-              <user />
+              <user @selectUser="getMsgFormSon" :items="list"></user>
             </div>
           </el-row>
 
@@ -204,11 +204,6 @@
     </el-col>
   </el-container>
 </template>
-
-<script>
-export default {};
-</script>
-
 <style lang="stylus" scoped>
 .el-header {
   text-align: center;
@@ -351,6 +346,7 @@ export default {};
 </style>
 
 <script>
+import axios from "axios";
 export default {
   data() {
     return {
@@ -365,25 +361,24 @@ export default {
       voicenum: "1",
       editmode: false,
       value1: true,
+      list: [],
     };
   },
+  beforeMount:function(){
+      this.getList()
+  },
   methods: {
-    formatTooltip(val) {
-      return val / 100;
+    getMsgFormSon(data) {
+      console.log(data);
     },
-    edit_on() {
-      this.changename = this.nickname;
-      this.editmode = true;
-    },
-    save_on() {
-      if (this.changename == "") {
-        alert("昵称不能为空！");
-        this.editmode = false;
-      } else {
-        this.nickname = this.changename;
-        this.editmode = false;
-      }
+    getList(){
+      axios.get('167.172.202.191:5000/api/v1/group/family',{
+        }).then(data=>{
+          this.list=data.members
+        })
     },
   },
+    
 };
+
 </script>
