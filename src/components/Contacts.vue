@@ -5,12 +5,13 @@
         <span>Contacts</span>
       </el-header>
       <el-main height="600px">
-        <user></user>
+        <user @func="getMsgFormSon"></user>
       </el-main>
       <el-footer height="30px">
         <el-button style="float: left" type="text" class="dark_main_text">ADD CONTACT</el-button>
-        <el-button style="float: right" type="text" class="dark_main_text">CLOSE</el-button>
+        <el-button style="float: right" type="text" class="dark_main_text" @click="close">CLOSE</el-button>
       </el-footer>
+      
     </el-container>
   </el-card>
 </template>
@@ -18,6 +19,20 @@
 <script>
 export default {
   name: "Contacts",
+  data () {
+        return {
+            msgFormSon: "this is msg"
+        }
+    },
+  methods:{
+    close(){
+      this.$emit('contactClose');
+    },
+    getMsgFormSon(data){
+                this.msgFormSon = data
+                console.log(this.msgFormSon)
+    }
+  }
 };
 </script>
 

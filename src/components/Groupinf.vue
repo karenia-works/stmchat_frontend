@@ -42,9 +42,6 @@
             <el-col :span="12" :offset="2">
               <div class="name_part" type="justify" align="start">
                 <div v-show="!editmode" class="name">{{groupname}}</div>
-                <div v-show="editmode" class="name">
-                  <el-input v-model="changename" placeholder="Nick name" style="height:35px"></el-input>
-                </div>
                 <div class="state">42member</div>
               </div>
             </el-col>
@@ -80,7 +77,7 @@
                 <el-row class="top_pad" type="flex" justify="space-between" align="middle">
                   <div class="content">Desktop Notifications</div>
                   <el-switch v-model="value1" active-color="#13ce66" inactive-color="#ff4949"></el-switch>
-                </el-row>   
+                </el-row>
               </div>
             </el-col>
           </el-row>
@@ -100,7 +97,7 @@
               </div>
             </el-col>
           </el-row>
-          
+
           <el-row type="flex" align="top">
             <el-col :span="3">
               <div class="icon_part icon_pad">
@@ -113,7 +110,7 @@
               </div>
             </el-col>
           </el-row>
-          
+
           <el-row type="flex" align="top">
             <el-col :span="3">
               <div class="icon_part icon_pad">
@@ -341,9 +338,9 @@
   }
   }
   .usrlist{
-    width:100%;
-    //height:80px;
-   }
+  width:100%;
+  //height:80px;
+  }
 </style>
 
 <script>

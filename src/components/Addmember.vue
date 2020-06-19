@@ -6,12 +6,13 @@
         <span class="mem-num dark_sub_text">1/200000</span>
       </el-header>
       <el-main height="600px">
-        <user></user>
+        <user @func="getMsgFormSon"></user>
       </el-main>
       <el-footer height="30px">
-        <el-button style="float: right" type="text" class="dark_main_text">CANCEL</el-button>
-        <el-button style="float: right;margin-right:20px" type="text" class="dark_main_text">CREATE</el-button>
+        <el-button style="float: right" type="text" class="dark_main_text" @click="cancel">CANCEL</el-button>
+        <el-button style="float: right;margin-right:20px" type="text" class="dark_main_text" @click="create">CREATE</el-button>
       </el-footer>
+      
     </el-container>
   </el-card>
 </template>
@@ -19,6 +20,23 @@
 <script>
 export default {
   name: "Addmember",
+  data () {
+        return {
+            msgFormSon: "this is msg"
+        }
+    },
+  methods:{
+    create(){
+      this.$emit('create')
+    },
+    cancel(){
+      this.$emit('cancel')
+    },
+     getMsgFormSon(data){
+                this.msgFormSon = data
+                console.log(this.msgFormSon)
+    }
+  }
 };
 </script>
 <style lang="stylus" scoped>

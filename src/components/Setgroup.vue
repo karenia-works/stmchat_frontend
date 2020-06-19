@@ -19,12 +19,13 @@
         </el-container>
       </el-main>
       <el-footer height="30px">
-        <el-button style="float: right" type="text" class="dark_main_text">CANCEL</el-button>
+        <el-button style="float: right" type="text" class="dark_main_text" @click="cancelGroup">CANCEL</el-button>
         <el-button
           style="float: right;margin-right:20px"
           type="text"
           v-on:click="goadd"
           class="dark_main_text"
+          @click="createGroup"
         >NEXT</el-button>
         <router-view></router-view>
       </el-footer>
@@ -43,6 +44,12 @@ export default {
   methods: {
     goadd() {
       this.$router.push({ path: "/Addmember" });
+    },
+    createGroup() {
+      this.$emit('createGroup')
+    },
+    cancelGroup(){
+      this.$emit('cancelGroup')
     },
   },
 };

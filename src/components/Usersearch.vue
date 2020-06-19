@@ -12,8 +12,8 @@
     </div>
     <hr />
     <div v-if="searchData.length>0">
-      <div v-for="item in searchData" :key="item">
-        <el-container >
+      <div v-for="item in searchData" :key="item.usrId">
+        <el-container @click.native="sendMsg(item.usrId)" >
           <el-aside width="70px">
             <el-avatar :size="50" :src="item.circleUrl"></el-avatar>
           </el-aside>
@@ -25,8 +25,8 @@
       </div>
     </div>
     <div v-else="">
-      <div v-for="item in items" :key="item">
-        <el-container >
+      <div v-for="item in items" :key="item.usrId">
+        <el-container @click.native="sendMsg(item.usrId)">
           <el-aside width="70px">
             <el-avatar :size="50" :src="item.circleUrl"></el-avatar>
           </el-aside>
@@ -56,6 +56,7 @@ export default {
       },
       ],
       searchData:[],
+       msg: "msg",
     };
   },
   
@@ -69,6 +70,11 @@ export default {
             this.searchData=list;
                     
        },
+       sendMsg(id){
+             this.msg=id
+             this.$emit('func',id)
+             
+         }
    }
 };
 </script>
