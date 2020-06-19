@@ -32,7 +32,7 @@ export class ProfilePool<T> implements ICachingDataPool<T> {
 
   private async lookUpUser(id: string): Promise<T | undefined> {
     if (this.pending.has(id)) {
-      let pending = this.pending.get(id);
+      let pending = this.pending.get(id)!;
       let t = await pending.toPromise();
       return t;
     } else {
@@ -84,7 +84,7 @@ export class ProfilePool<T> implements ICachingDataPool<T> {
 @singleton()
 export class UserProfilePool extends ProfilePool<UserProfile> {
   public constructor(
-    @inject("server_config") serverConfig: IServerConfig,
+    @inject("server_config") private serverConfig: IServerConfig,
     ws: WsMessageService,
     private loginService: LoginService,
   ) {
@@ -93,7 +93,7 @@ export class UserProfilePool extends ProfilePool<UserProfile> {
       serverConfig.apiBaseUrl + serverConfig.apiEndpoints.userProfile.get,
       id =>
         serverConfig.apiBaseUrl +
-        serverConfig.apiEndpoints.userProfile.single.replace("{name}", id),
+        serverConfig.apiEndpoints.userProfile.single.replace("{id}", id),
     );
     ws.userOnlineState.subscribe({
       next: msg => {
@@ -113,14 +113,40 @@ export class UserProfilePool extends ProfilePool<UserProfile> {
     if (!this.loginService.loginState.isLoggedIn()) {
       return null;
     } else {
-      throw new Error("Not implemented");
+      let result = await axios.get<UserProfile>(
+        this.serverConfig.apiBaseUrl +
+          this.serverConfig.apiEndpoints.userProfile.getMine,
+        {},
+      );
+      return result.data;
     }
   }
+
+  // public async register(profile: UserProfile): Promise<UserProfile> {
+  //   if (this.loginService.loginState.isLoggedIn()) {
+  //     throw new Error("User is already logged in");
+  //   } else {
+  //     let result = await axios.post<UserProfile>(
+  //       this.serverConfig.apiBaseUrl +
+  //         this.serverConfig.apiEndpoints.userProfile.register,
+  //       profile,
+  //     );
+  //     if (result.status == 400) {
+  //       throw new Error("Username taken");
+  //     } else if (result.status >= 300) {
+  //       throw new Error("Register error");
+  //     }
+  //     this.updateData(result.data.id, result.data);
+  //     return result.data;
+  //   }
+  // }
 }
 
 @singleton()
 export class GroupProfilePool extends ProfilePool<GroupProfile> {
-  public constructor(@inject("server_config") serverConfig: IServerConfig) {
+  public constructor(
+    @inject("server_config") private serverConfig: IServerConfig,
+  ) {
     super(
       1024,
       serverConfig.apiBaseUrl + serverConfig.apiEndpoints.groupProfile.get,
@@ -128,5 +154,15 @@ export class GroupProfilePool extends ProfilePool<GroupProfile> {
         serverConfig.apiBaseUrl +
         serverConfig.apiEndpoints.groupProfile.single.replace("{name}", id),
     );
+  }
+
+  public async makeGroup(profile: GroupProfile): Promise<GroupProfile> {
+    let result = await axios.post<GroupProfile>(
+      this.serverConfig.apiBaseUrl +
+        this.serverConfig.apiEndpoints.groupProfile.make,
+      profile,
+    );
+    this.updateData(result.data.id, result.data);
+    return result.data;
   }
 }

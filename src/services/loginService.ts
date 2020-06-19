@@ -81,6 +81,12 @@ interface UserLoginData {
   scope: string;
 }
 
+export interface User {
+  id: string;
+  name: string;
+  password: string;
+}
+
 @singleton()
 export class LoginService {
   public constructor(@inject("server_config") private config: IServerConfig) {}
@@ -112,5 +118,21 @@ export class LoginService {
 
   public async logout() {
     this._loginState.clearToken();
+  }
+
+  public async register(username: string, password: string): Promise<boolean> {
+    let result = await Axios.post(
+      this.config.apiBaseUrl + this.config.apiEndpoints.userProfile.register,
+      {
+        name: username,
+        password: password,
+      } as User,
+      {
+        validateStatus(status) {
+          return true;
+        },
+      },
+    );
+    return result.status < 300;
   }
 }

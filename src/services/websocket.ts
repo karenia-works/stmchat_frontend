@@ -21,6 +21,7 @@ export class WsMessageService {
 
   protected connectWebsocket(dest: string) {
     let self = this;
+    console.log("Connecting to websocket ", dest);
     this.ws_connection = new WebSocket(dest);
     this.ws_connection.onopen = function(ev) {
       self.onWebsocketOpen(this, ev);
@@ -126,16 +127,16 @@ export class WsMessageService {
 
   protected reconnectWebsocket(dest: string) {
     const max_wait_time = 32000;
-    if (this.wait_time < max_wait_time) {
-      this.wait_time = Math.min(this.wait_time * 2, max_wait_time);
-    } else {
-      this.wait_time = max_wait_time;
-    }
     console.warn(
       `Cannot connect to websocket. Retrying in ${this.wait_time / 1000}s`,
     );
     setTimeout(() => {
       this.connectWebsocket(dest);
     }, this.wait_time);
+    if (this.wait_time < max_wait_time) {
+      this.wait_time = Math.min(this.wait_time * 2, max_wait_time);
+    } else {
+      this.wait_time = max_wait_time;
+    }
   }
 }
