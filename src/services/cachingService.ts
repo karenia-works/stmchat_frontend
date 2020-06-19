@@ -122,24 +122,24 @@ export class UserProfilePool extends ProfilePool<UserProfile> {
     }
   }
 
-  public async register(profile: UserProfile): Promise<UserProfile> {
-    if (this.loginService.loginState.isLoggedIn()) {
-      throw new Error("User is already logged in");
-    } else {
-      let result = await axios.post<UserProfile>(
-        this.serverConfig.apiBaseUrl +
-          this.serverConfig.apiEndpoints.userProfile.register,
-        profile,
-      );
-      if (result.status == 400) {
-        throw new Error("Username taken");
-      } else if (result.status >= 300) {
-        throw new Error("Register error");
-      }
-      this.updateData(result.data.id, result.data);
-      return result.data;
-    }
-  }
+  // public async register(profile: UserProfile): Promise<UserProfile> {
+  //   if (this.loginService.loginState.isLoggedIn()) {
+  //     throw new Error("User is already logged in");
+  //   } else {
+  //     let result = await axios.post<UserProfile>(
+  //       this.serverConfig.apiBaseUrl +
+  //         this.serverConfig.apiEndpoints.userProfile.register,
+  //       profile,
+  //     );
+  //     if (result.status == 400) {
+  //       throw new Error("Username taken");
+  //     } else if (result.status >= 300) {
+  //       throw new Error("Register error");
+  //     }
+  //     this.updateData(result.data.id, result.data);
+  //     return result.data;
+  //   }
+  // }
 }
 
 @singleton()
