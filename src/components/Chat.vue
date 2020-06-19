@@ -1,5 +1,6 @@
 <template>
   <div class="chat" @click="showMsgMenu = false">
+    <button @click="getUser('wang')">test</button>
     <!-- <div class="wrapper">
       <div v-for="msg in list" :key="msg.msg.id">{{ msg }}</div>
     </div>-->
@@ -266,8 +267,9 @@ import { serviceProvider, TYPES } from "../services/dependencyInjection";
 import { ServerChatMsg } from "@/types/types";
 import Message from "./Message.vue";
 
-import Vue from "vue";
 import { FileUploader, getFileUri } from "../services/fileUploader";
+import { UserProfilePool } from "../services/cachingService";
+import Vue from "vue";
 export default Vue.extend({
   // props: {
   //   showSender: Boolean,
@@ -347,6 +349,15 @@ export default Vue.extend({
     };
   },
   methods: {
+    async getUser(id: string) {
+      let ufp = serviceProvider.resolve<UserProfilePool>(UserProfilePool);
+      try {
+        let user = await ufp.getData(id);
+        console.log(user);
+      } catch (err) {
+        console.log(err);
+      }
+    },
     send() {
       if (this.showUpload && this.upUrl) {
         console.log({
@@ -445,7 +456,7 @@ export default Vue.extend({
     },
     handleUploadError() {
       // ProgressEvent 找不着错误消息提示
-      this.$message.error("图片上传失败");
+      this.$message.error("图片或文件上传失败");
       this.showUpload = false;
     },
     handleUploadSuccess(res: string, file: { raw: File }) {
