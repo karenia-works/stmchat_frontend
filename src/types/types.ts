@@ -139,12 +139,23 @@ export interface UserProfile {
   hotkey: "enterNewline" | "enterSend";
 }
 
+// export interface GroupProfile {
+//   id: string;
+//   name: string;
+//   desc: string;
+//   avatarUrl: string;
+//   members: string[];
+// }
+
 export interface GroupProfile {
   id: string;
   name: string;
-  desc: string;
-  avatarUrl: string;
+  isFriend: boolean;
+  avatarUrl?: string;
+  owner: string;
+  describ?: string;
   members: string[];
+  chatlog: string;
 }
 
 let a: TextChatMsg = {

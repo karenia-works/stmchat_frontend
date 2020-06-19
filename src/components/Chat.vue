@@ -6,7 +6,7 @@
     </div>-->
     <div class="chat-top-bar dark_main_text dark_light_bg">
       <template v-if="!MultiOn">
-        <div class="chatinfo" :class="chatinfo.type">
+        <div class="chatinfo">
           <template v-if="chatinfo.isFriend">
             <span>{{ chatname }}</span>
             <span class="info online">
@@ -264,11 +264,12 @@ import { ChatMsgs } from "../assets/sample/wsChat";
 
 // import moment from "moment";
 import { serviceProvider, TYPES } from "../services/dependencyInjection";
-import { ServerChatMsg } from "@/types/types";
+import { ServerChatMsg, GroupProfile, ClientChatMsg } from "@/types/types";
 import Message from "./Message.vue";
 
 import { FileUploader, getFileUri } from "../services/fileUploader";
 import { UserProfilePool } from "../services/cachingService";
+import axios from "axios";
 import Vue from "vue";
 export default Vue.extend({
   // props: {
@@ -285,10 +286,18 @@ export default Vue.extend({
       else this.messageProcess = pos;
     },
   },
-  beforeMount: function() {},
+  beforeMount: function() {
+    this.getChatInfo(this.chatId);
+    if (this.chatinfo.isFriend) {
+      this.showSender = false;
+    }
+  },
 
   data() {
     return {
+      //props
+      chatId: "wang+li",
+
       // style config
       showSender: true,
       showAvatar: true,
@@ -296,6 +305,7 @@ export default Vue.extend({
       showEmptyWarning: false,
       showDelete: false,
       messageProcess: 0,
+      showForward: true,
 
       // chat messages
       connector: null,
@@ -310,11 +320,11 @@ export default Vue.extend({
         x: 0,
         y: 0,
       },
-      quoteMsg: null,
+      quoteMsg: null as ServerChatMsg | null,
 
       //upload
       showUpload: false,
-      uploadType: "",
+      uploadType: "image" as "image" | "file",
       upUrl: "",
       fileInfo: null as null | { name: string; size: number },
       uploading: false,
@@ -332,13 +342,12 @@ export default Vue.extend({
         groups: ["kruodis"],
       },
       chatinfo: {
-        id: "5ee5feefac7ecb0001782b61",
-        name: "wang+li",
+        id: "",
+        name: "",
         isFriend: true,
-        owner: "wang",
-        members: ["wang", "li"],
-        chatlog: "5ee5feefac7ecb0001782b62",
-      },
+        members: [""],
+        chatlog: "",
+      } as GroupProfile,
       configs: {
         hotKey: "enterSend", //"enterNewline"
       },
@@ -346,6 +355,7 @@ export default Vue.extend({
       // multi select
       MultiOn: false,
       checkedMessage: [] as ServerChatMsg[],
+      endpoint: " http://yuuna.srv.karenia.cc/api/v1",
     };
   },
   methods: {
@@ -358,38 +368,80 @@ export default Vue.extend({
         console.log(err);
       }
     },
+    getChatInfo(id: string) {
+      if (id) {
+        axios
+          .get(this.endpoint + "/group/" + this.chatId)
+          .then(res => {
+            this.chatinfo = res.data;
+          })
+          .catch(error => {
+            console.log(error);
+          });
+      }
+    },
     send() {
-      if (this.showUpload && this.upUrl) {
-        console.log({
-          _t: "image",
-          id: "1" + new Date().getTime(),
-          time: new Date(),
-          image: this.upUrl,
-          caption: this.sendMessage,
-          sender: this.me,
-        });
+      let msg: ClientChatMsg = { _t: "text" };
+
+      if (this.quoteMsg) {
+        msg.replyTo = this.quoteMsg.id;
+        this.quoteMsg = null;
+      }
+
+      // file of image
+      if (this.showUpload) {
+        if (!this.upUrl) return; // throw error
+        msg._t = this.uploadType;
+        msg.caption = this.sendMessage;
+
+        switch (this.uploadType) {
+          case "image":
+            msg.image = this.upUrl;
+            break;
+          case "file":
+            msg.file = this.upUrl;
+            msg.filename = this.fileInfo ? this.fileInfo.name : "";
+            msg.size = this.fileInfo ? this.fileInfo.size : 0;
+            break;
+        }
+
         this.sendMessage = "";
         this.upUrl = "";
+        this.fileInfo = null;
         this.showUpload = false;
       } else {
+        // test msg
         if (this.sendMessage.length == 0) {
           this.showEmptyWarning = true;
           setTimeout(() => {
             this.showEmptyWarning = false;
           }, 1500);
         } else {
-          console.log({
-            _t: "text",
-            id: "1" + new Date().getTime(),
-            time: new Date(),
-            text: this.sendMessage,
-            sender: this.me,
-          });
+          msg.text = this.sendMessage;
           this.sendMessage = "";
         }
       }
+      this.sendToClient(msg);
       this.jumpToMessage(-1);
     },
+
+    sendToClient(msg: ClientChatMsg) {
+      console.log({
+        _t: "chat",
+        chatId: this.chatinfo,
+        msg: msg,
+      });
+    },
+
+    forwardMsg(id: string) {
+      let msg: ClientChatMsg = {
+        _t: "forward",
+        fromChatId: this.chatId,
+        fromMessageId: id,
+      };
+      this.sendToClient(msg);
+    },
+
     chatPosition() {
       let vs: any = this.$refs["chat-messages"];
       const { v, h } = vs.getScrollProcess();
@@ -484,9 +536,7 @@ export default Vue.extend({
       });
       this.CancelMulti();
     },
-    forwardMsg(id: string) {
-      console.log("forward msg", id);
-    },
+
     deleteMulti() {
       this.checkedMessage.forEach(msg => {
         this.deleteMsg(msg.id);
@@ -509,6 +559,8 @@ export default Vue.extend({
       return (this as any).checkedMessage.length;
     },
     chatname(): string {
+      if (!this.chatinfo) return "";
+
       if (!this.chatinfo.isFriend) return this.chatinfo.name;
 
       // private chat
