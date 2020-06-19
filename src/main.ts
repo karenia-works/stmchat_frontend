@@ -8,11 +8,6 @@ import ElementUI from "element-ui";
 import "element-ui/lib/theme-chalk/index.css";
 import vuescroll from "vuescroll";
 
-import Usersearch from "@/components/Usersearch.vue";
-import Userlist from "@/components/Userlist.vue";
-// import "./plugins/element.js";
-// import { Button } from "element-ui";
-
 Vue.config.productionTip = false;
 Vue.use(ElementUI);
 Vue.use(vuescroll, {
@@ -25,8 +20,6 @@ Vue.use(vuescroll, {
   },
   name: "vueScroll",
 });
-Vue.component("user", Usersearch);
-Vue.component("userlist", Userlist);
 
 new Vue({
   router,

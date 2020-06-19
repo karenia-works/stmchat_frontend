@@ -24,8 +24,13 @@
 </template>
 
 <script>
+import Usersearch from "@/components/Usersearch.vue";
+
 export default {
   name: "Contacts",
+  components: {
+    user: Usersearch,
+  },
   data() {
     return {
       msgFormSon: "this is msg",

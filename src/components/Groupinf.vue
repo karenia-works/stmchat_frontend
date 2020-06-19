@@ -206,8 +206,13 @@
 </template>
 
 <script>
+import Usersearch from "@/components/Usersearch.vue";
+
 export default {
   name: "Setting",
+  components: {
+    user: Usersearch,
+  },
 };
 </script>
 

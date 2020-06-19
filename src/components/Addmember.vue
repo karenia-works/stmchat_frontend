@@ -29,12 +29,17 @@
 </template>
 
 <script>
+import Usersearch from "./Usersearch.vue";
+
 export default {
   name: "Addmember",
   data() {
     return {
       msgFormSon: "this is msg",
     };
+  },
+  components: {
+    user: Usersearch,
   },
   methods: {
     create() {
