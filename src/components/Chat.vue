@@ -534,7 +534,7 @@ export default Vue.extend({
 });
 </script>
 
-<style lang="stylus">
+<style lang="stylus" scoped>
 .input-bar {
   padding: 6px 0;
   display: flex;
@@ -837,20 +837,18 @@ export default Vue.extend({
   }
 
   .chat-messages {
-    .msg {
-      .msgbody {
-        background-color: colors.dark-medium;
+    .msgbody {
+      background-color: colors.dark-medium;
 
-        .sendername {
-          color: colors.theme-blue;
-        }
+      .sendername {
+        color: colors.theme-blue;
+      }
 
-        .msg-text {
-          color: colors.dark-main-text;
+      .msg-text {
+        color: colors.dark-main-text;
 
-          .time {
-            color: colors.dark-sub-text;
-          }
+        .time {
+          color: colors.dark-sub-text;
         }
       }
     }

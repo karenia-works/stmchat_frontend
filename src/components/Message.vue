@@ -258,11 +258,39 @@ export default Vue.extend({
   }
 }
 
-.quote-text {
-  // todo: quote width definited by message
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 200px;
+.quote {
+  border-left: 3px colors.theme-blue solid;
+  padding-left: 8px;
+  margin: 3px 0 5px;
+  color: colors.dark-sub-text;
+  display: flex;
+  font-size: 14px;
+
+  .el-image {
+    height: 43px;
+    width: 43px;
+    border-radius: 3px;
+    margin-right: 5px;
+    opacity: 0.8;
+  }
+
+  .quote-text {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 200px;
+  }
+}
+
+.info {
+  color: colors.dark-sub-text;
+  font-size: 12px;
+}
+
+.icon24 {
+  font-size: 24px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
 }
 </style>
