@@ -4,17 +4,18 @@
 
     <div class="bodytop">
       <div class="sendername" v-if="showSender">
-        {{ msg.sender.name }}
+        {{ msg.sender }}
       </div>
       <!-- replyTo -->
       <div v-if="msg.replyTo" class="quote">
         <el-image
           v-if="msg.replyTo._t == 'image'"
           :src="msg.replyTo.image"
+          lazy
         ></el-image>
         <div>
           <div class="sendername">
-            {{ msg.replyTo.sender.name }}
+            {{ msg.replyTo.sender }}
           </div>
           <div class="quote-text">
             <template v-if="msg.replyTo._t == 'text'">
@@ -38,7 +39,7 @@
 
       <!-- forwardFrom -->
       <div class="sendername" v-if="msg.forwardFrom">
-        Forwarded from {{ msg.forwardFrom.sender.name }}
+        Forwarded from {{ msg.forwardFrom.userId }}
       </div>
     </div>
 
