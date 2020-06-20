@@ -8,14 +8,21 @@
     </div>
     <div :style="{ height: listHeight }">
       <vueScroll>
-        <div v-for="item in queryList" :key="item.usrId">
-          <el-container @click.native="$emit('selectUser', item.usrId)">
+        <div v-for="item in queryList" :key="item.username">
+          <el-container @click.native="$emit('selectUser', item.username)">
             <el-aside width="70px">
-              <el-avatar :size="50" :src="item.circleUrl"></el-avatar>
+              <el-avatar
+                v-if="item.avatarUrl"
+                :src="item.avatarUrl"
+                :size="50"
+              ></el-avatar>
+              <el-avatar v-else :size="50">{{
+                item.username[0].toUpperCase()
+              }}</el-avatar>
             </el-aside>
             <el-container>
               <el-header height="30px" class="dark_main_text">{{
-                item.usrId
+                item.username
               }}</el-header>
               <el-footer height="20px" class="dark_sub_text">Footer</el-footer>
             </el-container>
@@ -32,18 +39,6 @@ export default {
   data() {
     return {
       selectVal: "",
-      items: [
-        {
-          circleUrl:
-            "https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png",
-          usrId: "name1",
-        },
-        {
-          circleUrl:
-            "https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png",
-          usrId: "name2",
-        },
-      ],
       listHeight: "350px",
     };
   },
@@ -52,9 +47,12 @@ export default {
     this.listHeight = this.$refs["out"].clientHeight - 60 + "px";
   },
 
+  props: ["items"],
   computed: {
     queryList() {
-      return this.items.filter(item => item.usrId.indexOf(this.selectVal) > -1);
+      return this.items.filter(
+        item => item.username.indexOf(this.selectVal) > -1,
+      );
     },
   },
 };
