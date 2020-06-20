@@ -34,16 +34,18 @@ export default {
   data() {
     return {
       msgFormSon: "this is msg",
-       list: [
+      list: [
         {
-          circleUrl:
+          avatarUrl:
             "https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png",
-          usrId: "name1",
+          username: "li",
+          state: true,
         },
         {
-          circleUrl:
+          avatarUrl:
             "https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png",
-          usrId: "name2",
+          username: "wang",
+          state: false,
         },
       ],
     };
@@ -59,7 +61,6 @@ export default {
       this.msgFormSon = data;
       console.log(this.msgFormSon);
     },
-    
   },
 };
 </script>

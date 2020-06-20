@@ -7,14 +7,14 @@
     </div>
     <hr />
 
-    <div v-for="item in queryList" :key="item.usrId">
-      <el-container @click.native="$emit('selectUser', item.usrId)">
+    <div v-for="item in queryList" :key="item.username">
+      <el-container @click.native="$emit('selectUser', item.username)">
         <el-aside width="70px">
-          <el-avatar :size="50" :src="item.circleUrl"></el-avatar>
+          <el-avatar :size="50" :src="item.avatarUrl"></el-avatar>
         </el-aside>
         <el-container>
           <el-header height="30px" class="dark_main_text">{{
-            item.usrId
+            item.username
           }}</el-header>
           <el-footer height="20px" class="dark_sub_text">Footer</el-footer>
         </el-container>
@@ -30,10 +30,12 @@ export default {
       selectVal: "",
     };
   },
-  props: ['items'],
+  props: ["items"],
   computed: {
     queryList() {
-      return this.items.filter(item => item.usrId.indexOf(this.selectVal) > -1);
+      return this.items.filter(
+        item => item.username.indexOf(this.selectVal) > -1,
+      );
     },
   },
 };
