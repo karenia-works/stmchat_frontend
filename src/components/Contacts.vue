@@ -2,21 +2,21 @@
   <el-card class="box-card dark_medium_bg">
     <el-container>
       <el-header height="15px" class="dark_main_text">
-        <span>Contacts</span>
+        <span>联系人列表</span>
       </el-header>
       <el-main height="600px">
-        <user @selectUser="getMsgFormSon"></user>
+        <user @selectUser="getMsgFormSon" :items="list"></user>
       </el-main>
       <el-footer height="30px">
         <el-button style="float: left" type="text" class="dark_main_text"
-          >ADD CONTACT</el-button
+          >添加联系人</el-button
         >
         <el-button
           style="float: right"
           type="text"
           class="dark_main_text"
           @click="close"
-          >CLOSE</el-button
+          >关闭</el-button
         >
       </el-footer>
     </el-container>
@@ -26,6 +26,24 @@
 <script>
 export default {
   name: "Contacts",
+  data() {
+    return {
+      list: [
+        {
+          avatarUrl:
+            "https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png",
+          username: "li",
+          state: true,
+        },
+        {
+          avatarUrl:
+            "https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png",
+          username: "wang",
+          state: false,
+        },
+      ],
+    };
+  },
   methods: {
     close() {
       this.$emit("contactClose");
