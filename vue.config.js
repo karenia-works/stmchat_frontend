@@ -14,6 +14,7 @@ module.exports = {
   configureWebpack: {
     plugins: [
       new CircularDependencyPlugin({
+        exclude: /node_modules/,
         // add errors to webpack instead of warnings
         failOnError: true,
         // allow import cycles that include an asyncronous import,
