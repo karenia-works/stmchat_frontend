@@ -1,267 +1,274 @@
 <template>
   <div class="chat" @click="showMsgMenu = false">
-    <button @click="getUser('wang')">test</button>
-    <div class="chat-top-bar dark_main_text dark_light_bg">
-      <template v-if="!MultiOn">
-        <div class="chatinfo">
-          <template v-if="chatinfo.isFriend">
-            <span>{{ chatname }}</span>
-            <span class="info online">
-              online
-            </span>
-          </template>
-          <template v-else>
-            <span>{{ chatname }}</span>
-            <span class="info">{{ chatinfo.members.length }} members</span>
-          </template>
-        </div>
-      </template>
+    <template v-if="!chatinfo">
+      <div class="non-chat chat-messages dark_deep_bg">
+        <div class="notice dark_main_text">选择一个联系人或群聊开始聊天</div>
+      </div>
+    </template>
+    <template v-else>
+      <button @click="getUser('wang')">test</button>
+      <div class="chat-top-bar dark_main_text dark_light_bg">
+        <template v-if="!MultiOn">
+          <div class="chatinfo">
+            <template v-if="chatinfo.isFriend">
+              <span>{{ chatname }}</span>
+              <span class="info online">
+                online
+              </span>
+            </template>
+            <template v-else>
+              <span>{{ chatname }}</span>
+              <span class="info">{{ chatinfo.members.length }} members</span>
+            </template>
+          </div>
+        </template>
 
-      <!-- 多选框功能栏 -->
-      <template v-else>
-        <div class="multi_row">
-          <el-button
-            type="primary"
-            class="multi_button"
-            @click="showDelete = true"
-          >
-            删除
-            <span class="multi_num">{{ checkedNumber }}</span>
-          </el-button>
-          <el-button
-            type="primary"
-            class="multi_button"
-            @click="showForward = true"
-          >
-            转发
-            <span class="multi_num">{{ checkedNumber }}</span>
-          </el-button>
-          <el-button class="multi_cancel" type="text" @click="CancelMulti"
-            >取消</el-button
-          >
-        </div>
-      </template>
-      <!-- <div class="chatopt icon24">
+        <!-- 多选框功能栏 -->
+        <template v-else>
+          <div class="multi_row">
+            <el-button
+              type="primary"
+              class="multi_button"
+              @click="showDelete = true"
+            >
+              删除
+              <span class="multi_num">{{ checkedNumber }}</span>
+            </el-button>
+            <el-button
+              type="primary"
+              class="multi_button"
+              @click="showForward = true"
+            >
+              转发
+              <span class="multi_num">{{ checkedNumber }}</span>
+            </el-button>
+            <el-button class="multi_cancel" type="text" @click="CancelMulti"
+              >取消</el-button
+            >
+          </div>
+        </template>
+        <!-- <div class="chatopt icon24">
         <i class="el-icon-more"></i>
       </div>-->
-    </div>
+      </div>
 
-    <div class="chat-messages dark_deep_bg">
-      <!-- 置底按钮 -->
-      <el-button
-        type="primary"
-        icon="el-icon-arrow-down"
-        circle
-        v-show="showGoDown"
-        class="goBtn"
-        @click="jumpToMessage(-1)"
-      ></el-button>
+      <div class="chat-messages dark_deep_bg">
+        <!-- 置底按钮 -->
+        <el-button
+          type="primary"
+          icon="el-icon-arrow-down"
+          circle
+          v-show="showGoDown"
+          class="goBtn"
+          @click="jumpToMessage(-1)"
+        ></el-button>
 
-      <vueScroll ref="chat-messages" @handle-scroll="handleScroll">
-        <div v-for="msg in list" :key="msg.id">
-          <!-- 多选框 -->
-          <el-col :span="1" v-if="MultiOn">
-            <el-checkbox
-              @change="checked => checkMulti(checked, msg)"
-            ></el-checkbox>
-          </el-col>
+        <vueScroll ref="chat-messages" @handle-scroll="handleScroll">
+          <div v-for="msg in list" :key="msg.id">
+            <!-- 多选框 -->
+            <el-col :span="1" v-if="MultiOn">
+              <el-checkbox
+                @change="checked => checkMulti(checked, msg)"
+              ></el-checkbox>
+            </el-col>
 
-          <div class="msg" :class="{ self: msg.sender == me.username }">
-            <template v-if="showAvatar">
-              <el-avatar
-                v-if="name2avatar[msg.sender]"
-                :src="name2avatar[msg.sender]"
-              ></el-avatar>
-              <el-avatar v-else>{{ msg.sender[0].toUpperCase() }}</el-avatar>
-            </template>
+            <div class="msg" :class="{ self: msg.sender == me.username }">
+              <template v-if="showAvatar">
+                <el-avatar
+                  v-if="name2avatar[msg.sender]"
+                  :src="name2avatar[msg.sender]"
+                ></el-avatar>
+                <el-avatar v-else>{{ msg.sender[0].toUpperCase() }}</el-avatar>
+              </template>
 
-            <Message
-              :msg="msg"
-              :showSender="showSender"
-              @contextmenu.native.prevent="
-                () => {
-                  if (!MultiOn) openMenu($event, msg);
-                }
+              <Message
+                :msg="msg"
+                :showSender="showSender"
+                @contextmenu.native.prevent="
+                  () => {
+                    if (!MultiOn) openMenu($event, msg);
+                  }
+                "
+              ></Message>
+            </div>
+          </div>
+        </vueScroll>
+
+        <!-- 删除消息确认 -->
+        <el-dialog title="删除消息" :visible.sync="showDelete" width="30%">
+          <span v-if="!MultiOn">是否删除此条消息？</span>
+          <span v-else>是否删除所选消息？</span>
+          <span slot="footer" class="dialog-footer">
+            <el-button
+              @click="showDelete = false"
+              type="text"
+              style="margin-right: 10px;"
+              >取消</el-button
+            >
+            <el-button
+              v-if="!MultiOn"
+              type="primary"
+              @click="
+                deleteMsg(menuMsg.id);
+                showDelete = false;
               "
-            ></Message>
-          </div>
-        </div>
-      </vueScroll>
-
-      <!-- 删除消息确认 -->
-      <el-dialog title="删除消息" :visible.sync="showDelete" width="30%">
-        <span v-if="!MultiOn">是否删除此条消息？</span>
-        <span v-else>是否删除所选消息？</span>
-        <span slot="footer" class="dialog-footer">
-          <el-button
-            @click="showDelete = false"
-            type="text"
-            style="margin-right: 10px;"
-            >取消</el-button
-          >
-          <el-button
-            v-if="!MultiOn"
-            type="primary"
-            @click="
-              deleteMsg(menuMsg.id);
-              showDelete = false;
-            "
-            >确定</el-button
-          >
-          <el-button
-            v-else
-            type="primary"
-            @click="
-              deleteMulti();
-              showDelete = false;
-            "
-            >确定</el-button
-          >
-        </span>
-      </el-dialog>
-    </div>
-
-    <div class="chat-bottom-bar dark_light_bg dark_main_text">
-      <!-- 回复引用条 -->
-      <div v-if="quoteMsg" class="quote-bar">
-        <div class="quote">
-          <el-image
-            v-if="quoteMsg._t == 'image'"
-            :src="quoteMsg.image"
-          ></el-image>
-          <div>
-            <div class="sendername">{{ quoteMsg.sender }}</div>
-            <div class="quote-text">
-              <template v-if="quoteMsg._t == 'text'">
-                {{ quoteMsg.text }}
-              </template>
-              <template v-else-if="quoteMsg._t == 'image'">
-                [图片]
-                <span v-if="quoteMsg.caption">, {{ quoteMsg.caption }}</span>
-              </template>
-              <template v-else-if="quoteMsg._t == 'file'">
-                {{ quoteMsg.filename }}
-                <span v-if="quoteMsg.caption">, {{ quoteMsg.caption }}</span>
-              </template>
-            </div>
-          </div>
-        </div>
-        <i class="el-icon-close" @click="quoteMsg = null"></i>
+              >确定</el-button
+            >
+            <el-button
+              v-else
+              type="primary"
+              @click="
+                deleteMulti();
+                showDelete = false;
+              "
+              >确定</el-button
+            >
+          </span>
+        </el-dialog>
       </div>
 
-      <!-- 输入 -->
-      <div class="input-bar">
-        <div class="sendopt icon24">
-          <el-upload
-            action="https://jsonplaceholder.typicode.com/posts/"
-            :accept="uploadType == 'image' ? 'image/png, image/jpeg' : ''"
-            :show-file-list="false"
-            :before-upload="beforeUpload"
-            :http-request="handleUpload"
-            :on-success="handleUploadSuccess"
-            :on-error="handleUploadError"
-          >
-            <i class="el-icon-paperclip" @click="uploadType = 'file'"></i>
+      <div class="chat-bottom-bar dark_light_bg dark_main_text">
+        <!-- 回复引用条 -->
+        <div v-if="quoteMsg" class="quote-bar">
+          <div class="quote">
+            <el-image
+              v-if="quoteMsg._t == 'image'"
+              :src="quoteMsg.image"
+            ></el-image>
+            <div>
+              <div class="sendername">{{ quoteMsg.sender }}</div>
+              <div class="quote-text">
+                <template v-if="quoteMsg._t == 'text'">
+                  {{ quoteMsg.text }}
+                </template>
+                <template v-else-if="quoteMsg._t == 'image'">
+                  [图片]
+                  <span v-if="quoteMsg.caption">, {{ quoteMsg.caption }}</span>
+                </template>
+                <template v-else-if="quoteMsg._t == 'file'">
+                  {{ quoteMsg.filename }}
+                  <span v-if="quoteMsg.caption">, {{ quoteMsg.caption }}</span>
+                </template>
+              </div>
+            </div>
+          </div>
+          <i class="el-icon-close" @click="quoteMsg = null"></i>
+        </div>
+
+        <!-- 输入 -->
+        <div class="input-bar">
+          <div class="sendopt icon24">
+            <el-upload
+              action="https://jsonplaceholder.typicode.com/posts/"
+              :accept="uploadType == 'image' ? 'image/png, image/jpeg' : ''"
+              :show-file-list="false"
+              :before-upload="beforeUpload"
+              :http-request="handleUpload"
+              :on-success="handleUploadSuccess"
+              :on-error="handleUploadError"
+            >
+              <i class="el-icon-paperclip" @click="uploadType = 'file'"></i>
+              <i
+                class="el-icon-picture-outline"
+                @click="uploadType = 'image'"
+              ></i>
+            </el-upload>
+          </div>
+          <el-input
+            type="textarea"
+            :autosize="{ maxRows: 8 }"
+            placeholder="请输入内容"
+            v-model="sendMessage"
+            resize="none"
+            @keydown.native="enterInput"
+          ></el-input>
+          <div class="sendicon icon24" slot="reference">
+            <div class="emptyWarning" :class="{ show: showEmptyWarning }">
+              不能发送空消息
+            </div>
             <i
-              class="el-icon-picture-outline"
-              @click="uploadType = 'image'"
+              class="el-icon-s-promotion"
+              :class="{ iconforbid: sendMessage.length == 0 }"
+              @click="send()"
             ></i>
-          </el-upload>
-        </div>
-        <el-input
-          type="textarea"
-          :autosize="{ maxRows: 8 }"
-          placeholder="请输入内容"
-          v-model="sendMessage"
-          resize="none"
-          @keydown.native="enterInput"
-        ></el-input>
-        <div class="sendicon icon24" slot="reference">
-          <div class="emptyWarning" :class="{ show: showEmptyWarning }">
-            不能发送空消息
           </div>
-          <i
-            class="el-icon-s-promotion"
-            :class="{ iconforbid: sendMessage.length == 0 }"
-            @click="send()"
-          ></i>
         </div>
+
+        <!-- upload dialog -->
+        <el-dialog :visible="showUpload" width="40%" class="up-dialog">
+          <div class="image-wrapper" v-if="uploadType == 'image'">
+            <el-image :src="upUrl" fit="cover">
+              <div slot="error" class="icon24">
+                <i class="el-icon-loading"></i>
+              </div>
+            </el-image>
+          </div>
+          <div v-else-if="showUpload && uploadType == 'file'" class="file">
+            <div class="file-icon icon24">
+              <i class="el-icon-loading" v-if="uploading"></i>
+              <i class="el-icon-document" v-else></i>
+            </div>
+            <div class="file-info">
+              <div class="file-name">{{ fileInfo.name }}</div>
+              <div class="info">{{ fileInfo.size | fileSize }}</div>
+            </div>
+          </div>
+
+          <el-input
+            placeholder="请输入内容"
+            v-model="sendMessage"
+            @keydown.native="enterInput"
+          ></el-input>
+
+          <span slot="footer" class="dialog-footer">
+            <el-button
+              @click="showUpload = false"
+              type="text"
+              style="margin-right: 10px;"
+              >取消</el-button
+            >
+            <el-button type="primary" @click="send" :disabled="uploading"
+              >发送</el-button
+            >
+          </span>
+        </el-dialog>
+
+        <!-- forward dialog -->
+        <el-dialog
+          title="转发消息"
+          :visible.sync="showForward"
+          width="50%"
+          top="10vh"
+          class="forward-dia"
+        >
+          <user
+            @selectUser="handleForward"
+            :items="contacts"
+            style="height: 300px;"
+          />
+        </el-dialog>
       </div>
 
-      <!-- upload dialog -->
-      <el-dialog :visible="showUpload" width="40%" class="up-dialog">
-        <div class="image-wrapper" v-if="uploadType == 'image'">
-          <el-image :src="upUrl" fit="cover">
-            <div slot="error" class="icon24">
-              <i class="el-icon-loading"></i>
-            </div>
-          </el-image>
-        </div>
-        <div v-else-if="showUpload && uploadType == 'file'" class="file">
-          <div class="file-icon icon24">
-            <i class="el-icon-loading" v-if="uploading"></i>
-            <i class="el-icon-document" v-else></i>
-          </div>
-          <div class="file-info">
-            <div class="file-name">{{ fileInfo.name }}</div>
-            <div class="info">{{ fileInfo.size | fileSize }}</div>
-          </div>
-        </div>
-
-        <el-input
-          placeholder="请输入内容"
-          v-model="sendMessage"
-          @keydown.native="enterInput"
-        ></el-input>
-
-        <span slot="footer" class="dialog-footer">
-          <el-button
-            @click="showUpload = false"
-            type="text"
-            style="margin-right: 10px;"
-            >取消</el-button
-          >
-          <el-button type="primary" @click="send" :disabled="uploading"
-            >发送</el-button
-          >
-        </span>
-      </el-dialog>
-
-      <!-- forward dialog -->
-      <el-dialog
-        title="转发消息"
-        :visible.sync="showForward"
-        width="50%"
-        top="10vh"
-        class="forward-dia"
+      <!-- 右键菜单 -->
+      <el-card
+        v-if="menuMsg"
+        class="msg-menu"
+        :class="{ open: showMsgMenu }"
+        :style="{ left: msgMenuPos.x + 'px', top: msgMenuPos.y + 'px' }"
+        :body-style="{ padding: '0' }"
       >
-        <user
-          @selectUser="handleForward"
-          :items="contacts"
-          style="height: 300px;"
-        />
-      </el-dialog>
-    </div>
-
-    <!-- 右键菜单 -->
-    <el-card
-      v-if="menuMsg"
-      class="msg-menu"
-      :class="{ open: showMsgMenu }"
-      :style="{ left: msgMenuPos.x + 'px', top: msgMenuPos.y + 'px' }"
-      :body-style="{ padding: '0' }"
-    >
-      <div class="menu-item" @click="quoteMsg = menuMsg">回复</div>
-      <div class="menu-item" @click="showForward = true">转发</div>
-      <div class="menu-item" @click="MultiOn = true">多选</div>
-      <div class="menu-item delete" @click="showDelete = true">删除</div>
-    </el-card>
+        <div class="menu-item" @click="quoteMsg = menuMsg">回复</div>
+        <div class="menu-item" @click="showForward = true">转发</div>
+        <div class="menu-item" @click="MultiOn = true">多选</div>
+        <div class="menu-item delete" @click="showDelete = true">删除</div>
+      </el-card>
+    </template>
   </div>
 </template>
 
 <script lang="ts">
 //// pass items into <user>
-//todo: without chat info template
+//// without chat info template
 //todo: quote text / jump to message
 // ? download file: in same site
 // * 处理消息数据：格式和字段名；转发消息从对象中移出
@@ -301,9 +308,6 @@ export default Vue.extend({
   },
   beforeMount: function() {
     this.getChatInfo(this.chatId);
-    if (this.chatinfo.isFriend) {
-      this.showSender = false;
-    }
     this.getProfile();
   },
 
@@ -351,13 +355,7 @@ export default Vue.extend({
         state?: boolean;
       }[],
       me: null as null | UserProfile,
-      chatinfo: {
-        id: "",
-        name: "",
-        isFriend: true,
-        members: [""],
-        chatlog: "",
-      } as GroupProfile,
+      chatinfo: null as GroupProfile | null,
       configs: {
         hotKey: "enterSend", //"enterNewline"
       },
@@ -574,13 +572,25 @@ export default Vue.extend({
           .get(this.endpoint + "/group/" + this.chatId)
           .then(res => {
             this.chatinfo = res.data;
-            this.getAvatars(this.chatinfo.members);
-            if (!this.chatinfo.isFriend) this.showSender = true;
+            if (this.chatinfo) {
+              this.getAvatars(this.chatinfo.members);
+              if (this.chatinfo.isFriend) {
+                this.showSender = false;
+              }
+            }
           })
           .catch(error => {
             console.log(error);
           });
       }
+      // this.chatinfo = {
+      //   id: "wang+li",
+      //   name: "wang+li",
+      //   isFriend: true,
+      //   members: ["wang", "li"],
+      //   owner: "wang",
+      //   chatlog: "",
+      // };
     },
     getAvatars(ids: string[]) {
       ids.forEach(id => {
@@ -944,6 +954,21 @@ export default Vue.extend({
 
   .chat-bottom-bar {
     padding: 0 20px;
+  }
+
+  .non-chat {
+    height: 600px;
+    align-items: center;
+    justify-content: center;
+
+    .notice {
+      width: 250px;
+      text-align: center;
+      background-color: rgba(128, 128, 128, 0.3);
+      border-radius: 20px;
+      font-size: 14px;
+      line-height: 28px;
+    }
   }
 }
 
