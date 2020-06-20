@@ -56,7 +56,7 @@ let _cfg: IServerConfig = {
 };
 
 if (environment == "development") {
-  _cfg.wsEndpoint = "ws://yuuna.srv.karenia.cc/ws/li";
+  _cfg.wsEndpoint = "ws://localhost:5000/ws/li";
   _cfg.apiBaseUrl = "http://yuuna.srv.karenia.cc/api/v1";
   _cfg.getFile = "http://yuuna.srv.karenia.cc{name}";
 }

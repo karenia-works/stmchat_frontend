@@ -14,6 +14,7 @@ import { TYPES } from "./dependencyInjection";
 @singleton()
 export class WsMessageService {
   public constructor(@inject(TYPES.ServerConfig) serverConfig: IServerConfig) {
+    console.trace("WsMessageService constructed");
     this.dest = serverConfig.wsEndpoint;
     this.connectWebsocket();
   }
@@ -23,8 +24,10 @@ export class WsMessageService {
   protected connectWebsocket() {
     console.log("Connecting to websocket", this.dest);
     this.ws_connection = new WebSocket(this.dest);
-    this.ws_connection.onopen = ev => this.onWebsocketOpen(ev);
-    this.ws_connection.onclose = ev => this.onWebsocketClose(ev);
+    this.ws_connection.onopen = ev => {
+      this.ws_connection.onclose = ev => this.onWebsocketClose(ev);
+      this.onWebsocketOpen(ev);
+    };
     this.ws_connection.onmessage = ev => this.onWebsocketMessage(ev);
     this.ws_connection.onerror = ev => this.onWebsocketError(ev);
   }
@@ -75,20 +78,21 @@ export class WsMessageService {
   }
 
   protected onWebsocketOpen(err: Event) {
+    console.log("Connected to websocket");
     this.connection_state.next(true);
     this.wait_time = 500;
-    console.log("Connected to websocket");
   }
 
   protected onWebsocketClose(err: CloseEvent) {
+    console.log("Disconnected from websocket", this.ws_connection.url);
     this.connection_state.next(false);
-    console.warn("Disconnected from websocket", this.ws_connection.url);
     this.reconnectWebsocket();
   }
 
   protected onWebsocketMessage(ev: MessageEvent) {
     try {
       let raw_msg = ev.data;
+      console.log(raw_msg);
       let msg = JSON.parse(raw_msg, (k, v) => {
         if (k == "_t" && v instanceof String && v.endsWith("_s")) {
           return v.substr(0, v.length - 2);

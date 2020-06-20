@@ -86,8 +86,8 @@ export class ProfilePool<T> implements ICachingDataPool<T> {
 export class UserProfilePool extends ProfilePool<UserProfile> {
   public constructor(
     @inject(TYPES.ServerConfig) private serverConfig: IServerConfig,
-    @inject(TYPES.WsMessageService) private ws: WsMessageService,
-    @inject(TYPES.LoginService) private loginService: LoginService,
+    private ws: WsMessageService,
+    private loginService: LoginService,
   ) {
     super(
       1024,
