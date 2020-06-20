@@ -28,21 +28,9 @@ export default {
   data() {
     return {
       selectVal: "",
-      items: [
-        {
-          circleUrl:
-            "https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png",
-          usrId: "name1",
-        },
-        {
-          circleUrl:
-            "https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png",
-          usrId: "name2",
-        },
-      ],
     };
   },
-
+  props: ['items'],
   computed: {
     queryList() {
       return this.items.filter(item => item.usrId.indexOf(this.selectVal) > -1);

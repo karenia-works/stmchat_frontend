@@ -193,7 +193,7 @@
           </el-row>
           <el-row type="flex" align="top">
             <div class="usrlist">
-              <user />
+              <user @selectUser="getMsgFormSon" :items="list"></user>
             </div>
           </el-row>
 
@@ -205,9 +205,6 @@
   </el-container>
 </template>
 
-<script>
-export default {};
-</script>
 
 <style lang="stylus" scoped>
 .el-header {
@@ -365,24 +362,25 @@ export default {
       voicenum: "1",
       editmode: false,
       value1: true,
+      list: [
+        {
+          circleUrl:
+            "https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png",
+          usrId: "name1",
+        },
+        {
+          circleUrl:
+            "https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png",
+          usrId: "name2",
+        },
+      ],
     };
+    
   },
   methods: {
-    formatTooltip(val) {
-      return val / 100;
-    },
-    edit_on() {
-      this.changename = this.nickname;
-      this.editmode = true;
-    },
-    save_on() {
-      if (this.changename == "") {
-        alert("昵称不能为空！");
-        this.editmode = false;
-      } else {
-        this.nickname = this.changename;
-        this.editmode = false;
-      }
+    getMsgFormSon(data) {
+      this.msgFormSon = data;
+      console.log(this.msgFormSon);
     },
   },
 };

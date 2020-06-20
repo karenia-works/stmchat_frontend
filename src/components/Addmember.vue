@@ -2,11 +2,11 @@
   <el-card class="box-card dark_medium_bg">
     <el-container>
       <el-header height="15px">
-        <span class="dark_main_text">Add Members</span>
+        <span class="dark_main_text">添加成员</span>
         <span class="mem-num dark_sub_text">1/200000</span>
       </el-header>
       <el-main height="600px">
-        <user @selectUser="getMsgFormSon"></user>
+        <user @selectUser="getMsgFormSon" :items="list"></user>
       </el-main>
       <el-footer height="30px">
         <el-button
@@ -14,14 +14,14 @@
           type="text"
           class="dark_main_text"
           @click="cancel"
-          >CANCEL</el-button
+          >取消</el-button
         >
         <el-button
           style="float: right;margin-right:20px"
           type="text"
           class="dark_main_text"
           @click="create"
-          >CREATE</el-button
+          >创建</el-button
         >
       </el-footer>
     </el-container>
@@ -34,6 +34,18 @@ export default {
   data() {
     return {
       msgFormSon: "this is msg",
+       list: [
+        {
+          circleUrl:
+            "https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png",
+          usrId: "name1",
+        },
+        {
+          circleUrl:
+            "https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png",
+          usrId: "name2",
+        },
+      ],
     };
   },
   methods: {
@@ -47,6 +59,7 @@ export default {
       this.msgFormSon = data;
       console.log(this.msgFormSon);
     },
+    
   },
 };
 </script>
