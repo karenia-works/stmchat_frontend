@@ -1,27 +1,31 @@
 <template>
-  <el-row style="height:500px">
-    <div>
-      <el-input v-model="selectVal" placeholder="Search" style="height:35px">
+  <div ref="out">
+    <div style="height:60px">
+      <el-input v-model="selectVal" placeholder="Search">
         <i slot="prefix" class="el-input__icon el-icon-search"></i>
       </el-input>
+      <hr />
     </div>
-    <hr />
-
-    <div v-for="item in queryList" :key="item.usrId">
-      <el-container @click.native="$emit('selectUser', item.usrId)">
-        <el-aside width="70px">
-          <el-avatar :size="50" :src="item.circleUrl"></el-avatar>
-        </el-aside>
-        <el-container>
-          <el-header height="30px" class="dark_main_text">{{
-            item.usrId
-          }}</el-header>
-          <el-footer height="20px" class="dark_sub_text">Footer</el-footer>
-        </el-container>
-      </el-container>
+    <div :style="{ height: listHeight }">
+      <vueScroll>
+        <div v-for="item in queryList" :key="item.usrId">
+          <el-container @click.native="$emit('selectUser', item.usrId)">
+            <el-aside width="70px">
+              <el-avatar :size="50" :src="item.circleUrl"></el-avatar>
+            </el-aside>
+            <el-container>
+              <el-header height="30px" class="dark_main_text">{{
+                item.usrId
+              }}</el-header>
+              <el-footer height="20px" class="dark_sub_text">Footer</el-footer>
+            </el-container>
+          </el-container>
+        </div>
+      </vueScroll>
     </div>
-  </el-row>
+  </div>
 </template>
+
 <script>
 export default {
   name: "Usersearch",
@@ -40,7 +44,12 @@ export default {
           usrId: "name2",
         },
       ],
+      listHeight: "350px",
     };
+  },
+
+  mounted: function() {
+    this.listHeight = this.$refs["out"].clientHeight - 60 + "px";
   },
 
   computed: {
