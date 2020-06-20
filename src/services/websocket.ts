@@ -9,32 +9,24 @@ import "rxjs";
 import { Subject } from "rxjs";
 import { singleton, inject } from "tsyringe";
 import { IServerConfig } from "./serverConfig";
+import { TYPES } from "./dependencyInjection";
 
 @singleton()
 export class WsMessageService {
-  public constructor(@inject("server_config") serverConfig: IServerConfig) {
+  public constructor(@inject(TYPES.ServerConfig) serverConfig: IServerConfig) {
     this.dest = serverConfig.wsEndpoint;
-    this.connectWebsocket(this.dest);
+    this.connectWebsocket();
   }
 
   private dest: string;
 
-  protected connectWebsocket(dest: string) {
-    let self = this;
-    console.log("Connecting to websocket ", dest);
-    this.ws_connection = new WebSocket(dest);
-    this.ws_connection.onopen = function(ev) {
-      self.onWebsocketOpen(this, ev);
-    };
-    this.ws_connection.onclose = function(ev) {
-      self.onWebsocketClose(this, ev);
-    };
-    this.ws_connection.onmessage = function(ev) {
-      self.onWebsocketMessage(this, ev);
-    };
-    this.ws_connection.onerror = function(ev) {
-      self.onWebsocketError(this, ev);
-    };
+  protected connectWebsocket() {
+    console.log("Connecting to websocket", this.dest);
+    this.ws_connection = new WebSocket(this.dest);
+    this.ws_connection.onopen = ev => this.onWebsocketOpen(ev);
+    this.ws_connection.onclose = ev => this.onWebsocketClose(ev);
+    this.ws_connection.onmessage = ev => this.onWebsocketMessage(ev);
+    this.ws_connection.onerror = ev => this.onWebsocketError(ev);
   }
 
   ws_connection!: WebSocket;
@@ -82,19 +74,19 @@ export class WsMessageService {
     this.ws_connection.send(JSON.stringify(msg));
   }
 
-  protected onWebsocketOpen(ws: WebSocket, err: Event) {
+  protected onWebsocketOpen(err: Event) {
     this.connection_state.next(true);
     this.wait_time = 500;
     console.log("Connected to websocket");
   }
 
-  protected onWebsocketClose(ws: WebSocket, err: CloseEvent) {
+  protected onWebsocketClose(err: CloseEvent) {
     this.connection_state.next(false);
-    console.warn("Disconnected from websocket", ws.url);
-    this.reconnectWebsocket(this.dest);
+    console.warn("Disconnected from websocket", this.ws_connection.url);
+    this.reconnectWebsocket();
   }
 
-  protected onWebsocketMessage(ws: WebSocket, ev: MessageEvent) {
+  protected onWebsocketMessage(ev: MessageEvent) {
     try {
       let raw_msg = ev.data;
       let msg = JSON.parse(raw_msg) as ServerMessage;
@@ -118,20 +110,24 @@ export class WsMessageService {
     }
   }
 
-  protected onWebsocketError(_ws: WebSocket, err: Event) {
+  protected onWebsocketError(err: Event) {
     this.connection_state.next(false);
     this.chat_msg.error(err);
-    console.error("Failed to connect to websocket", _ws.url, err);
+    console.error(
+      "Failed to connect to websocket",
+      this.ws_connection.url,
+      err,
+    );
     // this.reconnectWebsocket(this.dest);
   }
 
-  protected reconnectWebsocket(dest: string) {
+  protected reconnectWebsocket() {
     const max_wait_time = 32000;
     console.warn(
       `Cannot connect to websocket. Retrying in ${this.wait_time / 1000}s`,
     );
     setTimeout(() => {
-      this.connectWebsocket(dest);
+      this.connectWebsocket();
     }, this.wait_time);
     if (this.wait_time < max_wait_time) {
       this.wait_time = Math.min(this.wait_time * 2, max_wait_time);
