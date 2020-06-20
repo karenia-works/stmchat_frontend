@@ -67,10 +67,14 @@
           </el-col>
 
           <div class="msg" :class="{ self: msg.sender == me.username }">
-            <el-avatar
-              :src="name2avatar[msg.sender]"
-              v-if="showAvatar"
-            ></el-avatar>
+            <template v-if="showAvatar">
+              <template v-if="name2avatar[msg.sender]">
+                <el-avatar :src="name2avatar[msg.sender]"></el-avatar>
+              </template>
+              <template v-else>
+                <el-avatar>{{ msg.sender[0].toUpperCase() }}</el-avatar>
+              </template>
+            </template>
 
             <Message
               :msg="msg"
@@ -254,6 +258,7 @@
 
 <script lang="ts">
 //todo: quote text / jump to message
+//todo: pass items into <user>
 // ? download file: in same site
 // * 处理消息数据：格式和字段名；转发消息从对象中移出
 
@@ -305,6 +310,7 @@ export default Vue.extend({
       showDelete: false,
       showForward: false,
       messageProcess: 0,
+      quoteMsg: null as ServerChatMsg | null,
 
       // chat messages
       connector: null,
@@ -319,7 +325,6 @@ export default Vue.extend({
         x: 0,
         y: 0,
       },
-      quoteMsg: null as ServerChatMsg | null,
 
       //upload
       showUpload: false,
@@ -329,14 +334,12 @@ export default Vue.extend({
       uploading: false,
 
       // data cache
-      name2avatar: {
-        wang: "https://www.gx8899.com/uploads/allimg/180118/3-1P11P92057.jpg",
-        li:
-          "https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcSeKy1XelUk53kiE3EfnxfppDz5n3hYaseeK8O8KdzmBl7oOH5o&usqp=CAU",
-      },
+      name2avatar: {} as { [propName: string]: string }[],
       me: {
-        id: "5ee5feeeac7ecb0001782b5d",
+        id: "5eec7cd9c1e7520001d26e79",
         username: "wang",
+        avatarUrl:
+          "https://www.gx8899.com/uploads/allimg/180118/3-1P11P92057.jpg",
         friends: ["li", "yang"],
         groups: ["kruodis"],
       },
@@ -373,11 +376,25 @@ export default Vue.extend({
           .get(this.endpoint + "/group/" + this.chatId)
           .then(res => {
             this.chatinfo = res.data;
+            this.getAvatars(this.chatinfo.members);
+            if (!this.chatinfo.isFriend) this.showSender = true;
           })
           .catch(error => {
             console.log(error);
           });
       }
+    },
+    getAvatars(ids: string[]) {
+      ids.forEach(id => {
+        axios
+          .get(this.endpoint + "/profile/" + id)
+          .then(res => {
+            this.$set(this.name2avatar, id, res.data.avatarUrl);
+          })
+          .catch(error => {
+            console.log(error);
+          });
+      });
     },
 
     send() {
@@ -421,11 +438,12 @@ export default Vue.extend({
           this.sendMessage = "";
         }
       }
-      this.sendToClient(msg, this.chatinfo.id);
+      this.sendToClient(msg, this.chatId);
       this.jumpToMessage(-1);
     },
 
     sendToClient(msg: ClientChatMsg, id: string) {
+      // todo: convey private chatId
       console.log({
         _t: "chat",
         chatId: id,
@@ -522,16 +540,12 @@ export default Vue.extend({
       this.uploading = true;
     },
     async handleUpload(options: any) {
-      console.log(options);
+      // console.log(options);
       let uploader = serviceProvider.resolve<FileUploader>(FileUploader);
-      // try {
       let res = await uploader.uploadFile([options.file]);
-      console.log("onHandleUpload", res);
+      // console.log("onHandleUpload", res);
       // options.onSuccess(res[0]);
       return res[0];
-      // } catch (e) {
-      //   options.onError(e);
-      // }
     },
     handleUploadError() {
       // ProgressEvent 找不着错误消息提示
@@ -539,7 +553,7 @@ export default Vue.extend({
       this.showUpload = false;
     },
     handleUploadSuccess(res: string, file: { raw: File }) {
-      console.log("uploadSuccess", res);
+      // console.log("uploadSuccess", res);
       this.uploading = false;
       this.upUrl = getFileUri(res);
     },

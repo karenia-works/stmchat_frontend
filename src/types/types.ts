@@ -153,7 +153,7 @@ export interface GroupProfile {
   isFriend: boolean;
   avatarUrl?: string;
   owner: string;
-  describ?: string;
+  describe?: string;
   members: string[];
   chatlog: string;
 }
