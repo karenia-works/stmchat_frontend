@@ -8,10 +8,17 @@
     </div>
     <div :style="{ height: listHeight }">
       <vueScroll>
-        <div v-for="item in queryList" :key="item.usrId">
-          <el-container @click.native="$emit('selectUser', item.usrId)">
+        <div v-for="item in queryList" :key="item.username">
+          <el-container @click.native="$emit('selectUser', item.username)">
             <el-aside width="70px">
-              <el-avatar :size="50" :src="item.avatarUrl"></el-avatar>
+              <el-avatar
+                v-if="item.avatarUrl"
+                :src="item.avatarUrl"
+                :size="50"
+              ></el-avatar>
+              <el-avatar v-else :size="50">{{
+                item.username[0].toUpperCase()
+              }}</el-avatar>
             </el-aside>
             <el-container>
               <el-header height="30px" class="dark_main_text">{{

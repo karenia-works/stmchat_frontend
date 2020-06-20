@@ -68,12 +68,11 @@
 
           <div class="msg" :class="{ self: msg.sender == me.username }">
             <template v-if="showAvatar">
-              <template v-if="name2avatar[msg.sender]">
-                <el-avatar :src="name2avatar[msg.sender]"></el-avatar>
-              </template>
-              <template v-else>
-                <el-avatar>{{ msg.sender[0].toUpperCase() }}</el-avatar>
-              </template>
+              <el-avatar
+                v-if="name2avatar[msg.sender]"
+                :src="name2avatar[msg.sender]"
+              ></el-avatar>
+              <el-avatar v-else>{{ msg.sender[0].toUpperCase() }}</el-avatar>
             </template>
 
             <Message
@@ -236,7 +235,11 @@
         top="10vh"
         class="forward-dia"
       >
-        <user @selectUser="handleForward" style="height: 300px;" />
+        <user
+          @selectUser="handleForward"
+          :items="contacts"
+          style="height: 300px;"
+        />
       </el-dialog>
     </div>
 
@@ -257,8 +260,9 @@
 </template>
 
 <script lang="ts">
+//// pass items into <user>
+//todo: without chat info template
 //todo: quote text / jump to message
-//todo: pass items into <user>
 // ? download file: in same site
 // * 处理消息数据：格式和字段名；转发消息从对象中移出
 
@@ -268,7 +272,12 @@ import { ChatMsgs } from "../assets/sample/wsChat";
 
 // import moment from "moment";
 import { serviceProvider, TYPES } from "../services/dependencyInjection";
-import { ServerChatMsg, GroupProfile, ClientChatMsg } from "@/types/types";
+import {
+  ServerChatMsg,
+  GroupProfile,
+  UserProfile,
+  ClientChatMsg,
+} from "@/types/types";
 import Message from "./Message.vue";
 
 import { FileUploader, getFileUri } from "../services/fileUploader";
@@ -295,6 +304,7 @@ export default Vue.extend({
     if (this.chatinfo.isFriend) {
       this.showSender = false;
     }
+    this.getProfile();
   },
 
   data() {
@@ -335,14 +345,12 @@ export default Vue.extend({
 
       // data cache
       name2avatar: {} as { [propName: string]: string }[],
-      me: {
-        id: "5eec7cd9c1e7520001d26e79",
-        username: "wang",
-        avatarUrl:
-          "https://www.gx8899.com/uploads/allimg/180118/3-1P11P92057.jpg",
-        friends: ["li", "yang"],
-        groups: ["kruodis"],
-      },
+      contacts: [] as {
+        username: string;
+        avatarUrl: string;
+        state?: boolean;
+      }[],
+      me: null as null | UserProfile,
       chatinfo: {
         id: "",
         name: "",
@@ -369,32 +377,6 @@ export default Vue.extend({
       } catch (err) {
         console.log(err);
       }
-    },
-    getChatInfo(id: string) {
-      if (id) {
-        axios
-          .get(this.endpoint + "/group/" + this.chatId)
-          .then(res => {
-            this.chatinfo = res.data;
-            this.getAvatars(this.chatinfo.members);
-            if (!this.chatinfo.isFriend) this.showSender = true;
-          })
-          .catch(error => {
-            console.log(error);
-          });
-      }
-    },
-    getAvatars(ids: string[]) {
-      ids.forEach(id => {
-        axios
-          .get(this.endpoint + "/profile/" + id)
-          .then(res => {
-            this.$set(this.name2avatar, id, res.data.avatarUrl);
-          })
-          .catch(error => {
-            console.log(error);
-          });
-      });
     },
 
     send() {
@@ -584,13 +566,85 @@ export default Vue.extend({
     func() {
       console.log("hi");
     },
+
+    // get data
+    getChatInfo(id: string) {
+      if (id) {
+        axios
+          .get(this.endpoint + "/group/" + this.chatId)
+          .then(res => {
+            this.chatinfo = res.data;
+            this.getAvatars(this.chatinfo.members);
+            if (!this.chatinfo.isFriend) this.showSender = true;
+          })
+          .catch(error => {
+            console.log(error);
+          });
+      }
+    },
+    getAvatars(ids: string[]) {
+      ids.forEach(id => {
+        axios
+          .get(this.endpoint + "/profile/" + id)
+          .then(res => {
+            this.$set(this.name2avatar, id, res.data.avatarUrl);
+          })
+          .catch(error => {
+            console.log(error);
+          });
+      });
+    },
+    getProfile() {
+      this.me = {
+        id: "5eec7cd9c1e7520001d26e79",
+        username: "wang",
+        avatarUrl:
+          "https://www.gx8899.com/uploads/allimg/180118/3-1P11P92057.jpg",
+        friends: ["li", "yang"],
+        groups: ["kruodis"],
+        state: true,
+      };
+      this.getContacts();
+    },
+    getContacts() {
+      if (!this.me) return;
+      this.me.friends.forEach(id => {
+        axios
+          .get(this.endpoint + "/profile/" + id)
+          .then(res => {
+            let pf = res.data;
+            this.contacts.push({
+              username: id,
+              avatarUrl: pf.avatarUrl,
+              state: pf.state,
+            });
+          })
+          .catch(error => {
+            console.log(error);
+          });
+      });
+      this.me.groups.forEach(id => {
+        axios
+          .get(this.endpoint + "/group/" + id)
+          .then(res => {
+            let pf = res.data;
+            this.contacts.push({
+              username: id,
+              avatarUrl: pf.avatarUrl,
+            });
+          })
+          .catch(error => {
+            console.log(error);
+          });
+      });
+    },
   },
   computed: {
     checkedNumber(): number {
       return (this as any).checkedMessage.length;
     },
     chatname(): string {
-      if (!this.chatinfo) return "";
+      if (!this.chatinfo || !this.me) return "";
 
       if (!this.chatinfo.isFriend) return this.chatinfo.name;
 

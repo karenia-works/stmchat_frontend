@@ -127,16 +127,16 @@ export interface ClientReadPositionMessage extends ClientMessage {
 export interface UserProfile {
   id: string;
   username: string;
-  nickname: string;
-  avatarUrl: string;
+  nickname?: string;
+  avatarUrl?: string;
   friends: string[];
   groups: string[];
   state: boolean;
-  desktopNotifications: boolean;
-  backgroundNotification: boolean;
-  soundOn: boolean;
-  soundDegree: number;
-  hotkey: "enterNewline" | "enterSend";
+  // desktopNotifications: boolean;
+  // backgroundNotification: boolean;
+  // soundOn: boolean;
+  // soundDegree: number;
+  // hotkey: "enterNewline" | "enterSend";
 }
 
 // export interface GroupProfile {
