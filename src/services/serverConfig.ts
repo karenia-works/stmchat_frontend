@@ -31,7 +31,7 @@ let environment = process.env.NODE_ENV;
 
 let _cfg: IServerConfig = {
   environment: environment,
-  wsEndpoint: "/ws/",
+  wsEndpoint: "ws://yuuna.srv.karenia.cc/ws/li",
   apiBaseUrl: "/api/v1",
   auth: {
     clientId: "",
@@ -56,10 +56,9 @@ let _cfg: IServerConfig = {
 };
 
 if (environment == "development") {
-  _cfg.wsEndpoint = "ws://yuuna.srv.karenia.cc:5000/li/ws";
-  // _cfg.apiBaseUrl = "http://yuuna.srv.karenia.cc:5000/api/v1";
+  _cfg.wsEndpoint = "ws://yuuna.srv.karenia.cc/ws/li";
   _cfg.apiBaseUrl = "http://yuuna.srv.karenia.cc/api/v1";
-  _cfg.getFile = "http://yuuna.srv.karenia.cc:5000{name}";
+  _cfg.getFile = "http://yuuna.srv.karenia.cc{name}";
 }
 
 export const serverConfig: IServerConfig = _cfg;

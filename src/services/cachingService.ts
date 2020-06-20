@@ -3,10 +3,10 @@ import axios from "axios";
 import { Lru } from "tiny-lru";
 import { injectable, inject, singleton } from "tsyringe";
 import { WsMessageService } from "./websocket";
-import { TYPES } from "./dependencyInjection";
 import { IServerConfig } from "./serverConfig";
 import { LoginService } from "./loginService";
 import { Subject } from "rxjs";
+import { TYPES } from "./dependencyInjection";
 
 /**
  * Represents an async data caching service of type `T`, which
@@ -17,6 +17,7 @@ export interface ICachingDataPool<T> {
   updateData(id: string, data: T): Promise<void>;
   removeData(id: string): Promise<void>;
 }
+console.log(TYPES);
 
 export class ProfilePool<T> implements ICachingDataPool<T> {
   public constructor(
@@ -84,9 +85,9 @@ export class ProfilePool<T> implements ICachingDataPool<T> {
 @singleton()
 export class UserProfilePool extends ProfilePool<UserProfile> {
   public constructor(
-    @inject("server_config") private serverConfig: IServerConfig,
-    ws: WsMessageService,
-    private loginService: LoginService,
+    @inject(TYPES.ServerConfig) private serverConfig: IServerConfig,
+    @inject(TYPES.WsMessageService) private ws: WsMessageService,
+    @inject(TYPES.LoginService) private loginService: LoginService,
   ) {
     super(
       1024,
