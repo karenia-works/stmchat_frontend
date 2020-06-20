@@ -1,9 +1,6 @@
 <template>
   <div class="chat" @click="showMsgMenu = false">
     <button @click="getUser('wang')">test</button>
-    <!-- <div class="wrapper">
-      <div v-for="msg in list" :key="msg.msg.id">{{ msg }}</div>
-    </div>-->
     <div class="chat-top-bar dark_main_text dark_light_bg">
       <template v-if="!MultiOn">
         <div class="chatinfo">
@@ -31,7 +28,11 @@
             删除
             <span class="multi_num">{{ checkedNumber }}</span>
           </el-button>
-          <el-button type="primary" class="multi_button" @click="forwardMulti">
+          <el-button
+            type="primary"
+            class="multi_button"
+            @click="showForward = true"
+          >
             转发
             <span class="multi_num">{{ checkedNumber }}</span>
           </el-button>
@@ -55,20 +56,6 @@
         class="goBtn"
         @click="jumpToMessage(-1)"
       ></el-button>
-
-      <!-- 右键菜单 -->
-      <el-card
-        v-if="menuMsg"
-        class="msg-menu"
-        :class="{ open: showMsgMenu }"
-        :style="{ left: msgMenuPos.x + 'px', top: msgMenuPos.y + 'px' }"
-        :body-style="{ padding: '0' }"
-      >
-        <div class="menu-item" @click="quoteMsg = menuMsg">回复</div>
-        <div class="menu-item" @click="forwardMsg(menuMsg.id)">转发</div>
-        <div class="menu-item" @click="MultiOn = true">多选</div>
-        <div class="menu-item delete" @click="showDelete = true">删除</div>
-      </el-card>
 
       <vueScroll ref="chat-messages" @handle-scroll="handleScroll">
         <div v-for="msg in list" :key="msg.id">
@@ -198,6 +185,7 @@
         </div>
       </div>
 
+      <!-- upload dialog -->
       <el-dialog :visible="showUpload" width="40%" class="up-dialog">
         <div class="image-wrapper" v-if="uploadType == 'image'">
           <el-image :src="upUrl" fit="cover">
@@ -235,27 +223,38 @@
           >
         </span>
       </el-dialog>
+
+      <!-- forward dialog -->
+      <el-dialog
+        title="转发消息"
+        :visible.sync="showForward"
+        width="50%"
+        top="10vh"
+        class="forward-dia"
+      >
+        <user @selectUser="handleForward" style="height: 300px;" />
+      </el-dialog>
     </div>
+
+    <!-- 右键菜单 -->
+    <el-card
+      v-if="menuMsg"
+      class="msg-menu"
+      :class="{ open: showMsgMenu }"
+      :style="{ left: msgMenuPos.x + 'px', top: msgMenuPos.y + 'px' }"
+      :body-style="{ padding: '0' }"
+    >
+      <div class="menu-item" @click="quoteMsg = menuMsg">回复</div>
+      <div class="menu-item" @click="showForward = true">转发</div>
+      <div class="menu-item" @click="MultiOn = true">多选</div>
+      <div class="menu-item delete" @click="showDelete = true">删除</div>
+    </el-card>
   </div>
 </template>
 
 <script lang="ts">
-//todo: uploading async
 //todo: quote text / jump to message
-
-//// upload image/ file
 // ? download file: in same site
-//// right click: forward, quote, copy, muti-select
-//// quote input
-//// bottom-bar height
-//// muti-selected
-//// foward style
-//// quote style
-//// style for file
-//// online/offline
-//// send empty warning
-//// switch hotkey
-
 // * 处理消息数据：格式和字段名；转发消息从对象中移出
 
 import { WsMessageService } from "../services/websocket";
@@ -304,8 +303,8 @@ export default Vue.extend({
       showGoDown: false,
       showEmptyWarning: false,
       showDelete: false,
+      showForward: false,
       messageProcess: 0,
-      showForward: true,
 
       // chat messages
       connector: null,
@@ -380,6 +379,7 @@ export default Vue.extend({
           });
       }
     },
+
     send() {
       let msg: ClientChatMsg = { _t: "text" };
 
@@ -421,25 +421,52 @@ export default Vue.extend({
           this.sendMessage = "";
         }
       }
-      this.sendToClient(msg);
+      this.sendToClient(msg, this.chatinfo.id);
       this.jumpToMessage(-1);
     },
 
-    sendToClient(msg: ClientChatMsg) {
+    sendToClient(msg: ClientChatMsg, id: string) {
       console.log({
         _t: "chat",
-        chatId: this.chatinfo,
+        chatId: id,
         msg: msg,
       });
     },
 
-    forwardMsg(id: string) {
+    forwardMsg(msgId: string, chatId: string) {
       let msg: ClientChatMsg = {
         _t: "forward",
         fromChatId: this.chatId,
-        fromMessageId: id,
+        fromMessageId: msgId,
       };
-      this.sendToClient(msg);
+      this.sendToClient(msg, chatId);
+    },
+
+    // forward message
+    handleForward(id: string) {
+      this.$confirm("确认将信息转发给" + id + "？")
+        .then(() => {
+          // single forward
+          if (!this.MultiOn) {
+            if (this.menuMsg) {
+              this.forwardMsg(this.menuMsg.id, id);
+            } else {
+              this.$message({
+                type: "error",
+                message: "转发失败",
+              });
+            }
+            this.showForward = false;
+
+            // multi forward
+          } else {
+            this.checkedMessage.forEach(msg => {
+              this.forwardMsg(msg.id, id);
+            });
+            this.CancelMulti();
+          }
+        })
+        .catch(() => {});
     },
 
     chatPosition() {
@@ -479,8 +506,8 @@ export default Vue.extend({
     },
 
     openMenu(e: any, msg: ServerChatMsg) {
-      this.msgMenuPos.x = e.clientX - 5;
-      this.msgMenuPos.y = e.clientY - 60;
+      this.msgMenuPos.x = e.clientX;
+      this.msgMenuPos.y = e.clientY;
       this.showMsgMenu = true;
       this.menuMsg = msg;
     },
@@ -530,12 +557,6 @@ export default Vue.extend({
       this.MultiOn = false;
       this.checkedMessage = [];
     },
-    forwardMulti() {
-      this.checkedMessage.forEach(msg => {
-        this.forwardMsg(msg.id);
-      });
-      this.CancelMulti();
-    },
 
     deleteMulti() {
       this.checkedMessage.forEach(msg => {
@@ -545,10 +566,6 @@ export default Vue.extend({
     },
     deleteMsg(id: string) {
       console.log("delete msg", id);
-      // let index = this.messages.findIndex(o => o.msg.id === id);
-      // if (index > -1) {
-      //   this.messages.splice(index, 1);
-      // }
     },
     func() {
       console.log("hi");
@@ -708,6 +725,11 @@ export default Vue.extend({
   .el-input {
     margin-top: 16px;
   }
+}
+
+.forward-dia .el-dialog__body {
+  // todo: not work
+  padding-top: 0;
 }
 
 .goBtn {
