@@ -89,7 +89,13 @@ export class WsMessageService {
   protected onWebsocketMessage(ev: MessageEvent) {
     try {
       let raw_msg = ev.data;
-      let msg = JSON.parse(raw_msg) as ServerMessage;
+      let msg = JSON.parse(raw_msg, (k, v) => {
+        if (k == "_t" && v instanceof String && v.endsWith("_s")) {
+          return v.substr(0, v.length - 2);
+        } else {
+          return v;
+        }
+      }) as ServerMessage;
       this.msg.next(msg);
       switch (msg._t) {
         case "chat":
