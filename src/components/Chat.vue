@@ -6,7 +6,6 @@
       </div>
     </template>
     <template v-else>
-      <button @click="getUser('wang')">test</button>
       <div class="chat-top-bar dark_main_text dark_light_bg">
         <template v-if="!MultiOn">
           <div class="chatinfo">
@@ -29,7 +28,7 @@
             <el-button
               type="primary"
               class="multi_button"
-              @click="showDelete = true"
+              @click="handleDelete"
             >
               删除
               <span class="multi_num">{{ checkedNumber }}</span>
@@ -93,38 +92,6 @@
             </div>
           </div>
         </vueScroll>
-
-        <!-- 删除消息确认 -->
-        <el-dialog title="删除消息" :visible.sync="showDelete" width="30%">
-          <span v-if="!MultiOn">是否删除此条消息？</span>
-          <span v-else>是否删除所选消息？</span>
-          <span slot="footer" class="dialog-footer">
-            <el-button
-              @click="showDelete = false"
-              type="text"
-              style="margin-right: 10px;"
-              >取消</el-button
-            >
-            <el-button
-              v-if="!MultiOn"
-              type="primary"
-              @click="
-                deleteMsg(menuMsg.id);
-                showDelete = false;
-              "
-              >确定</el-button
-            >
-            <el-button
-              v-else
-              type="primary"
-              @click="
-                deleteMulti();
-                showDelete = false;
-              "
-              >确定</el-button
-            >
-          </span>
-        </el-dialog>
       </div>
 
       <div class="chat-bottom-bar dark_light_bg dark_main_text">
@@ -260,7 +227,7 @@
         <div class="menu-item" @click="quoteMsg = menuMsg">回复</div>
         <div class="menu-item" @click="showForward = true">转发</div>
         <div class="menu-item" @click="MultiOn = true">多选</div>
-        <div class="menu-item delete" @click="showDelete = true">删除</div>
+        <div class="menu-item delete" @click="handleDelete">删除</div>
       </el-card>
     </template>
   </div>
@@ -273,24 +240,26 @@
 // ? download file: in same site
 // * 处理消息数据：格式和字段名；转发消息从对象中移出
 
-import { WsMessageService } from "../services/websocket";
-import { ChatMessages } from "../assets/sample/wsSample";
-import { ChatMsgs } from "../assets/sample/wsChat";
+import Vue from "vue";
+// import axios from "axios";
 
-// import moment from "moment";
 import { serviceProvider, TYPES } from "../services/dependencyInjection";
+import { WsMessageService } from "../services/websocket";
+import { LoginService } from "../services/loginService";
+import { FileUploader, getFileUri } from "../services/fileUploader";
+import { UserProfilePool, GroupProfilePool } from "../services/cachingService";
+import { ChatMessageService } from "../services/messageService";
+
+import { ChatMsgs } from "../assets/sample/wsChat";
+import Message from "./Message.vue";
+
 import {
   ServerChatMsg,
   GroupProfile,
   UserProfile,
   ClientChatMsg,
 } from "@/types/types";
-import Message from "./Message.vue";
 
-import { FileUploader, getFileUri } from "../services/fileUploader";
-import { UserProfilePool } from "../services/cachingService";
-import axios from "axios";
-import Vue from "vue";
 export default Vue.extend({
   // props: {
   //   showSender: Boolean,
@@ -307,8 +276,32 @@ export default Vue.extend({
     },
   },
   beforeMount: function() {
-    this.getChatInfo(this.chatId);
-    this.getProfile();
+    try {
+      this.userProfilePool = serviceProvider.resolve<UserProfilePool>(
+        UserProfilePool,
+      );
+      this.groupProfilePool = serviceProvider.resolve<GroupProfilePool>(
+        GroupProfilePool,
+      );
+
+      // let loginService = serviceProvider.resolve<LoginService>(LoginService);
+      // let state = loginService.loginState;
+      // console.log("login state: ", state.getUsername());
+
+      let chatMsgService = serviceProvider.resolve<ChatMessageService>(
+        ChatMessageService,
+      );
+      this.msgSub = chatMsgService.getObservable(this.chatId).subscribe({
+        next: msg => {
+          this.msgList = msg;
+        },
+      });
+
+      this.getChatInfo();
+      this.getProfile();
+    } catch (err) {
+      console.log(err);
+    }
   },
 
   data() {
@@ -321,14 +314,14 @@ export default Vue.extend({
       showAvatar: true,
       showGoDown: false,
       showEmptyWarning: false,
-      showDelete: false,
       showForward: false,
       messageProcess: 0,
       quoteMsg: null as ServerChatMsg | null,
 
       // chat messages
-      connector: null,
-      messages: ChatMessages,
+      // connector: null,
+      msgSub: null,
+      msgList: null as ServerChatMsg[] | null,
       list: ChatMsgs as ServerChatMsg[],
       sendMessage: "",
 
@@ -348,14 +341,14 @@ export default Vue.extend({
       uploading: false,
 
       // data cache
+      me: null as UserProfile | null,
+      chatinfo: null as GroupProfile | null,
       name2avatar: {} as { [propName: string]: string }[],
       contacts: [] as {
         username: string;
         avatarUrl: string;
         state?: boolean;
       }[],
-      me: null as null | UserProfile,
-      chatinfo: null as GroupProfile | null,
       configs: {
         hotKey: "enterSend", //"enterNewline"
       },
@@ -363,20 +356,15 @@ export default Vue.extend({
       // multi select
       MultiOn: false,
       checkedMessage: [] as ServerChatMsg[],
+
+      // services
       endpoint: " http://yuuna.srv.karenia.cc/api/v1",
+      userProfilePool: null,
+      groupProfilePool: null,
+      // loginService: null,
     };
   },
   methods: {
-    async getUser(id: string) {
-      let ufp = serviceProvider.resolve<UserProfilePool>(UserProfilePool);
-      try {
-        let user = await ufp.getData(id);
-        console.log(user);
-      } catch (err) {
-        console.log(err);
-      }
-    },
-
     send() {
       let msg: ClientChatMsg = { _t: "text" };
 
@@ -413,6 +401,7 @@ export default Vue.extend({
           setTimeout(() => {
             this.showEmptyWarning = false;
           }, 1500);
+          return;
         } else {
           msg.text = this.sendMessage;
           this.sendMessage = "";
@@ -429,15 +418,6 @@ export default Vue.extend({
         chatId: id,
         msg: msg,
       });
-    },
-
-    forwardMsg(msgId: string, chatId: string) {
-      let msg: ClientChatMsg = {
-        _t: "forward",
-        fromChatId: this.chatId,
-        fromMessageId: msgId,
-      };
-      this.sendToClient(msg, chatId);
     },
 
     // forward message
@@ -467,10 +447,40 @@ export default Vue.extend({
         .catch(() => {});
     },
 
+    forwardMsg(msgId: string, chatId: string) {
+      let msg: ClientChatMsg = {
+        _t: "forward",
+        fromChatId: this.chatId,
+        fromMessageId: msgId,
+      };
+      this.sendToClient(msg, chatId);
+    },
+
+    // delete message
+    handleDelete() {
+      this.$confirm(this.MultiOn ? "是否删除所选消息？" : "是否删除此条消息？")
+        .then(() => {
+          // single forward
+          if (!this.MultiOn) {
+            if (this.menuMsg) this.deleteMsg(this.menuMsg.id);
+
+            // multi forward
+          } else {
+            this.checkedMessage.forEach(msg => {
+              this.deleteMsg(msg.id);
+            });
+            this.CancelMulti();
+          }
+        })
+        .catch(() => {});
+    },
+    deleteMsg(id: string) {
+      console.log("delete msg", id);
+    },
+
     chatPosition() {
       let vs: any = this.$refs["chat-messages"];
       const { v, h } = vs.getScrollProcess();
-      // console.log(v);
       return v;
     },
     jumpToMessage(id: number) {
@@ -552,37 +562,40 @@ export default Vue.extend({
       this.checkedMessage = [];
     },
 
-    deleteMulti() {
-      this.checkedMessage.forEach(msg => {
-        this.deleteMsg(msg.id);
-      });
-      this.CancelMulti();
-    },
-    deleteMsg(id: string) {
-      console.log("delete msg", id);
-    },
     func() {
       console.log("hi");
     },
 
     // get data
-    getChatInfo(id: string) {
-      if (id) {
-        axios
-          .get(this.endpoint + "/group/" + this.chatId)
-          .then(res => {
-            this.chatinfo = res.data;
-            if (this.chatinfo) {
-              this.getAvatars(this.chatinfo.members);
-              if (this.chatinfo.isFriend) {
-                this.showSender = false;
-              }
-            }
-          })
-          .catch(error => {
-            console.log(error);
-          });
+    async getUser(id: string) {
+      try {
+        return await this.userProfilePool.getData(id);
+      } catch (err) {
+        console.log("getUser err: ", err);
       }
+    },
+
+    async getGroup(id: string) {
+      try {
+        return await this.groupProfilePool.getData(id);
+      } catch (err) {
+        console.log("getGroup err: ", err);
+      }
+    },
+
+    async getChatInfo() {
+      try {
+        this.chatinfo = await this.getGroup(this.chatId);
+        if (this.chatinfo) {
+          this.getAvatars(this.chatinfo.members);
+          if (this.chatinfo.isFriend) {
+            this.showSender = false;
+          }
+        }
+      } catch (err) {
+        console.log("get chatInfo err: ", err);
+      }
+
       // this.chatinfo = {
       //   id: "wang+li",
       //   name: "wang+li",
@@ -592,61 +605,53 @@ export default Vue.extend({
       //   chatlog: "",
       // };
     },
-    getAvatars(ids: string[]) {
-      ids.forEach(id => {
-        axios
-          .get(this.endpoint + "/profile/" + id)
-          .then(res => {
-            this.$set(this.name2avatar, id, res.data.avatarUrl);
-          })
-          .catch(error => {
-            console.log(error);
-          });
-      });
+    async getAvatars(ids: string[]) {
+      for (let id of ids) {
+        let pf = await this.getUser(id);
+        this.$set(this.name2avatar, id, pf.avatarUrl);
+      }
     },
-    getProfile() {
+
+    async getProfile() {
+      // try {
+      //   this.me = await this.userProfilePool.getMyProfile();
+      //   console.log("get me: ", this.me);
+      // } catch (err) {
+      //   console.log("getProfile err: ", err);
+      // }
       this.me = {
         id: "5eec7cd9c1e7520001d26e79",
         username: "wang",
         avatarUrl:
           "https://www.gx8899.com/uploads/allimg/180118/3-1P11P92057.jpg",
         friends: ["li", "yang"],
-        groups: ["kruodis"],
+        groups: ["family"],
         state: true,
       };
       this.getContacts();
     },
-    getContacts() {
-      if (!this.me) return;
-      this.me.friends.forEach(id => {
-        axios
-          .get(this.endpoint + "/profile/" + id)
-          .then(res => {
-            let pf = res.data;
-            this.contacts.push({
-              username: id,
-              avatarUrl: pf.avatarUrl,
-              state: pf.state,
-            });
-          })
-          .catch(error => {
-            console.log(error);
+
+    async getContacts() {
+      try {
+        for (let id of this.me.friends) {
+          let pf = await this.getUser(id);
+          this.contacts.push({
+            username: id,
+            avatarUrl: pf.avatarUrl,
+            state: pf.state,
           });
-      });
-      this.me.groups.forEach(id => {
-        axios
-          .get(this.endpoint + "/group/" + id)
-          .then(res => {
-            let pf = res.data;
-            this.contacts.push({
-              username: id,
-              avatarUrl: pf.avatarUrl,
-            });
-          })
-          .catch(error => {
-            console.log(error);
+        }
+
+        for (let id of this.me.groups) {
+          let pf = await this.getGroup(id);
+          this.contacts.push({
+            username: id,
+            avatarUrl: pf.avatarUrl,
           });
-      });
+        }
+      } catch (err) {
+        console.log("get contact err: ", err);
+      }
     },
   },
   computed: {
@@ -752,7 +757,7 @@ export default Vue.extend({
 }
 
 .up-dialog {
-  .el-dialog__header, .el-dialog__body {
+  /deep/ .el-dialog__header, /deep/ .el-dialog__body {
     padding-bottom: 0;
   }
 
@@ -805,9 +810,8 @@ export default Vue.extend({
   }
 }
 
-.forward-dia .el-dialog__body {
-  // todo: not work
-  padding-top: 0;
+/deep/ .forward-dia .el-dialog__body {
+  padding-top: 10px;
 }
 
 .goBtn {
@@ -1021,7 +1025,7 @@ export default Vue.extend({
     }
   }
 
-  .el-textarea__inner {
+  /deep/ .el-textarea__inner {
     color: colors.dark-main-text;
     background-color: colors.dark-light;
   }

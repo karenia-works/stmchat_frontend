@@ -153,7 +153,7 @@ export class GroupProfilePool extends ProfilePool<GroupProfile> {
       serverConfig.apiBaseUrl + serverConfig.apiEndpoints.groupProfile.get,
       id =>
         serverConfig.apiBaseUrl +
-        serverConfig.apiEndpoints.groupProfile.single.replace("{name}", id),
+        serverConfig.apiEndpoints.groupProfile.single.replace("{id}", id),
     );
   }
 
