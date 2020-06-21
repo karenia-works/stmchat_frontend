@@ -205,7 +205,6 @@
   </el-container>
 </template>
 
-
 <style lang="stylus" scoped>
 .el-header {
   text-align: center;
@@ -367,7 +366,6 @@ export default {
       contacts:[],
       endpoint: " http://yuuna.srv.karenia.cc/api/v1",
     };
-    
   },
   beforeMount:function(){
     this.getProfile();

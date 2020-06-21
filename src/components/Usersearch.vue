@@ -30,7 +30,7 @@ export default {
       selectVal: "",
     };
   },
-  props: ['items'],
+  props: ["items"],
   computed: {
     queryList() {
       return this.items.filter(item => item.username.indexOf(this.selectVal) > -1);
