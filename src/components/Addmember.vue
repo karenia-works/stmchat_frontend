@@ -5,7 +5,7 @@
         <span class="dark_main_text">添加成员</span>
         <span class="mem-num dark_sub_text">1/200000</span>
       </el-header>
-      <el-main height="600px">
+      <el-main style="height:550px">
         <user @selectUser="getMsgFormSon" :items="list"></user>
       </el-main>
       <el-footer height="30px">
@@ -29,26 +29,18 @@
 </template>
 
 <script>
+import axios from "axios";
 export default {
   name: "Addmember",
   data() {
     return {
       msgFormSon: "this is msg",
-      list: [
-        {
-          avatarUrl:
-            "https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png",
-          username: "li",
-          state: true,
-        },
-        {
-          avatarUrl:
-            "https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png",
-          username: "wang",
-          state: false,
-        },
-      ],
+      list: [],
+      avatarUrl: "",
     };
+  },
+  beforeMount: function() {
+    this.getList();
   },
   methods: {
     create() {
@@ -60,6 +52,26 @@ export default {
     getMsgFormSon(data) {
       this.msgFormSon = data;
       console.log(this.msgFormSon);
+    },
+    getList() {
+      axios({
+        url: "http://yuuna.srv.karenia.cc/api/v1/profile/li/friends",
+        method: "get",
+      }).then(data => {
+        this.list = data.data;
+      });
+      this.addDetail();
+    },
+    addDetail() {
+      this.list.forEach(item => {
+        axios({
+          url: `http://yuuna.srv.karenia.cc/api/v1/profile/${item.username}`,
+          method: "get",
+        }).then(data => {
+          this.avatarUrl = data.avatarUrl;
+        });
+        this.$set(item, "avatarUrl", this.avatarUrl);
+      });
     },
   },
 };
@@ -82,8 +94,10 @@ export default {
 }
 
 .box-card {
-  width: 400px;
-  margin-left: 50px;
+  width: 100%;
+  border-radius: 0px;
+  height: 650px;
+  margin-left: 0px;
 }
 
 .mem-num {

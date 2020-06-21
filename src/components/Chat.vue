@@ -505,7 +505,7 @@ export default Vue.extend({
 
     openMenu(e: any, msg: ServerChatMsg) {
       this.msgMenuPos.x = e.clientX;
-      this.msgMenuPos.y = e.clientY;
+      this.msgMenuPos.y = e.clientY-50;
       this.showMsgMenu = true;
       this.menuMsg = msg;
     },
@@ -934,8 +934,8 @@ export default Vue.extend({
 .chat {
   display: flex;
   flex-direction: column;
-  max-width: 750px;
-  height: 600px;
+  width: 850px;
+  height: 650px;
 
   .chat-top-bar {
     flex-basis: 55px;
@@ -957,7 +957,7 @@ export default Vue.extend({
   }
 
   .non-chat {
-    height: 600px;
+    height: 650px;
     align-items: center;
     justify-content: center;
 
