@@ -24,24 +24,18 @@
 </template>
 
 <script>
+import axios from "axios"
 export default {
   name: "Contacts",
   data() {
     return {
-       list: [
-        {
-          circleUrl:
-            "https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png",
-          usrId: "name1",
-        },
-        {
-          circleUrl:
-            "https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png",
-          usrId: "name2",
-        },
-      ],
+       list: [],
+       avatarUrl:"",
     };
   },
+  beforeMount:function(){
+    this.getList()
+   },
   methods: {
     close() {
       this.$emit("contactClose");
@@ -49,6 +43,25 @@ export default {
     getMsgFormSon(data) {
       console.log(data);
     },
+        getList(){
+      axios({
+        url:'http://yuuna.srv.karenia.cc/api/v1/profile/wang/friends',
+        method:'get',
+      }).then(data=>{
+          this.list=data.data
+        })
+     },
+     addDetail(){
+        this.list.forEach(item => {
+           axios({
+            url:`http://yuuna.srv.karenia.cc/api/v1/profile/${item.username}`,
+            method:'get',
+              }).then(data=>{
+                this.avatarUrl=data.avatarUrl;
+            });
+            this.$set(item,"avatarUrl",this.avatarUrl);
+        });  
+     },
   },
 };
 </script>

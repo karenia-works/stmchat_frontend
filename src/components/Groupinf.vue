@@ -43,8 +43,8 @@
             </el-col>
             <el-col :span="12" :offset="2">
               <div class="name_part" type="justify" align="start">
-                <div v-show="!editmode" class="name">{{ groupname }}</div>
-                <div class="state">42member</div>
+                <div v-show="!editmode" class="name">{{ me.name }}</div>
+                <div class="state">{{me.members.length}} members</div>
               </div>
             </el-col>
           </el-row>
@@ -63,7 +63,7 @@
             </el-col>
             <el-col :span="12" :offset="2">
               <div class="name_part top_pad" type="justify" align="start">
-                <div class="content">{{ groupdes }}</div>
+                <div class="content">{{ me.describe }}</div>
                 <div class="comment"></div>
               </div>
             </el-col>
@@ -193,7 +193,7 @@
           </el-row>
           <el-row type="flex" align="top">
             <div class="usrlist">
-              <user @selectUser="getMsgFormSon" :items="list"></user>
+              <user @selectUser="getMsgFormSon" :items="contacts"></user>
             </div>
           </el-row>
 
@@ -348,6 +348,7 @@
 </style>
 
 <script>
+import axios from "axios"
 export default {
   data() {
     return {
@@ -362,25 +363,53 @@ export default {
       voicenum: "1",
       editmode: false,
       value1: true,
-      list: [
-        {
-          circleUrl:
-            "https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png",
-          usrId: "name1",
-        },
-        {
-          circleUrl:
-            "https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png",
-          usrId: "name2",
-        },
-      ],
+      me: [],
+      contacts:[],
+      endpoint: " http://yuuna.srv.karenia.cc/api/v1",
     };
     
   },
+  beforeMount:function(){
+    this.getProfile();
+   },
   methods: {
     getMsgFormSon(data) {
       this.msgFormSon = data;
       console.log(this.msgFormSon);
+    },
+    getProfile() {
+      this.me={
+        "id": "5eec7cd9c1e7520001d26e82",
+        "name": "family",
+        "isFriend": false,
+        "owner": "wang",
+        "describe": "wei are family",
+        "members": [
+            "wang",
+            "he",
+            "li"
+         ],
+        "chatlog": "5eec7cd9c1e7520001d26e81"
+      }
+      this.getContacts();
+    },
+    getContacts() {
+      if (!this.me) return;
+      this.me.members.forEach(id => {
+        axios
+          .get(this.endpoint + "/profile/" + id)
+          .then(res => {
+            let pf = res.data;
+            this.contacts.push({
+              username: id,
+              avatarUrl: pf.avatarUrl,
+              state: pf.state,
+            });
+          })
+          .catch(error => {
+            console.log(error);
+          });
+      });
     },
   },
 };
