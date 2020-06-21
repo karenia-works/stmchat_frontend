@@ -129,9 +129,9 @@ export class WsMessageService {
   protected onWebsocketMessage(ev: MessageEvent) {
     try {
       let raw_msg = ev.data;
-      console.log(raw_msg);
+      console.log("Websocket: got", raw_msg);
       let msg = JSON.parse(raw_msg, (k, v) => {
-        if (k == "_t" && v instanceof String && v.endsWith("_s")) {
+        if (k == "_t" && typeof v === "string" && v.endsWith("_s")) {
           return v.substr(0, v.length - 2);
         } else {
           return v;
