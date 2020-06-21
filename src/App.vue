@@ -23,6 +23,7 @@ import { MessageListService } from "./services/messageService";
         console.log(v);
       },
     });
+    serviceProvider.resolve<WsMessageService>(WsMessageService);
   },
 })
 export default class App extends Vue {}
