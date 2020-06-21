@@ -17,13 +17,6 @@ import { MessageListService } from "./services/messageService";
   },
   beforeCreate() {
     registerDI();
-    let mls = serviceProvider.resolve<MessageListService>(MessageListService);
-    mls.messageListSubject.subscribe({
-      next(v) {
-        console.log(v);
-      },
-    });
-    serviceProvider.resolve<WsMessageService>(WsMessageService);
   },
 })
 export default class App extends Vue {}
