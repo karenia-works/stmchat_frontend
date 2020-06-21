@@ -106,9 +106,9 @@ export class WsMessageService {
   /** 发送消息 */
   public sendMessage(msg: ClientMessage) {
     if (this.connection_state.value === false) {
-      this.ws_connection.send(JSON.stringify(msg));
-    } else {
       this.pendingMessages.push(msg);
+    } else {
+      this.ws_connection.send(JSON.stringify(msg));
     }
   }
 
