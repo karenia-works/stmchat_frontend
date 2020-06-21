@@ -9,6 +9,8 @@ import { Component, Vue } from "vue-property-decorator";
 import HelloWorld from "./components/HelloWorld.vue";
 import { serviceProvider } from "./services/dependencyInjection";
 import registerDI from "./services/registerDI";
+import { WsMessageService } from "./services/websocket";
+import { MessageListService } from "./services/messageService";
 @Component({
   components: {
     HelloWorld,
