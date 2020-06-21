@@ -95,7 +95,7 @@
         </vueScroll>
 
         <!-- 删除消息确认 -->
-        <el-dialog title="删除消息" :visible.sync="showDelete" width="30%">
+        <el-dialog title="删除消息" :visible.sync="showDelete" width="30%" :append-to-body="true">
           <span v-if="!MultiOn">是否删除此条消息？</span>
           <span v-else>是否删除所选消息？</span>
           <span slot="footer" class="dialog-footer">
@@ -240,6 +240,7 @@
           width="50%"
           top="10vh"
           class="forward-dia"
+          :append-to-body="true"
         >
           <user
             @selectUser="handleForward"
