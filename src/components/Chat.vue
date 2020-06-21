@@ -63,7 +63,7 @@
         ></el-button>
 
         <vueScroll ref="chat-messages" @handle-scroll="handleScroll">
-          <div v-for="msg in list" :key="msg.id">
+          <div v-for="msg in msgList" :key="msg.id">
             <!-- 多选框 -->
             <el-col :span="1" v-if="MultiOn">
               <el-checkbox
@@ -277,21 +277,12 @@ export default Vue.extend({
   },
   beforeMount: function() {
     try {
-      this.userProfilePool = serviceProvider.resolve<UserProfilePool>(
-        UserProfilePool,
-      );
-      this.groupProfilePool = serviceProvider.resolve<GroupProfilePool>(
-        GroupProfilePool,
-      );
-
+      this.getServices();
       // let loginService = serviceProvider.resolve<LoginService>(LoginService);
       // let state = loginService.loginState;
       // console.log("login state: ", state.getUsername());
 
-      let chatMsgService = serviceProvider.resolve<ChatMessageService>(
-        ChatMessageService,
-      );
-      this.msgSub = chatMsgService.getObservable(this.chatId).subscribe({
+      this.msgSub = this.chatMsgService.getObservable(this.chatId).subscribe({
         next: msg => {
           this.msgList = msg;
         },
@@ -361,10 +352,22 @@ export default Vue.extend({
       endpoint: " http://yuuna.srv.karenia.cc/api/v1",
       userProfilePool: null,
       groupProfilePool: null,
+      chatMsgService: null,
       // loginService: null,
     };
   },
   methods: {
+    getServices() {
+      this.userProfilePool = serviceProvider.resolve<UserProfilePool>(
+        UserProfilePool,
+      );
+      this.groupProfilePool = serviceProvider.resolve<GroupProfilePool>(
+        GroupProfilePool,
+      );
+      this.chatMsgService = serviceProvider.resolve<ChatMessageService>(
+        ChatMessageService,
+      );
+    },
     send() {
       let msg: ClientChatMsg = { _t: "text" };
 
@@ -408,13 +411,13 @@ export default Vue.extend({
         }
       }
       this.sendToClient(msg, this.chatId);
+      this.chatMsgService.sendMessage(msg, this.chatId);
       this.jumpToMessage(-1);
     },
 
     sendToClient(msg: ClientChatMsg, id: string) {
       // todo: convey private chatId
       console.log({
-        _t: "chat",
         chatId: id,
         msg: msg,
       });
@@ -454,6 +457,7 @@ export default Vue.extend({
         fromMessageId: msgId,
       };
       this.sendToClient(msg, chatId);
+      this.chatMsgService.sendMessage(msg, this.chatId);
     },
 
     // delete message
@@ -954,6 +958,7 @@ export default Vue.extend({
     display: flex;
     flex-direction: column;
     min-height: 0;
+    height: 600px;
   }
 
   .chat-bottom-bar {
@@ -961,7 +966,6 @@ export default Vue.extend({
   }
 
   .non-chat {
-    height: 600px;
     align-items: center;
     justify-content: center;
 
