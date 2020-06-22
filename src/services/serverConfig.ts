@@ -63,7 +63,7 @@ if (environment == "development") {
   _cfg.wsEndpoint = "ws://localhost:5000/ws/{name}";
   _cfg.apiBaseUrl = "http://yuuna.srv.karenia.cc/api/v1";
   _cfg.getFile = "http://yuuna.srv.karenia.cc{name}";
-  _cfg.debug = { wsEndpointOverride: "ws://yuuna.srv.karenia.cc/ws/wang" };
+  _cfg.debug = { wsEndpointOverride: "ws://yuuna.srv.karenia.cc/ws/li" };
 }
 
 export const serverConfig: IServerConfig = _cfg;
