@@ -485,8 +485,6 @@ export default Vue.extend({
       );
       let messageCountAfter = this.msgList.length;
       let messageDiff = messageCountAfter - messageCount;
-      this.messageProcess += messageDiff;
-      this.checkedMessage = this.checkedMessage.map(x => x + messageDiff);
     },
     async handleScrollBottom() {
       console.log("fetchBottom");
