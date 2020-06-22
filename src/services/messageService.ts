@@ -6,6 +6,7 @@ import {
   GroupProfile,
   ClientChatMessage,
   ClientChatMsg,
+  ClientReadPositionMessage,
 } from "@/types/types";
 import { WsMessageService } from "./websocket";
 import { TYPES } from "./dependencyInjection";
@@ -103,6 +104,18 @@ export class ChatMessageService {
             limit: limit,
             reverse: reverse,
           },
+          transformResponse: [
+            resp =>
+              JSON.parse(resp, (k, v) => {
+                if (k == "_t" && typeof v == "string" && v.endsWith("_s"))
+                  return v.slice(0, v.length - 2);
+                else return v;
+              }),
+            resp => {
+              console.log(resp);
+              return resp.map((x: any) => x.msg);
+            },
+          ],
         },
       )
     ).data;
@@ -255,6 +268,15 @@ export class ChatMessageService {
     } else {
       return false;
     }
+  }
+
+  public sendReadPosition(chatId: string, msgId: string) {
+    let msg: ClientReadPositionMessage = {
+      _t: "read_position",
+      chatId,
+      msgId,
+    };
+    this.wss.sendMessage(msg);
   }
 }
 
