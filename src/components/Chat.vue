@@ -57,10 +57,10 @@
           circle
           v-show="showGoDown"
           class="goBtn"
-          @click="jumpToMessage(-1)"
+          @click="jumpToMessage('bottom')"
         ></el-button>
 
-        <vueScroll ref="chat-messages" @handle-scroll="handleScroll">
+        <vueScroll ref="chatMessages" @handle-scroll="handleScroll">
           <div v-for="msg in msgList" :key="msg.id">
             <!-- 多选框 -->
             <el-col :span="1" v-if="MultiOn">
@@ -266,23 +266,28 @@ export default Vue.extend({
   components: {
     Message,
   },
-  watch: {
-    messages(val) {
-      let pos = this.chatPosition();
-      if (pos == 1) this.jumpToMessage(-1);
-      else this.messageProcess = pos;
-    },
-  },
+  // watch: {
+  //   msgList(val) {
+  //     let pos = this.chatPosition();
+  //     if (pos == 1) this.jumpToMessage(-1);
+  //     else this.messageProcess = pos;
+  //   },
+  // },
   beforeMount: function() {
     try {
       this.getServices();
       // let loginService = serviceProvider.resolve<LoginService>(LoginService);
       // let state = loginService.loginState;
       // console.log("login state: ", state.getUsername());
+      console.log("refs: ", this.$refs.chatMessages);
 
       this.msgSub = this.chatMsgService.getObservable(this.chatId).subscribe({
         next: msg => {
           this.msgList = msg;
+
+          let pos = this.chatPosition();
+          if (pos == 1) this.jumpToMessage("bottom");
+          else this.messageProcess = pos;
         },
       });
 
@@ -363,6 +368,7 @@ export default Vue.extend({
         ChatMessageService,
       );
     },
+
     async send() {
       let msg: ClientChatMsg = { _t: "text" };
 
@@ -407,7 +413,6 @@ export default Vue.extend({
       }
       this.sendToClient(msg, this.chatId);
       await this.chatMsgService.sendMessage(msg, this.chatId);
-      this.jumpToMessage(-1);
     },
 
     sendToClient(msg: ClientChatMsg, id: string) {
@@ -477,18 +482,23 @@ export default Vue.extend({
       console.log("delete msg", id);
     },
 
-    chatPosition() {
-      let vs: any = this.$refs["chat-messages"];
-      const { v, h } = vs.getScrollProcess();
-      return v;
+    chatPosition(): number {
+      let vs: any = this.$refs.chatMessages;
+      if (vs) {
+        const { v, h } = vs.getScrollProcess();
+        return v;
+      } else return 0;
     },
-    jumpToMessage(id: number) {
-      let vs: any = this.$refs["chat-messages"];
-      if (id < 0) {
-        //jump to bottom
-        vs.scrollTo({
-          y: "200%",
-        });
+    jumpToMessage(id: string) {
+      let vs: any = this.$refs.chatMessages;
+      if (vs) {
+        if (id == "bottom") {
+          vs.scrollTo({
+            y: "200%",
+          });
+        } else {
+          vs.scrollIntoView("#msg" + id);
+        }
       }
     },
     handleScroll(vertical: any) {
@@ -937,8 +947,8 @@ export default Vue.extend({
 .chat {
   display: flex;
   flex-direction: column;
-  width: 850px;
   height: 650px;
+  max-width: 750px;
 
   .chat-top-bar {
     flex-basis: 55px;
