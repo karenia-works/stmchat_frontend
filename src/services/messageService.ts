@@ -88,13 +88,16 @@ export class MessageListService {
     private groupProfileService: GroupProfilePool,
   ) {
     console.log("MessageListService constructed");
-    wss.chatMessageSubject.subscribe({
+    this.sub1 = wss.chatMessageSubject.subscribe({
       next: val => this.onNewChatMessage(val).then(),
     });
-    wss.unreadMessageCount.subscribe({
+    this.sub2 = wss.unreadMessageCount.subscribe({
       next: val => this.onNewUnreadCountUpdate(val).then(),
     });
   }
+
+  private sub1: any;
+  private sub2: any;
 
   private messageMap = new Map<string, MessageListItem>();
   private _messageListSubject = new BehaviorSubject<MessageListItem[]>([]);
