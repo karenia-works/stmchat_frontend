@@ -383,16 +383,20 @@ export default Vue.extend({
             this.$forceUpdate();
         },
         beforeCreate() {
-            let mls=serviceProvider.resolve<MessageListService>(MessageListService);
+            let mls = serviceProvider.resolve<MessageListService>(MessageListService);
             mls.messageListSubject.subscribe({
                 next(v){
                     mesgNotice();
-                next:(v)=>{
-                    this.tableData=v;
-                    console.log("ChatList",v);
-                }})
+                        this.tableData = v;
+                        console.log("ChatList", v);
+
+
+                }
+            })
         },
-        clicktry(){}
+        clicktry(){
+            console.log("sss",this.tableData)
+        }
     },
     filters: {
         ellipsis(value) {
