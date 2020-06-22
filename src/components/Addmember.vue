@@ -20,7 +20,7 @@
           style="float: right;margin-right:20px"
           type="text"
           class="dark_main_text"
-          @click="create"
+          @click="$emit('Groupmem',members)"
           >创建</el-button
         >
       </el-footer>
@@ -28,51 +28,47 @@
   </el-card>
 </template>
 
-<script>
+<script lang="ts">
 import axios from "axios"
+import { serviceProvider , TYPES } from "@/services/dependencyInjection";
+import { GroupProfilePool } from "@/services/cachingService";
 export default {
   name: "Addmember",
   data() {
     return {
-      msgFormSon: "this is msg",
+      username:"",
        list: [
       ],
       avatarUrl:"",
+      groupname:"test",
+      members:[],
     };
   },
   beforeMount:function(){
     this.getList()
    },
   methods: {
-    create() {
-      this.$emit("create");
-    },
     cancel() {
       this.$emit("cancel");
     },
     getMsgFormSon(data) {
-      this.msgFormSon = data;
-      console.log(this.msgFormSon);
+      this.username=data;
+      console.log(this.username);
+      this.members.push(this.username);
+      this.list.forEach((item,i)=>{
+          if (item.username == this.username){
+               this.list.splice(i,1);
+                return true;
+           }
+       });
     },
     getList(){
       axios({
-        url:'http://yuuna.srv.karenia.cc/api/v1/profile/li/friends',
+        url:'http://yuuna.srv.karenia.cc/api/v1/profile/wang/friends',
         method:'get',
       }).then(data=>{
           this.list=data.data
         });
-       this.addDetail();
-     },
-     addDetail(){
-        this.list.forEach(item => {
-           axios({
-            url:`http://yuuna.srv.karenia.cc/api/v1/profile/${item.username}`,
-            method:'get',
-              }).then(data=>{
-                this.avatarUrl=data.avatarUrl;
-            });
-            this.$set(item,"avatarUrl",this.avatarUrl);
-        });  
      },
   },
 };

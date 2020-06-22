@@ -43,7 +43,7 @@ export default {
     getMsgFormSon(data) {
       console.log(data);
     },
-        getList(){
+    getList(){
       axios({
         url:'http://yuuna.srv.karenia.cc/api/v1/profile/wang/friends',
         method:'get',
