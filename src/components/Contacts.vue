@@ -95,28 +95,4 @@ export default {
   height: 650px;
   margin-left: 0px;
 }
-
-@media (prefers-color-scheme: dark) {
-  .dark_light_bg {
-    background-color: colors.dark-light;
-    border-color: colors.dark-medium;
-  }
-
-  .dark_medium_bg {
-    background-color: colors.dark-medium;
-    border-color: colors.dark-light;
-  }
-
-  .dark_deep_bg {
-    background-color: colors.dark-deep;
-  }
-
-  .dark_sub_text {
-    color: colors.dark-sub-text;
-  }
-
-  .dark_main_text {
-    color: colors.dark-main-text;
-  }
-}
 </style>

@@ -33,7 +33,7 @@
                 </Addmember>
               </el-aside>
               <el-container width="65%">
-                <Chat></Chat>
+                <Chat :chatId="'wang+li'"></Chat>
               </el-container> </el-container
           ></el-col>
           <el-col :span="4"></el-col>
@@ -110,30 +110,6 @@
 .grid-content-home {
   border-radius: 4px;
   min-height: 36px;
-}
-
-@media (prefers-color-scheme: dark) {
-  .dark_light_bg {
-    background-color: #606266;
-    border-color: #44474E;
-  }
-
-  .dark_medium_bg {
-    background-color: #44474E;
-    border-color: #606266;
-  }
-
-  .dark_deep_bg {
-    background-color: #303133;
-  }
-
-  .dark_sub_text {
-    color: #909399;
-  }
-
-  .dark_main_text {
-    color: #E4E7ED;
-  }
 }
 </style>
 

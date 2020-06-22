@@ -201,38 +201,13 @@
 }
 
 @media (prefers-color-scheme: dark) {
-  .dark_light_bg {
-    background-color: colors.dark-light;
-  }
-
-  .dark_medium_bg {
-    background-color: colors.dark-medium;
-  }
-
-  .dark_deep_bg {
-    background-color: colors.dark-deep;
-  }
-
   .dark_eee_bg {
     background-color: colors.theme-light-grey;
-  }
-
-  .dark_sub_text {
-    color: colors.dark-sub-text;
-  }
-
-  .dark_main_text {
-    color: colors.dark-main-text;
   }
 
   .el-badge__content {
     color: colors.dark-main-text;
     background-color: colors.theme-blue;
-  }
-
-  .el-input__inner {
-    color: colors.dark-main-text;
-    background-color: colors.dark-light;
   }
 
   .el-input-group__prepend {

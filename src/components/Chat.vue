@@ -260,10 +260,9 @@ import {
 } from "@/types/types";
 
 export default Vue.extend({
-  // props: {
-  //   showSender: Boolean,
-  //   showAvatar: Boolean,
-  // },
+  props: {
+    chatId: String,
+  },
   components: {
     Message,
   },
@@ -296,9 +295,6 @@ export default Vue.extend({
 
   data() {
     return {
-      //props
-      chatId: "wang+li",
-
       // style config
       showSender: true,
       showAvatar: true,
@@ -989,28 +985,6 @@ export default Vue.extend({
 }
 
 @media (prefers-color-scheme: dark) {
-  .dark_light_bg {
-    background-color: colors.dark-light;
-    border-color: colors.dark-medium;
-  }
-
-  .dark_medium_bg {
-    background-color: colors.dark-medium;
-    border-color: colors.dark-light;
-  }
-
-  .dark_deep_bg {
-    background-color: colors.dark-deep;
-  }
-
-  .dark_sub_text {
-    color: colors.dark-sub-text;
-  }
-
-  .dark_main_text {
-    color: colors.dark-main-text;
-  }
-
   .chat-messages {
     .msgbody {
       background-color: colors.dark-medium;
@@ -1027,11 +1001,6 @@ export default Vue.extend({
         }
       }
     }
-  }
-
-  /deep/ .el-textarea__inner {
-    color: colors.dark-main-text;
-    background-color: colors.dark-light;
   }
 }
 

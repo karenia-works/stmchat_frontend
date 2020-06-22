@@ -73,13 +73,13 @@
 
 <style lang="stylus" scoped>
 .el-header, .el-footer {
-  color :colors.theme-black
+  color: colors.theme-black;
   text-align: left;
   line-height: 60px;
 }
 
 .el-main {
-  color :colors.theme-black
+  color: colors.theme-black;
   text-align: center;
   line-height: 70px;
 }
@@ -87,7 +87,7 @@
 .box-card {
   width: 700px;
   align: center;
-  background: rgba(255,255,255,0.5);
+  background: rgba(255, 255, 255, 0.5);
 }
 
 .el-row {
@@ -107,51 +107,27 @@
   min-height: 36px;
 }
 
-.background{
-    background-size: cover;
-    width:100%;
-    height:100%;
-    z-index:-1;
-    position: fixed;
-    top:0px;
-    left:0px;
-    right:0px;
-    bottom:0px;
+.background {
+  background-size: cover;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  right: 0px;
+  bottom: 0px;
 }
 
-.front{
-    z-index:1;
-     top:0px;
-    left:0px;
-    right:0px;
-    bottom:0px;
-    position: fixed;
-    width:100%;
-    height:100%;
-}
-
-@media (prefers-color-scheme: dark) {
-  .dark_light_bg {
-    background-color: colors.dark-light;
-    border-color: colors.dark-medium;
-  }
-
-  .dark_medium_bg {
-    background-color: colors.dark-medium;
-    border-color: colors.dark-light;
-  }
-
-  .dark_deep_bg {
-    background-color: colors.dark-deep;
-  }
-
-  .dark_sub_text {
-    color: colors.dark-sub-text;
-  }
-
-  .dark_main_text {
-    color: colors.dark-main-text;
-  }
+.front {
+  z-index: 1;
+  top: 0px;
+  left: 0px;
+  right: 0px;
+  bottom: 0px;
+  position: fixed;
+  width: 100%;
+  height: 100%;
 }
 </style>
 
