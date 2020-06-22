@@ -399,6 +399,7 @@
                 let mls=serviceProvider.resolve<MessageListService>(MessageListService);
                 mls.messageListSubject.subscribe({
                     next(v){
+                        mesgNotice();
                         this.tableData=v;
                         console.log(v);
                     }
@@ -419,7 +420,7 @@
         computed: {
             //最终需要显示的数组
             sortableData: function() {
-                mesgNotice();
+
                 return sortByTime(this.tableData, "lastTimestamp");
             },
         },
