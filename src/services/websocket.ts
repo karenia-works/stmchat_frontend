@@ -18,7 +18,7 @@ export class WsMessageService {
     @inject(TYPES.ServerConfig) serverConfig: IServerConfig,
     private loginService: LoginService,
   ) {
-    console.trace("WsMessageService constructed");
+    // console.trace("WsMessageService constructed");
     this.dest = serverConfig.wsEndpoint;
 
     // DEBUG: 如果设置里提出了要强制链接就强制链接
@@ -134,7 +134,7 @@ export class WsMessageService {
     this.wait_time = 500;
     try {
       let raw_msg = ev.data;
-      console.log("Websocket: got", raw_msg);
+      // console.log("Websocket: got", raw_msg);
       let msg = JSON.parse(raw_msg, (k, v) => {
         if (k == "_t" && typeof v === "string" && v.endsWith("_s")) {
           return v.substr(0, v.length - 2);
