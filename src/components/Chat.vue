@@ -598,8 +598,8 @@ export default Vue.extend({
     },
 
     openMenu(e: any, msg: ServerChatMsg) {
-      this.msgMenuPos.x = e.clientX;
-      this.msgMenuPos.y = e.clientY - 50;
+      this.msgMenuPos.x = e.clientX - 15;
+      this.msgMenuPos.y = e.clientY - 20;
       this.showMsgMenu = true;
       this.menuMsg = msg;
     },
@@ -1086,6 +1086,24 @@ export default Vue.extend({
           color: colors.dark-sub-text;
         }
       }
+    }
+  }
+
+  .msg-menu {
+    background-color: colors.dark-light;
+    color: colors.dark-main-text;
+  }
+
+  /deep/ .el-textarea__inner, /deep/ .el-input__inner {
+    color: colors.dark-main-text;
+    background-color: colors.dark-light;
+  }
+
+  /deep/ .el-dialog {
+    background: colors.dark-medium;
+
+    .el-dialog__body, .el-dialog__title {
+      color: colors.dark-main-text;
     }
   }
 }

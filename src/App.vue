@@ -28,6 +28,10 @@ export default class App extends Vue {}
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 
+  /deep/ .el-dialog {
+    border-radius: 3px;
+  }
+
   @media (prefers-color-scheme: dark) {
     .dark_light_bg {
       background-color: colors.dark-light;
@@ -62,6 +66,14 @@ export default class App extends Vue {}
     /deep/ .el-textarea__inner, /deep/ .el-input__inner {
       color: colors.dark-main-text;
       background-color: colors.dark-light;
+    }
+
+    /deep/ .el-dialog {
+      background: colors.dark-medium;
+
+      .el-dialog__body, .el-dialog__title {
+        color: colors.dark-main-text;
+      }
     }
   }
 }
