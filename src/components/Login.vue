@@ -163,8 +163,9 @@ export default {
       if (this.userID == "" || this.userPasswd == "") {
         this.warning("登录信息不得为空");
       } else {
-        let userLogin = serviceProvider.resolve < LoginService > LoginService;
+        let userLogin = serviceProvider.resolve(LoginService);
         let res = await userLogin.login(this.userID, this.userPasswd);
+        
         console.log(res);
         if (res == true) {
           this.succeed();

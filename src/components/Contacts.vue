@@ -8,7 +8,11 @@
         <user @selectUser="getMsgFormSon" :items="list"></user>
       </el-main>
       <el-footer height="30px">
-        <el-button style="float: left" type="text" class="dark_main_text" @click="addContacts"
+        <el-button
+          style="float: left"
+          type="text"
+          class="dark_main_text"
+          @click="addContacts"
           >添加联系人</el-button
         >
         <el-button
@@ -16,28 +20,27 @@
           type="text"
           class="dark_main_text"
           @click="close"
-          >关闭</el-button
-        >
+          >关闭</el-button>
       </el-footer>
     </el-container>
   </el-card>
 </template>
 
 <script>
-import axios from "axios";
+import axios from "axios"
 export default {
   name: "Contacts",
   data() {
     return {
-      list: [],
-      avatarUrl: "",
+       list: [],
+       avatarUrl:"",
     };
   },
-  beforeMount: function() {
-    this.getList();
-  },
+  beforeMount:function(){
+    this.getList()
+   },
   methods: {
-    addContacts(){
+    addContacts() {
       this.$emit("addContacts");
     },
     close() {
@@ -46,25 +49,25 @@ export default {
     getMsgFormSon(data) {
       console.log(data);
     },
-    getList() {
+    getList(){
       axios({
-        url: "http://yuuna.srv.karenia.cc/api/v1/profile/wang/friends",
-        method: "get",
-      }).then(data => {
-        this.list = data.data;
-      });
-    },
-    addDetail() {
-      this.list.forEach(item => {
-        axios({
-          url: `http://yuuna.srv.karenia.cc/api/v1/profile/${item.username}`,
-          method: "get",
-        }).then(data => {
-          this.avatarUrl = data.avatarUrl;
-        });
-        this.$set(item, "avatarUrl", this.avatarUrl);
-      });
-    },
+        url:'http://yuuna.srv.karenia.cc/api/v1/profile/wang/friends',
+        method:'get',
+      }).then(data=>{
+          this.list=data.data
+        })
+     },
+     addDetail(){
+        this.list.forEach(item => {
+           axios({
+            url:`http://yuuna.srv.karenia.cc/api/v1/profile/${item.username}`,
+            method:'get',
+              }).then(data=>{
+                this.avatarUrl=data.avatarUrl;
+            });
+            this.$set(item,"avatarUrl",this.avatarUrl);
+        });  
+     },
   },
 };
 </script>
@@ -90,29 +93,5 @@ export default {
   border-radius: 0px;
   height: 650px;
   margin-left: 0px;
-}
-
-@media (prefers-color-scheme: dark) {
-  .dark_light_bg {
-    background-color: colors.dark-light;
-    border-color: colors.dark-medium;
-  }
-
-  .dark_medium_bg {
-    background-color: colors.dark-medium;
-    border-color: colors.dark-light;
-  }
-
-  .dark_deep_bg {
-    background-color: colors.dark-deep;
-  }
-
-  .dark_sub_text {
-    color: colors.dark-sub-text;
-  }
-
-  .dark_main_text {
-    color: colors.dark-main-text;
-  }
 }
 </style>

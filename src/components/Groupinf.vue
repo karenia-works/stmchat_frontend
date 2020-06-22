@@ -233,14 +233,14 @@
 
 .up_card {
   background-color: #409EFF;
-  width:600px;
-  height:90px;
+  width: 600px;
+  height: 90px;
   border-bottom-left-radius: 0px;
   border-bottom-right-radius: 0px;
 }
 
 .down_card {
-  width:600px;
+  width: 600px;
   border-top-left-radius: 0px;
   border-top-right-radius: 0px;
 }
@@ -263,7 +263,7 @@
 .name_part {
   .name {
     font-weight: bolder;
-    font-size:20px;
+    font-size: 20px;
   }
 }
 
@@ -377,7 +377,7 @@ export default {
       if (!this.me) return;
       this.me.members.forEach(id => {
         axios
-          .get(this.endpoint + "/profile/" + id)
+          .get(this.endpoint + "/profile/test/" + id)
           .then(res => {
             let pf = res.data;
             this.contacts.push({
@@ -395,5 +395,6 @@ export default {
       this.$emit("closeInfo");
     },
   },
+    
 };
 </script>

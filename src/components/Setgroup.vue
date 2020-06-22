@@ -33,9 +33,8 @@
         <el-button
           style="float: right;margin-right:20px"
           type="text"
-          v-on:click="goadd"
           class="dark_main_text"
-          @click="createGroup"
+          @click="$emit('Groupname',input)"
           >NEXT</el-button
         >
         <router-view></router-view>
@@ -45,8 +44,6 @@
 </template>
 
 <script lang="ts">
-import { serviceProvider } from "@/services/dependencyInjection";
-import { ChatMessageService } from "@/services/messageService";
 import Vue from "vue";
 
 export default Vue.extend({
@@ -58,9 +55,6 @@ export default Vue.extend({
     };
   },
   methods: {
-    goadd() {
-      this.$router.push({ path: "/Addmember" });
-    },
     createGroup() {
       this.$emit("createGroup");
     },
@@ -111,37 +105,5 @@ export default Vue.extend({
 .el-aside {
   margin-top: 30px;
   text-align: center;
-}
-
-@media (prefers-color-scheme: dark) {
-  .dark_light_bg {
-    background-color: colors.dark-light;
-    border-color: colors.dark-medium;
-  }
-
-  .dark_medium_bg {
-    background-color: colors.dark-medium;
-    border-color: colors.dark-light;
-  }
-
-  .dark_deep_bg {
-    background-color: colors.dark-deep;
-  }
-
-  .dark_sub_text {
-    color: colors.dark-sub-text;
-  }
-
-  .dark_main_text {
-    color: colors.dark-main-text;
-  }
-
-  .dark_hr {
-    border-style: solid;
-    border-radius: 1px;
-    border-width: 1px;
-    border-color: white;
-    background-color: white;
-  }
 }
 </style>
