@@ -71,7 +71,7 @@
             </el-button>
           </el-input>
         </div>
-        <botton @click="beforeCreate">test</botton>
+<!--        <botton @click="getUserID">test</botton>-->
         <!--                聊天列表-->
         <div
           v-for="(o, index) in sortableData"
@@ -268,20 +268,12 @@ import axios from "axios";
 import {GroupProfile, ServerChatMsg} from "@/types/types";
 import moment from "moment";
 import Vuex from "vuex"
-Vue.use(Vuex);
+import bus from "../store/eventBus"
 export default Vue.extend({
   beforeMount: function() {
         try {
           var datalist=[];
           let mls = serviceProvider.resolve<MessageListService>(MessageListService);
-          // mls.messageListSubject.subscribe({
-          //   next(v){
-          //     mesgNotice();
-          //    this.tableData=JSON.parse(JSON.stringify(v));
-          //     // this.tableData=v ;
-          //     console.log("ChatList", v);
-          //   }
-          // })
           mls.messageListSubject.subscribe({
             next: v=> {
               mesgNotice();
@@ -363,27 +355,9 @@ export default Vue.extend({
         handleclick(index,o:MessageListItem) {
             this.active = index;
             this.getUserID();
-            var i=o.chat.name.length<=this.username.length?o.chat.name.length:this.username.length;
-            if(o.chat.isFriend){
-              for(var j=0;j<i;j++){
-                if(o.chat.name[j]>this.username[j]){
-                  this.$emit("chat-people",o.chat.name+'+'+this.username);
-                  console.log(o.chat.name+'+'+this.username);
-                     break;
-                }
-                else if(o.chat.name[j]<this.username[j]){
-                  this.$emit("chat-people",this.username+'+'+o.chat.name);
-                  console.log(o.chat.name+'+'+this.username);
-                  break;
-                }
-              }
+            bus.$emit("chat-people",o.chat.name);
+            console.log(o.chat.name)
 
-            }
-            else{
-                this.$emit("chat-people",o.chat.name);
-                console.log(o.chat.name)
-            }
-            ;
         },
         handleScroll(vertical) {
             let vp = vertical.process;

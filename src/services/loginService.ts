@@ -118,7 +118,7 @@ export class LoginService {
       grant_type: "password",
       username,
       password,
-      scope: this.config.auth.scope,
+      //scope: this.config.auth.scope,
     };
 
     let result = await Axios.post<UserLoginData>(url, qs.stringify(tokenCtx));
