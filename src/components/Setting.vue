@@ -358,13 +358,16 @@ export default {
 </style>
 
 <script>
+import axios from "axios";
 export default {
   data() {
     return {
-      nickname: "Skuld",
+      endpoint: "http://yuuna.srv.karenia.cc/api/v1",
+      nickname: "",
       changename: "",
       phonenum: "+86 13918128942",
-      username: "skuld_yi",
+      id: "",
+      avatarUrl: "",
       editmode: false,
       valueDesktopNotifications: true,
       valueBackgroundNotifications: true,
@@ -372,9 +375,28 @@ export default {
       valueSound: true,
       radio: "1",
       soundDegree: 50,
+      // object,
     };
   },
+  beforeMount: function() {
+    this.getInfo();
+  },
   methods: {
+    // 后端通讯
+    getInfo(id) {
+      axios
+        .get(this.endpoint + "/profile/" + "li")
+        .then(file => {
+          let object = file.data;
+          this.nickname = object.username;
+          this.id = object.id;
+          this.avatarUrl = object.avatarUrl;
+        })
+        .catch(error => {
+          console.log(error);
+        });
+    },
+
     formatTooltip(val) {
       return val / 100;
     },
@@ -398,6 +420,11 @@ export default {
         this.editmode = false;
       } else {
         this.nickname = this.changename;
+        axios.post(
+          this.endpoint + "/profile/" + "li",
+
+        )
+
         alert('昵称已成功变更为 "' + this.changename + '"');
         this.editmode = false;
         this.$emit("saved");
