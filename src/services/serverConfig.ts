@@ -4,6 +4,7 @@ export interface IServerConfig {
   auth: {
     clientId: string;
     clientSecret: string;
+    scope: string;
     tokenEndpoint: string;
   };
   apiBaseUrl: string;
@@ -38,16 +39,17 @@ let _cfg: IServerConfig = {
   wsEndpoint: "ws://yuuna.srv.karenia.cc/ws/{name}",
   apiBaseUrl: "/api/v1",
   auth: {
-    clientId: "",
-    clientSecret: "",
+    clientId: "client",
+    clientSecret: "client",
+    scope: "IdentityServerApi",
     tokenEndpoint: "/connect/token",
   },
   apiEndpoints: {
     userProfile: {
-      get: "/profile",
+      get: "/profile/test",
       register: "/register",
-      getMine: "/profile/mine",
-      single: "/profile/{id}",
+      getMine: "/profile/me",
+      single: "/profile/test/{id}",
     },
     groupProfile: {
       get: "/group",
@@ -60,10 +62,10 @@ let _cfg: IServerConfig = {
 };
 
 if (environment == "development") {
-  _cfg.wsEndpoint = "ws://localhost:5000/ws/{name}";
   _cfg.apiBaseUrl = "http://yuuna.srv.karenia.cc/api/v1";
   _cfg.getFile = "http://yuuna.srv.karenia.cc{name}";
-  _cfg.debug = { wsEndpointOverride: "ws://yuuna.srv.karenia.cc/ws/wang" };
+  _cfg.auth.tokenEndpoint = "http://yuuna.srv.karenia.cc/connect/token";
+  _cfg.debug = { wsEndpointOverride: "ws://yuuna.srv.karenia.cc/ws/li" };
 }
 
 export const serverConfig: IServerConfig = _cfg;

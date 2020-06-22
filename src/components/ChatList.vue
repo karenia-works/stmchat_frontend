@@ -1,158 +1,158 @@
 <template>
-  <div id="app">
-    <el-container>
-      <el-aside
-        width="300px"
-        class="dark_medium_bg demo-input-suffix"
-        style="overflow-x: hidden; overflow-y: hidden"
-      >
-        <vueScroll @handle-scroll="handleScroll">
-          <div class="search" @click="openSearch">
-            <el-input
-              v-model="input"
-              placeholder="search"
-              class="dark_eee_bg"
-              v-if="!searchShow"
-            >
-              <el-dropdown slot="prepend" @command="handleCommand">
-                <span class="el-dropdown-link">
-                  <i
-                    class="dark_main_text el-icon-s-unfold el-icon--center
+  <div>
+    <el-container
+      class="dark_medium_bg demo-input-suffix el-aside-container"
+      style="overflow-x: hidden; overflow-y: hidden;width:100%"
+    >
+      <vueScroll @handle-scroll="handleScroll">
+        <!--                导航栏-->
+        <div class="search" @click="openSearch">
+          <el-input
+            v-model="input"
+            placeholder="search"
+            class="dark_eee_bg"
+            v-if="!searchShow"
+          >
+            <el-dropdown slot="prepend" @command="handleCommand">
+              <span class="el-dropdown-link">
+                <i
+                  class="dark_main_text el-icon-s-unfold el-icon--center
                       el-icon-size el-icon-backgroud"
-                  ></i>
-                </span>
-                <el-dropdown-menu slot="dropdown" class="dark_medium_bg">
-                  <el-dropdown-item command="a" class="dark_main_text">
-                    <i class="el-icon-user-solid el-icon-size"></i>
-                    New group
-                  </el-dropdown-item>
-                  <el-dropdown-item command="b" class="dark_main_text">
-                    <i class="el-icon-s-custom el-icon-size"></i>
-                    Contacts
-                  </el-dropdown-item>
-                  <el-dropdown-item command="c" class="dark_main_text">
-                    <i class="el-icon-setting el-icon-size"></i>
-                    Settings
-                  </el-dropdown-item>
-                  <el-dropdown-item command="d" class="dark_main_text">
-                    <i class="el-icon-question el-icon-size"></i>
-                    STM FAQ
-                  </el-dropdown-item>
-                  <el-dropdown-item command="e" class="dark_main_text">
-                    <i class="el-icon-s-promotion el-icon-size"></i>
-                    About
-                  </el-dropdown-item>
-                </el-dropdown-menu>
-              </el-dropdown>
-            </el-input>
+                ></i>
+              </span>
+              <el-dropdown-menu slot="dropdown" class="dark_medium_bg">
+                <el-dropdown-item command="a" class="dark_main_text">
+                  <i class="el-icon-user-solid el-icon-size"></i>
+                  创建小组
+                </el-dropdown-item>
+                <el-dropdown-item command="b" class="dark_main_text">
+                  <i class="el-icon-s-custom el-icon-size"></i>
+                  联系人
+                </el-dropdown-item>
+                <el-dropdown-item command="c" class="dark_main_text">
+                  <i class="el-icon-setting el-icon-size"></i>
+                  设置
+                </el-dropdown-item>
+                <el-dropdown-item command="d" class="dark_main_text">
+                  <i class="el-icon-question el-icon-size"></i>
+                  STM FAQ
+                </el-dropdown-item>
+                <el-dropdown-item command="e" class="dark_main_text">
+                  <i class="el-icon-s-promotion el-icon-size"></i>
+                  登出
+                </el-dropdown-item>
+              </el-dropdown-menu>
+            </el-dropdown>
+          </el-input>
 
-            <!-- 搜索-->
-          </div>
-          <!-- <el-card class="box-card " style="margin-left: 0px">  v-on:input="inputChange"-->
-          <div class="search-header" v-if="searchShow">
-            <el-input
-              name="input"
-              class="keyword"
-              v-model="searchWord"
-              v-on:input="queryData"
-              placeholder="search"
-              clearable
+          <!-- 搜索-->
+        </div>
+        <!-- <el-card class="box-card " style="margin-left: 0px">  v-on:input="inputChange"-->
+        <!--                搜索栏-->
+        <div class="search-header" v-if="searchShow">
+          <el-input
+            name="input"
+            class="keyword"
+            v-model="searchWord"
+            v-on:input="queryData"
+            placeholder="search"
+            clearable
+          >
+            <el-button
+              slot="prepend"
+              type="primary"
+              @click="closeSearch"
+              class="el-button-new"
+              size="mini"
             >
-              <el-button
-                slot="prepend"
-                type="primary"
-                @click="closeSearch"
-                class="el-button-new"
-                size="mini"
+              返回
+            </el-button>
+          </el-input>
+        </div>
+        <Button @click="beforeCreate">test</Button>
+        <!--                聊天列表-->
+        <div
+          v-for="(o, index) in sortableData"
+          :key="o.name"
+          @click="handleclick(index), (o.unread = 0)"
+          :class="active == index ? 'addclass' : ''"
+          class="dark_main_text dark_deep_bg"
+          v-show="chatShow"
+        >
+          <!-- <el-card body-style="{ padding: '0' }" style="height:100px"> -->
+          <el-row type="flex" style="height:65px" align="middle">
+            <el-col :span="6" :offset="2">
+              <img :src="o.head_pic" class="round_icon img_size" />
+            </el-col>
+            <el-col :span="12">
+              <div class="name_size">
+                <span>{{ o.name }}</span>
+              </div>
+              <div
+                class="bottom clearfix margin-bottom:5px"
+                style="font-size:12px;color: dimgray"
               >
-                <i class="el-icon-back  el-icon--center" style="font-size:18px">
-                </i>
-              </el-button>
-            </el-input>
-          </div>
-
-          <div
-            v-for="(o, index) in sortableData"
-            v-bind:key="o"
-            @click="handleclick(index), (o.unread = 0)"
-            :class="active == index ? 'addclass' : ''"
-            class="dark_main_text dark_deep_bg"
-            v-show="chatShow"
-          >
-            <!-- <el-card body-style="{ padding: '0' }" style="height:100px"> -->
-            <el-row type="flex" style="height:65px" align="middle">
-              <el-col span="6" offset="2">
-                <img :src="o.head_pic" class="round_icon img_size" />
-              </el-col>
-              <el-col span="12">
-                <div class="name_size">
-                  <span>{{ o.name }}</span>
-                </div>
-                <div
-                  class="bottom clearfix margin-bottom:5px"
-                  style="font-size:12px;color: dimgray"
-                >
-                  <!-- <div >{{o.chat| ellipsis}}</div>-->
-                  <template>
-                    <span
-                      class="dark_sub_text"
-                      v-html="$options.filters.ellipsis(o.chat)"
-                    >
-                    </span>
-                  </template>
-                </div>
-              </el-col>
-              <el-col span="5">
-                <div style="height:50px;font-size:12px;color:dimgray;">
-                  <div class="dark_sub_text">{{ o.time }}</div>
-                  <el-badge
-                    :value="o.unread"
-                    class="item"
-                    style="margin-top:15px ;padding-left:10px;"
-                    v-show="o.unread > 0"
-                  ></el-badge>
-                </div>
-              </el-col>
-            </el-row>
-            <!-- </el-card> -->
-          </div>
-          <div
-            v-for="(o, index) in selectableData"
-            v-bind:key="o"
-            @click="handleclick(index), (o.unread = 0)"
-            :class="active == index ? 'addclass' : ''"
-            class="dark_main_text dark_deep_bg"
-            v-show="selectShow"
-          >
-            <!-- <el-card body-style="{ padding: '0' }" style="height:100px"> -->
-            <el-row type="flex" style="height:65px" align="middle">
-              <el-col span="6" offset="2">
-                <img :src="o.head_pic" class="round_icon img_size" />
-              </el-col>
-              <el-col span="12">
-                <div class="name_size">
-                  <span>{{ o.name }}</span>
-                </div>
-                <div
-                  class="bottom clearfix margin-bottom:5px"
-                  style="font-size:12px;color: dimgray"
-                >
-                  <!-- <div >{{o.chat| ellipsis}}</div>-->
-                  <template>
-                    <span
-                      class="dark_sub_text"
-                      v-html="$options.filters.ellipsis(o.chat)"
-                    >
-                    </span>
-                  </template>
-                </div>
-              </el-col>
-            </el-row>
-            <!-- </el-card> -->
-          </div>
-        </vueScroll>
-        <!-- </el-card> -->
-      </el-aside>
+                <!-- <div >{{o.chat| ellipsis}}</div>-->
+                <template>
+                  <span
+                    class="dark_sub_text"
+                    v-html="$options.filters.ellipsis(o.chat)"
+                  >
+                  </span>
+                </template>
+              </div>
+            </el-col>
+            <el-col :span="5">
+              <div style="height:50px;font-size:12px;color:dimgray;">
+                <div class="dark_sub_text">{{ o.time }}</div>
+                <el-badge
+                  :value="o.unread"
+                  class="item"
+                  style="margin-top:15px ;padding-left:10px;"
+                  v-show="o.unread > 0"
+                ></el-badge>
+              </div>
+            </el-col>
+          </el-row>
+          <!-- </el-card> -->
+        </div>
+        <!--                搜索结果-->
+        <div
+          v-for="(o, index) in selectableData"
+          :key="o.name"
+          @click="handleclick(index), (o.unread = 0)"
+          :class="active == index ? 'addclass' : ''"
+          class="dark_main_text dark_deep_bg"
+          v-show="selectShow"
+        >
+          <!-- <el-card body-style="{ padding: '0' }" style="height:100px"> -->
+          <el-row type="flex" style="height:65px" align="middle">
+            <el-col :span="6" :offset="2">
+              <img :src="o.head_pic" class="round_icon img_size" />
+            </el-col>
+            <el-col :span="12">
+              <div class="name_size">
+                <span>{{ o.name }}</span>
+              </div>
+              <div
+                class="bottom clearfix margin-bottom:5px"
+                style="font-size:12px;color: dimgray"
+              >
+                <!-- <div >{{o.chat| ellipsis}}</div>-->
+                <template>
+                  <span
+                    class="dark_sub_text"
+                    v-html="$options.filters.ellipsis(o.chat)"
+                  >
+                  </span>
+                </template>
+              </div>
+            </el-col>
+          </el-row>
+          <!-- </el-card> -->
+        </div>
+      </vueScroll>
+      <!-- </el-card> -->
     </el-container>
   </div>
 </template>
@@ -162,12 +162,12 @@
   color: dimgray;
 }
 
-.el-aside {
+.el-aside-container {
   background-color: white;
 }
 
 .el-container {
-  height: 700px;
+  height: 650px;
   solid-color: #eeeeee;
 }
 
@@ -201,38 +201,13 @@
 }
 
 @media (prefers-color-scheme: dark) {
-  .dark_light_bg {
-    background-color: colors.dark-light;
-  }
-
-  .dark_medium_bg {
-    background-color: colors.dark-medium;
-  }
-
-  .dark_deep_bg {
-    background-color: colors.dark-deep;
-  }
-
   .dark_eee_bg {
     background-color: colors.theme-light-grey;
-  }
-
-  .dark_sub_text {
-    color: colors.dark-sub-text;
-  }
-
-  .dark_main_text {
-    color: colors.dark-main-text;
   }
 
   .el-badge__content {
     color: colors.dark-main-text;
     background-color: colors.theme-blue;
-  }
-
-  .el-input__inner {
-    color: colors.dark-main-text;
-    background-color: colors.dark-light;
   }
 
   .el-input-group__prepend {
@@ -246,23 +221,23 @@
   }
 }
 
-.el-button {
-  height: 3.5rem;
-  width: 4rem;
-  margin-top: 0.6rem;
-  border-radius: 4px;
-}
-
 .el-button-new {
-  height: 3.5rem;
-  width: 1rem;
-  margin-top: 0.6rem;
+  height: 0.5rem;
+  width: 3.8 rem;
+  margin-top: 0 rem;
   background-color: white;
 }
 </style>
 
-<script>
-export default {
+<script lang="ts">
+import { WsMessageService } from "@/services/websocket";
+import { MessageListService } from "../services/messageService";
+import { serviceProvider } from "../services/dependencyInjection";
+import { Component, Vue } from "vue-property-decorator";
+import { UserProfilePool } from "@/services/cachingService";
+import axios from "axios";
+
+export default Vue.extend({
   data() {
     const item = {
       name: "軒",
@@ -388,6 +363,7 @@ export default {
       keyword: "",
       selectableData: [],
       noselectData: [itemfalse],
+      endpoint: " http://yuuna.srv.karenia.cc/api/v1",
     };
   },
   methods: {
@@ -395,15 +371,15 @@ export default {
       console.log("111");
 
       if (command == "a") {
-        this.$router.push({ path: "/Setgroup" });
+        this.$emit("chatListCommand", "a");
       } else if (command == "b") {
-        this.$router.push({ path: "/Contacts" });
+        this.$emit("chatListCommand", "b");
       } else if (command == "c") {
-        this.$router.push({ path: "/setting" });
+        this.$emit("chatListCommand", "c");
       } else if (command == "d") {
-        this.$router.push({ path: "/STM FAQ" });
+        this.$emit("chatListCommand", "d");
       } else if (command == "e") {
-        this.$router.push({ path: "/About" });
+        this.$emit("chatListCommand", "e");
       }
     },
     handleclick(index) {
@@ -443,6 +419,35 @@ export default {
       else this.selectableData = this.noselectData;
       this.$forceUpdate();
     },
+    beforeCreate() {
+      let mls = serviceProvider.resolve<MessageListService>(MessageListService);
+      mls.messageListSubject.subscribe({
+        next(v) {
+          console.log(v);
+        },
+      });
+    },
+    async getUser(id: string) {
+      let ufp = serviceProvider.resolve<UserProfilePool>(UserProfilePool);
+      try {
+        let user = await ufp.getData(id);
+        console.log(user);
+      } catch (err) {
+        console.log(err);
+      }
+    },
+    getAvatars(ids: string[]) {
+      ids.forEach(id => {
+        axios
+          .get(this.endpoint + "/profile/test/" + id)
+          .then(res => {
+            this.$set(this.name2avatar, id, res.data.avatarUrl);
+          })
+          .catch(error => {
+            console.log(error);
+          });
+      });
+    },
   },
   filters: {
     ellipsis(value) {
@@ -457,11 +462,11 @@ export default {
   computed: {
     //最终需要显示的数组
     sortableData: function() {
-      mesgNotice();
+      // mesgNotice();
       return sortByTime(this.tableData, "time");
     },
   },
-};
+});
 
 function sortByTime(array, key) {
   return array.sort(function(a, b) {

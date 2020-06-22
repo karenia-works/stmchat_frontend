@@ -88,14 +88,4 @@ export default {
   border-color: colors.theme-black;
   background-color: colors.theme-black;
 }
-
-@media (prefers-color-scheme: dark) {
-  .dark_hr {
-    border-style: solid;
-    border-radius: 1px;
-    border-width: 1px;
-    border-color: white;
-    background-color: white;
-  }
-}
 </style>

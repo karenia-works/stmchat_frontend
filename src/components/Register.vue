@@ -1,224 +1,93 @@
 <template>
-  <el-container style="padding:10px;height: 755px; border: 1px solid #eee">
-    <el-header class="dark_light_bg dark_main_text"
-      >STM-Chat---STM for Lighter Communication</el-header
-    >
-    <el-main class="dark_deep_bg">
-      <el-row>
-        <el-col :span="6">
-          <div class="grid-content"></div>
-        </el-col>
-        <el-col :span="12">
-          <div>
-            <el-card class="dark_medium_bg">
-              <div slot="header">
-                <el-steps
-                  :active="active"
-                  finish-status="success"
-                  simple
-                  style="margin-top: 1px"
-                  class="dark_light_bg"
-                >
-                  <el-step title="基本信息"></el-step>
-                  <el-step title="验证绑定"></el-step>
-                  <el-step title="获取ID"></el-step>
-                </el-steps>
-                <el-link
-                  :underline="false"
-                  style="float:right"
-                  v-on:click="ToLogin"
-                  class="dark_main_text"
-                  >已有账户？直接登录</el-link
-                >
-              </div>
-              <el-row v-show="active0">
-                <el-col :span="5">
-                  <div class="grid-content"></div>
-                </el-col>
-                <el-col :span="12">
-                  <el-input
-                    placeholder="昵称"
-                    prefix-icon="el-icon-user-solid"
-                    clearable
-                    v-model="userName"
-                    class="a"
-                  ></el-input>
+  <div>
+    <div class="background">
+      <img :src="imgSrc" width="100%" height="100%" alt="" />
+    </div>
+    <div class="front" width="100%" height="100%">
+      <el-container style="padding-top: 10px; height: 755px;">
+        <el-header class="dark_light_bg dark_main_text"></el-header>
+        <el-main class="dark_deep_bg">
+          <el-row>
+            <el-col :span="6">
+              <div class="grid-content"></div>
+            </el-col>
+            <el-col :span="12">
+              <el-card class="box-card dark_medium_bg" shadow="always">
+                <div slot="header" class="dark_main_text">
+                  <div style="font-size:25px;text-align:center">
+                    Welcome to STM-Chat
+                  </div>
+                  <div>
+                    <el-link
+                      :underline="false"
+                      style="float: right;font-size:18px;color:black;"
+                      v-on:click="ToLogin"
+                      class="dark_main_text"
+                      >已有账户？即刻登录</el-link
+                    >
+                  </div>
+                </div>
+                <el-row>
+                  <el-col :span="5">
+                    <div class="grid-content"></div>
+                  </el-col>
+                  <el-col :span="15">
+                    <div class="demo-input-suffix">
+                      <el-input
+                        placeholder="用户名"
+                        prefix-icon="el-icon-user-solid"
+                        clearable
+                        v-model="userID"
+                      ></el-input>
 
-                  <el-input
-                    placeholder="手机号"
-                    prefix-icon="el-icon-phone-outline"
-                    clearable
-                    v-model="userNumber"
-                  ></el-input>
+                      <el-input
+                        placeholder="密码"
+                        prefix-icon="el-icon-key"
+                        v-model="userPasswd"
+                        show-password
+                      ></el-input>
 
-                  <el-input
-                    placeholder="密码"
-                    prefix-icon="el-icon-key"
-                    v-model="userPasswd"
-                    show-password
-                  ></el-input>
-
-                  <el-button
-                    style="margin-top: 12px;"
-                    v-on:click="next"
-                    class="dark_light_bg dark_main_text"
-                    >下一步</el-button
-                  >
-                </el-col>
-                <el-col :span="5">
-                  <div class="grid-content"></div>
-                </el-col>
-              </el-row>
-
-              <el-row v-show="active1">
-                <el-col :span="5">
-                  <div class="grid-content"></div>
-                </el-col>
-                <el-col :span="12">
-                  <el-input
-                    prefix-icon="el-icon-phone-outline"
-                    :disabled="true"
-                    v-model="userNumber"
-                  ></el-input>
-
-                  <el-input
-                    placeholder="已发送短信验证码，请查收并输入"
-                    prefix-icon="el-icon-s-promotion"
-                    v-model="queryCode"
-                  ></el-input>
-
-                  <el-button
-                    style="margin-top: 12px;"
-                    v-on:click="next"
-                    class="dark_light_bg dark_main_text"
-                    >下一步</el-button
-                  >
-                </el-col>
-                <el-col :span="5">
-                  <div class="grid-content"></div>
-                </el-col>
-              </el-row>
-
-              <el-row v-show="active2">
-                <el-col :span="4">
-                  <div class="grid-content"></div>
-                </el-col>
-                <el-col :span="14">
-                  <p class="dark_main_text">
-                    注册成功，您可使用手机号或系统分配ID进行登录以及密码的找回。
-                    <br />系统分配ID为XXXXXX
-                  </p>
-                  <el-button
-                    style="margin-top: 12px;"
-                    v-on:click="next"
-                    class="dark_light_bg dark_main_text"
-                    >下一步</el-button
-                  >
-                </el-col>
-                <el-col :span="4">
-                  <div class="grid-content"></div>
-                </el-col>
-              </el-row>
-            </el-card>
-          </div>
-        </el-col>
-
-        <el-col :span="6">
-          <div class="grid-content"></div>
-        </el-col>
-      </el-row>
-    </el-main>
-  </el-container>
+                      <el-button
+                        type="primary"
+                        v-on:click="register"
+                        class="dark_light_bg"
+                        >注册</el-button
+                      >
+                    </div>
+                  </el-col>
+                  <el-col :span="6">
+                    <div class="grid-content"></div>
+                  </el-col>
+                </el-row>
+              </el-card>
+            </el-col>
+            <el-col :span="3">
+              <div class="grid-content"></div>
+            </el-col>
+          </el-row>
+        </el-main>
+      </el-container>
+    </div>
+  </div>
 </template>
-
-<script>
-export default {
-  data() {
-    return {
-      queryCode: "",
-      active: 1,
-      active0: true,
-      active1: false,
-      active2: false,
-      userName: "",
-      userNumber: "",
-      userPasswd: "",
-      getUserNumber: this.userNumber,
-    };
-  },
-
-  methods: {
-    next() {
-      if (this.active++ > 2) this.$router.push({ path: "/Login" });
-      if (this.active == 2) {
-        this.active0 = false;
-        this.active1 = true;
-      } else if (this.active == 3) {
-        this.active1 = false;
-        this.active2 = true;
-      }
-    },
-    ToLogin() {
-      this.$router.push({ path: "/Login" });
-    },
-    succeed() {
-      this.$message({
-        message: "验证码通过",
-        type: "success",
-      });
-    },
-    wrongCode() {
-      this.$message({
-        message: "验证码错误，请核实后再次填写",
-        type: "warning",
-      });
-    },
-    warning() {
-      this.$message({
-        message: "该手机号码已有绑定账户",
-        type: "warning",
-      });
-    },
-
-    register() {
-      if (
-        this.userName == "" ||
-        this.userPasswd == "" ||
-        this.getUserNumber == ""
-      ) {
-        alert("基本信息不得为空");
-      } else {
-        let data = { username: this.userName, password: this.userPasswd };
-        this.$http.post("", data).then(res => {
-          console.log(res);
-          if (res.data == "ok") {
-            //
-          }
-        });
-      }
-    },
-  },
-};
-</script>
 
 <style lang="stylus" scoped>
 .el-header, .el-footer {
-  background-color: colors.theme-green;
   color: colors.theme-black;
   text-align: left;
   line-height: 60px;
 }
 
 .el-main {
-  background-color: colors.theme-light-green;
   color: colors.theme-black;
   text-align: center;
   line-height: 70px;
 }
 
-.grid-content {
-  border-radius: 4px;
-  min-height: 36px;
+.box-card {
+  width: 700px;
+  align: center;
+  background: rgba(255, 255, 255, 0.5);
 }
 
 .el-row {
@@ -233,31 +102,80 @@ export default {
   border-radius: 4px;
 }
 
-.box-card {
-  text-align: center;
+.grid-content {
+  border-radius: 4px;
+  min-height: 36px;
 }
 
-@media (prefers-color-scheme: dark) {
-  .dark_light_bg {
-    background-color: colors.dark-light;
-    border-color: colors.dark-medium;
-  }
+.background {
+  background-size: cover;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  right: 0px;
+  bottom: 0px;
+}
 
-  .dark_medium_bg {
-    background-color: colors.dark-medium;
-    border-color: colors.dark-light;
-  }
-
-  .dark_deep_bg {
-    background-color: colors.dark-deep;
-  }
-
-  .dark_sub_text {
-    color: colors.dark-sub-text;
-  }
-
-  .dark_main_text {
-    color: colors.dark-main-text;
-  }
+.front {
+  z-index: 1;
+  top: 0px;
+  left: 0px;
+  right: 0px;
+  bottom: 0px;
+  position: fixed;
+  width: 100%;
+  height: 100%;
 }
 </style>
+
+<script>
+import { serviceProvider, TYPES } from "../services/dependencyInjection";
+import { LoginService } from "../services/loginService";
+
+export default {
+  methods: {
+    async register() {
+      if (this.userName == "" || this.userPasswd == "") {
+        this.warning("基本信息不得为空");
+      } else {
+        let userRegister =
+          serviceProvider.resolve < LoginService > LoginService;
+        let res = await userRegister.register(this.userName, this.userPasswd);
+        console.log(res);
+        if (res == true) {
+          this.succeed();
+        } else {
+          this.warning("已有重复用户名");
+        }
+      }
+    },
+    ToLogin() {
+      this.$router.push({ path: "/Login" });
+    },
+    succeed() {
+      this.$message({
+        message: "注册成功",
+        type: "success",
+      });
+      this.$router.push({ path: "/Login" });
+    },
+    warning(text) {
+      this.$message({
+        message: text,
+        type: "warning",
+      });
+    },
+  },
+  data() {
+    return {
+      imgSrc:
+        "http://img.pptjia.com/image/20180720/62b5f21d96b6b0c2c72baa7e72b7926f.png",
+      userID: "",
+      userPasswd: "",
+    };
+  },
+};
+</script>
