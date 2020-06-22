@@ -3,6 +3,20 @@ import { ServerChatMsg, ServerChatMessage } from "@/types/types";
 export const ChatMsgs: ServerChatMsg[] = [
   {
     _t: "text",
+    id: "12338",
+    sender: "li",
+    time: "" + new Date(),
+    text: "helloWorld",
+  },
+  {
+    _t: "text",
+    id: "12339",
+    sender: "li",
+    time: "" + new Date(),
+    text: "hello\nhello\nhello",
+  },
+  {
+    _t: "text",
     id: "12340",
     sender: "li",
     time: "" + new Date(),

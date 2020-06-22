@@ -18,7 +18,7 @@ export class WsMessageService {
     @inject(TYPES.ServerConfig) serverConfig: IServerConfig,
     private loginService: LoginService,
   ) {
-    console.trace("WsMessageService constructed");
+    // console.trace("WsMessageService constructed");
     this.dest = serverConfig.wsEndpoint;
 
     // DEBUG: 如果设置里提出了要强制链接就强制链接
@@ -50,7 +50,7 @@ export class WsMessageService {
     this.forceDisconnect = false;
     this.ws_connection = new WebSocket(this.dest);
     this.ws_connection.onopen = ev => {
-      this.ws_connection.onclose = ev => this.onWebsocketClose(ev);
+      this.ws_connection!.onclose = ev => this.onWebsocketClose(ev);
       this.onWebsocketOpen(ev);
     };
     this.ws_connection.onmessage = ev => this.onWebsocketMessage(ev);
@@ -59,7 +59,7 @@ export class WsMessageService {
 
   protected disconnectWebsocket() {
     this.forceDisconnect = true;
-    this.ws_connection.close();
+    this.ws_connection?.close();
   }
 
   private ws_connection: WebSocket | undefined;
@@ -117,9 +117,8 @@ export class WsMessageService {
   }
 
   protected onWebsocketOpen(err: Event) {
-    console.log("Connected to websocket");
+    console.trace("Connected to websocket");
     this.connection_state.next(true);
-    this.wait_time = 500;
 
     // Send all pending messages
   }
@@ -132,9 +131,10 @@ export class WsMessageService {
   }
 
   protected onWebsocketMessage(ev: MessageEvent) {
+    this.wait_time = 500;
     try {
       let raw_msg = ev.data;
-      console.log("Websocket: got", raw_msg);
+      // console.log("Websocket: got", raw_msg);
       let msg = JSON.parse(raw_msg, (k, v) => {
         if (k == "_t" && typeof v === "string" && v.endsWith("_s")) {
           return v.substr(0, v.length - 2);

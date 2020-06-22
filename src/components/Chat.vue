@@ -57,11 +57,16 @@
           circle
           v-show="showGoDown"
           class="goBtn"
-          @click="jumpToMessage(-1)"
+          @click="jumpToMessage('last')"
         ></el-button>
 
-        <vueScroll ref="chat-messages" @handle-scroll="handleScroll">
-          <div v-for="msg in msgList" :key="msg.id">
+        <vueScroll ref="chatMessages" @handle-scroll="handleScroll">
+          <div
+            v-for="msg in msgList"
+            :key="msg.id"
+            :id="'msg' + msg.id"
+            class="msg-wrapper"
+          >
             <!-- 多选框 -->
             <el-col :span="1" v-if="MultiOn">
               <el-checkbox
@@ -81,6 +86,7 @@
               <Message
                 :msg="msg"
                 :showSender="showSender"
+                @checkQuote="id => jumpToMessage(id)"
                 @contextmenu.native.prevent="
                   () => {
                     if (!MultiOn) openMenu($event, msg);
@@ -103,9 +109,9 @@
             <div>
               <div class="sendername">{{ quoteMsg.sender }}</div>
               <div class="quote-text">
-                <template v-if="quoteMsg._t == 'text'">{{
-                  quoteMsg.text
-                }}</template>
+                <template v-if="quoteMsg._t == 'text'">
+                  {{ quoteMsg.text }}
+                </template>
                 <template v-else-if="quoteMsg._t == 'image'">
                   [图片]
                   <span v-if="quoteMsg.caption">, {{ quoteMsg.caption }}</span>
@@ -266,14 +272,19 @@ export default Vue.extend({
   components: {
     Message,
   },
-  watch: {
-    messages(val) {
-      let pos = this.chatPosition();
-      if (pos == 1) this.jumpToMessage(-1);
-      else this.messageProcess = pos;
-    },
-  },
+  // watch: {
+  //   msgList(val) {
+  //     let pos = this.chatPosition();
+  //     if (pos == 1) this.jumpToMessage(-1);
+  //     else this.messageProcess = pos;
+  //   },
+  // },
   beforeMount: function() {
+    if (!this.chatId) {
+      this.chatInfo = null;
+      return;
+    }
+
     try {
       this.getServices();
       // let loginService = serviceProvider.resolve<LoginService>(LoginService);
@@ -283,14 +294,24 @@ export default Vue.extend({
       this.msgSub = this.chatMsgService.getObservable(this.chatId).subscribe({
         next: msg => {
           this.msgList = msg;
+          this.onNewMessage(msg);
+
+          let pos = this.chatPosition();
+          if (pos == 1) this.jumpToMessage("bottom");
+          else this.messageProcess = pos;
         },
       });
-
       this.getChatInfo();
       this.getProfile();
     } catch (err) {
       console.log(err);
     }
+  },
+
+  beforeDestroy() {
+    console.log("beforeDestroy: ", this.chatId);
+
+    this.msgSub?.unsubscribe();
   },
 
   data() {
@@ -304,12 +325,16 @@ export default Vue.extend({
       messageProcess: 0,
       quoteMsg: null as ServerChatMsg | null,
 
+      // Message limit
+      moreMessageAtTop: true,
+      moreMessageAtBottom: true,
+
       // chat messages
-      // connector: null,
       msgSub: null,
       msgList: null as ServerChatMsg[] | null,
       list: ChatMsgs as ServerChatMsg[],
       sendMessage: "",
+      lastPos: [],
 
       // right click menu
       showMsgMenu: false,
@@ -363,6 +388,7 @@ export default Vue.extend({
         ChatMessageService,
       );
     },
+
     async send() {
       let msg: ClientChatMsg = { _t: "text" };
 
@@ -405,17 +431,24 @@ export default Vue.extend({
           this.sendMessage = "";
         }
       }
-      this.sendToClient(msg, this.chatId);
+      // this.sendToClient(msg, this.chatId);
       await this.chatMsgService.sendMessage(msg, this.chatId);
-      this.jumpToMessage(-1);
+      this.jumpToMessage("bottom");
     },
 
     sendToClient(msg: ClientChatMsg, id: string) {
-      // todo: convey private chatId
       console.log({
         chatId: id,
         msg: msg,
       });
+    },
+
+    nameToChatid(name: string): string {
+      if (this.me.groups.includes(name)) return name;
+      else {
+        let me = this.me.username;
+        return me > name ? me + "+" + name : name + "+" + me;
+      }
     },
 
     // forward message
@@ -445,14 +478,15 @@ export default Vue.extend({
         .catch(() => {});
     },
 
-    forwardMsg(msgId: string, chatId: string) {
+    forwardMsg(msgId: string, chatname: string) {
       let msg: ClientChatMsg = {
         _t: "forward",
         fromChatId: this.chatId,
         fromMessageId: msgId,
       };
-      this.sendToClient(msg, chatId);
-      this.chatMsgService.sendMessage(msg, this.chatId);
+      // this.sendToClient(msg, this.nameToChatid(chatname));
+      let chatid = this.nameToChatid(chatname);
+      this.chatMsgService.sendMessage(msg, chatid);
     },
 
     // delete message
@@ -474,21 +508,39 @@ export default Vue.extend({
         .catch(() => {});
     },
     deleteMsg(id: string) {
-      console.log("delete msg", id);
+      let index = this.msgList.findIndex(o => o.id == id);
+      this.msgList.splice(index, 1);
+      // console.log("delete msg", id);
     },
 
-    chatPosition() {
-      let vs: any = this.$refs["chat-messages"];
-      const { v, h } = vs.getScrollProcess();
-      return v;
+    chatPosition(): number {
+      let vs: any = this.$refs.chatMessages;
+      if (vs) {
+        const { v, h } = vs.getScrollProcess();
+        return v;
+      } else return 0;
     },
-    jumpToMessage(id: number) {
-      let vs: any = this.$refs["chat-messages"];
-      if (id < 0) {
-        //jump to bottom
+
+    jumpToMessage(id: string) {
+      let vs: any = this.$refs.chatMessages;
+      if (!vs) return;
+
+      if (id == "bottom") {
         vs.scrollTo({
           y: "200%",
         });
+      } else if (id == "last") {
+        if (this.lastPos.length > 0) {
+          let last = this.lastPos.pop();
+          vs.scrollIntoView("#msg" + last, 200);
+        } else {
+          this.jumpToMessage("bottom");
+        }
+      } else {
+        let current = vs.getCurrentviewDom()[0].id.substring(3);
+        this.lastPos.push(current);
+        vs.scrollIntoView("#msg" + id, 200);
+        this.showGoDown = true;
       }
     },
     handleScroll(vertical: any) {
@@ -496,6 +548,39 @@ export default Vue.extend({
       if (vp < 1 && vp > this.messageProcess) this.showGoDown = true;
       else this.showGoDown = false;
       this.messageProcess = vp;
+      if (vertical.scrollTop < 50) {
+        this.handleScrollTop();
+      } else if (vp == 1) {
+        this.handleScrollBottom();
+      }
+    },
+    async handleScrollTop() {
+      // console.log("fetchTop");
+      if (!this.moreMessageAtTop) return;
+      let messageCount = this.msgList.length;
+      this.moreMessageAtTop = await this.chatMsgService.fetchPreviousMessageOfGroup(
+        this.chatId,
+      );
+      let messageCountAfter = this.msgList.length;
+      let messageDiff = messageCountAfter - messageCount;
+    },
+    async handleScrollBottom() {
+      // console.log("fetchBottom");
+      if (!this.moreMessageAtBottom) return;
+      let messageCount = this.msgList.length;
+      this.moreMessageAtBottom = await this.chatMsgService.fetchNextMessageOfGroup(
+        this.chatId,
+      );
+      let messageCountAfter = this.msgList.length;
+      let messageDiff = messageCountAfter - messageCount;
+    },
+    onNewMessage(messageList: ServerChatMsg[]) {
+      if (messageList.length != 0)
+        this.chatMsgService.sendReadPosition(
+          this.chatId,
+          messageList[messageList.length - 1].id,
+        );
+      else this.chatMsgService.fetchPreviousMessageOfGroup(this.chatId);
     },
     enterInput(e: any) {
       if (this.configs.hotKey == "enterSend") {
@@ -513,8 +598,8 @@ export default Vue.extend({
     },
 
     openMenu(e: any, msg: ServerChatMsg) {
-      this.msgMenuPos.x = e.clientX;
-      this.msgMenuPos.y = e.clientY - 50;
+      this.msgMenuPos.x = e.clientX - 15;
+      this.msgMenuPos.y = e.clientY - 20;
       this.showMsgMenu = true;
       this.menuMsg = msg;
     },
@@ -561,10 +646,6 @@ export default Vue.extend({
       this.checkedMessage = [];
     },
 
-    func() {
-      console.log("hi");
-    },
-
     // get data
     async getUser(id: string) {
       try {
@@ -594,7 +675,6 @@ export default Vue.extend({
       } catch (err) {
         console.log("get chatInfo err: ", err);
       }
-
       // this.chatinfo = {
       //   id: "wang+li",
       //   name: "wang+li",
@@ -751,7 +831,7 @@ export default Vue.extend({
   }
 
   .quote-text {
-    width: 400px;
+    width: 300px;
   }
 }
 
@@ -821,6 +901,7 @@ export default Vue.extend({
 }
 
 .msg-menu {
+  border: 0;
   height: 0;
   overflow: hidden;
   position: absolute;
@@ -896,6 +977,10 @@ export default Vue.extend({
 .chat-messages {
   position: relative;
 
+  // .msg-wrapper {
+  // display: flex;
+  // align-items: center;
+  // }
   .msg {
     display: flex;
     margin: 6px 20px;
@@ -903,6 +988,7 @@ export default Vue.extend({
     .el-avatar {
       margin-left: 0;
       margin-right: 12px;
+      flex-shrink: 0;
     }
 
     &.self {
@@ -937,8 +1023,8 @@ export default Vue.extend({
 .chat {
   display: flex;
   flex-direction: column;
-  width: 850px;
   height: 650px;
+  max-width: 750px;
 
   .chat-top-bar {
     flex-basis: 55px;
@@ -1002,11 +1088,31 @@ export default Vue.extend({
       }
     }
   }
+
+  .msg-menu {
+    background-color: colors.dark-light;
+    color: colors.dark-main-text;
+  }
+
+  /deep/ .el-textarea__inner, /deep/ .el-input__inner {
+    color: colors.dark-main-text;
+    background-color: colors.dark-light;
+  }
+
+  /deep/ .el-dialog {
+    background: colors.dark-medium;
+
+    .el-dialog__body, .el-dialog__title {
+      color: colors.dark-main-text;
+    }
+  }
 }
 
 // 多选框样式
 .el-col {
   margin-left: 20px;
+  position: relative;
+  top: -5px;
 }
 
 .multi_row {

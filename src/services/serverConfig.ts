@@ -24,6 +24,9 @@ export interface IServerConfig {
       post: string;
       get: string;
     };
+    chat: {
+      messages: string;
+    };
   };
   getFile: string;
   debug?: {
@@ -56,6 +59,9 @@ let _cfg: IServerConfig = {
       make: "/group",
       single: "/group/{id}",
     },
+    chat: {
+      messages: "/chat",
+    },
     file: { post: "/file", get: "/file/id" },
   },
   getFile: "{name}",
@@ -65,7 +71,8 @@ if (environment == "development") {
   _cfg.apiBaseUrl = "http://yuuna.srv.karenia.cc/api/v1";
   _cfg.getFile = "http://yuuna.srv.karenia.cc{name}";
   _cfg.auth.tokenEndpoint = "http://yuuna.srv.karenia.cc/connect/token";
-  _cfg.debug = { wsEndpointOverride: "ws://yuuna.srv.karenia.cc/ws/li" };
+  _cfg.debug = { wsEndpointOverride: "ws://yuuna.srv.karenia.cc/ws/wang" };
+
 }
 
 export const serverConfig: IServerConfig = _cfg;

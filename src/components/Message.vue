@@ -7,11 +7,14 @@
         {{ msg.sender }}
       </div>
       <!-- replyTo -->
-      <div v-if="msg.replyTo" class="quote">
+      <div
+        v-if="msg.replyTo"
+        class="quote"
+        @click="$emit('checkQuote', msg.replyTo.id)"
+      >
         <el-image
           v-if="msg.replyTo._t == 'image'"
-          :src="msg.replyTo.image"
-          lazy
+          :src="msg.replyTo.image ? msg.replyTo.image : imageph"
         ></el-image>
         <div>
           <div class="sendername">
@@ -39,7 +42,7 @@
 
       <!-- forwardFrom -->
       <div class="sendername" v-if="msg.forwardFrom">
-        Forwarded from {{ msg.forwardFrom.userId }}
+        Forwarded from {{ msg.forwardFrom.username }}
       </div>
     </div>
 
@@ -55,12 +58,11 @@
     <!-- image message -->
     <div v-else-if="msg._t == 'image'" :class="{ 'image-only': !msg.caption }">
       <el-image
-        :src="msg.image"
+        :src="msg.image ? msg.image : imageph"
         :preview-src-list="[msg.image]"
         :class="{
           noSender: !showSender && !msg.forwardFrom && !msg.replyTo,
         }"
-        lazy
       ></el-image>
       <div class="msg-text" v-if="msg.caption">
         <span>{{ msg.caption }}</span>
@@ -106,6 +108,12 @@ export default Vue.extend({
   props: {
     msg: Object,
     showSender: Boolean,
+  },
+  data() {
+    return {
+      imageph:
+        "https://cube.elemecdn.com/e/fd/0fc7d20532fdaf769a25683617711png.png",
+    };
   },
   filters: {
     msgTime(time: number) {
@@ -176,6 +184,7 @@ export default Vue.extend({
   .el-image {
     max-width: 400px;
     max-height: 250px;
+    align-self: center;
 
     &.noSender {
       border-top-left-radius: 7px;
