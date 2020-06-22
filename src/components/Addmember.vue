@@ -65,7 +65,7 @@ export default {
     addDetail() {
       this.list.forEach(item => {
         axios({
-          url: `http://yuuna.srv.karenia.cc/api/v1/profile/${item.username}`,
+          url: `http://yuuna.srv.karenia.cc/api/v1/profile/test/${item.username}`,
           method: "get",
         }).then(data => {
           this.avatarUrl = data.avatarUrl;

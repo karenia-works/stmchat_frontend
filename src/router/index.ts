@@ -15,8 +15,8 @@ Vue.use(VueRouter);
 
 const routes = [
   {
-    path: "/STM-Chat",
-    name: "stm main page",
+    path: "/",
+    name: "mainPage",
     component: STM_Chat,
   },
   {
