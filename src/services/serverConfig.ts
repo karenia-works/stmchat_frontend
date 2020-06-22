@@ -65,7 +65,7 @@ if (environment == "development") {
   _cfg.apiBaseUrl = "http://yuuna.srv.karenia.cc/api/v1";
   _cfg.getFile = "http://yuuna.srv.karenia.cc{name}";
   _cfg.auth.tokenEndpoint = "http://yuuna.srv.karenia.cc/connect/token";
-  _cfg.debug = { wsEndpointOverride: "ws://yuuna.srv.karenia.cc/ws/li" };
+  _cfg.debug = { wsEndpointOverride: "ws://yuuna.srv.karenia.cc/ws/wang" };
 }
 
 export const serverConfig: IServerConfig = _cfg;

@@ -8,59 +8,54 @@
       STM-Chat---STM for Lighter Communication</el-header
     >
     <el-main class="home-main dark_medium_bg">
-      <div>
-        <el-row class="home-row">
-          <el-col :span="4"><div class="grid-content-home"></div></el-col>
-          <el-col :span="16" class="home-col"
-            ><el-container width="50%">
-              <el-aside width="35%" style="overflow-x: hidden;">
-                <ChatList
-                  v-show="showChatList"
-                  @chatListCommand="chatListCommand($event)"
-                >
-                </ChatList>
-                <Contacts
-                  v-show="showContacts"
-                  @contactClose="contactClose"
-                  @addContacts="addContacts"
-                >
-                </Contacts>
-                <Addmember
-                  v-show="showMember"
-                  @create="create"
-                  @cancel="cancel"
-                >
-                </Addmember>
-              </el-aside>
-              <el-container width="65%">
-                <Chat :chatId="'wang+li'"></Chat>
-              </el-container> </el-container
-          ></el-col>
-          <el-col :span="4"></el-col>
-        </el-row>
+      <el-row>
+        <el-col :span="3"><div class="grid-content-home"></div></el-col>
+        <el-col :span="18" class="home-col">
+          <el-container class="main-container">
+            <el-aside width="35%">
+              <ChatList
+                v-show="showChatList"
+                @chatListCommand="chatListCommand($event)"
+              >
+              </ChatList>
+              <Contacts
+                v-show="showContacts"
+                @contactClose="contactClose"
+                @addContacts="addContacts"
+              >
+              </Contacts>
+              <Addmember v-show="showMember" @create="create" @cancel="cancel">
+              </Addmember>
+            </el-aside>
+            <el-main width="65%" style="padding: 0">
+              <Chat :chatId="openChat"></Chat>
+            </el-main>
+          </el-container>
+        </el-col>
+        <el-col :span="3"></el-col>
+      </el-row>
 
-        <!-- setting dialog -->
-        <el-dialog
-          :visible.sync="settingLayer"
-          :show-close="false"
-          class="cpn-dia"
-          width="400px"
-          top="5vh"
-        >
-          <Setting @closed="closed" @saved="saved"> </Setting>
-        </el-dialog>
+      <!-- setting dialog -->
+      <el-dialog
+        :visible.sync="settingLayer"
+        :show-close="false"
+        class="cpn-dia"
+        width="400px"
+        top="5vh"
+      >
+        <Setting @closed="closed" @saved="saved"> </Setting>
+      </el-dialog>
 
-        <!-- groupInfo dialog -->
-        <el-dialog
-          :visible.sync="groupinfoLayer"
-          :show-close="false"
-          class="cpn-dia"
-          width="600px"
-          top="5vh"
-        >
-          <Groupinfo @closeInfo="closeInfo"> </Groupinfo>
-        </el-dialog>
-      </div>
+      <!-- groupInfo dialog -->
+      <el-dialog
+        :visible.sync="groupinfoLayer"
+        :show-close="false"
+        class="cpn-dia"
+        width="600px"
+        top="5vh"
+      >
+        <Groupinfo @closeInfo="closeInfo"> </Groupinfo>
+      </el-dialog>
     </el-main>
     <!-- </div> -->
   </el-container>
@@ -72,6 +67,10 @@
     padding: 0;
     border-radius: 3px;
   }
+}
+
+.ctn-wrapper {
+  width: 80%;
 }
 
 // .background {
@@ -93,7 +92,7 @@
 
 .home-main {
   color: #333;
-  // text-align: center;
+  height: 100%;
 }
 
 .home-row {
@@ -103,8 +102,10 @@
 }
 
 .home-col {
-  border-radius: 4px;
-  min-height = 36px;
+  max-width: 900px;
+  min-width: 500px;
+  align-items: center;
+  justify-content: center;
 }
 
 .grid-content-home {
@@ -208,6 +209,7 @@ export default {
       dialogTableVisible: false,
       settingLayer: false,
       groupinfoLayer: false,
+      openChat: "family",
       imgSrc:
         "http://pic.51yuansu.com/backgd/cover/00/06/10/5b6510370f849.jpg%21/fw/780/quality/90/unsharp/true/compress/true",
     };

@@ -61,7 +61,7 @@
         ></el-button>
 
         <vueScroll ref="chatMessages" @handle-scroll="handleScroll">
-          <div v-for="msg in list" :key="msg.id" :id="'msg' + msg.id">
+          <div v-for="msg in msgList" :key="msg.id" :id="'msg' + msg.id">
             <!-- 多选框 -->
             <el-col :span="1" v-if="MultiOn">
               <el-checkbox
@@ -280,7 +280,6 @@ export default Vue.extend({
       // let loginService = serviceProvider.resolve<LoginService>(LoginService);
       // let state = loginService.loginState;
       // console.log("login state: ", state.getUsername());
-      console.log("refs: ", this.$refs.chatMessages);
 
       this.msgSub = this.chatMsgService.getObservable(this.chatId).subscribe({
         next: msg => {
@@ -297,6 +296,12 @@ export default Vue.extend({
     } catch (err) {
       console.log(err);
     }
+  },
+
+  beforeDestroy() {
+    console.log("beforeDestroy: ", this.chatId);
+
+    this.msgSub?.unsubscribe();
   },
 
   data() {
@@ -417,11 +422,18 @@ export default Vue.extend({
     },
 
     sendToClient(msg: ClientChatMsg, id: string) {
-      // todo: convey private chatId
       console.log({
         chatId: id,
         msg: msg,
       });
+    },
+
+    nameToChatid(name: string): string {
+      if (this.me.groups.includes(name)) return name;
+      else {
+        let me = this.me.username;
+        return me > name ? me + "+" + name : name + "+" + me;
+      }
     },
 
     // forward message
@@ -451,14 +463,14 @@ export default Vue.extend({
         .catch(() => {});
     },
 
-    forwardMsg(msgId: string, chatId: string) {
+    forwardMsg(msgId: string, chatname: string) {
       let msg: ClientChatMsg = {
         _t: "forward",
         fromChatId: this.chatId,
         fromMessageId: msgId,
       };
-      this.sendToClient(msg, chatId);
-      this.chatMsgService.sendMessage(msg, this.chatId);
+      this.sendToClient(msg, this.nameToChatid(chatname));
+      this.chatMsgService.sendMessage(msg, this.nameToChatid(chatname));
     },
 
     // delete message
@@ -480,7 +492,9 @@ export default Vue.extend({
         .catch(() => {});
     },
     deleteMsg(id: string) {
-      console.log("delete msg", id);
+      let index = this.msgList.findIndex(o => o.id == id);
+      this.msgList.splice(index, 1);
+      // console.log("delete msg", id);
     },
 
     chatPosition(): number {
@@ -496,12 +510,10 @@ export default Vue.extend({
       if (!vs) return;
 
       if (id == "bottom") {
-        console.log("go bottom");
         vs.scrollTo({
           y: "200%",
         });
       } else if (id == "last") {
-        console.log("go last");
         if (this.lastPos.length > 0) {
           let last = this.lastPos.pop();
           vs.scrollIntoView("#msg" + last, 200);
@@ -509,7 +521,6 @@ export default Vue.extend({
           this.jumpToMessage("bottom");
         }
       } else {
-        console.log("go up", id);
         let current = vs.getCurrentviewDom()[0].id.substring(3);
         this.lastPos.push(current);
         vs.scrollIntoView("#msg" + id, 200);
@@ -586,10 +597,6 @@ export default Vue.extend({
       this.checkedMessage = [];
     },
 
-    func() {
-      console.log("hi");
-    },
-
     // get data
     async getUser(id: string) {
       try {
@@ -608,25 +615,25 @@ export default Vue.extend({
     },
 
     async getChatInfo() {
-      // try {
-      //   this.chatinfo = await this.getGroup(this.chatId);
-      //   if (this.chatinfo) {
-      //     this.getAvatars(this.chatinfo.members);
-      //     if (this.chatinfo.isFriend) {
-      //       this.showSender = false;
-      //     }
-      //   }
-      // } catch (err) {
-      //   console.log("get chatInfo err: ", err);
-      // }
-      this.chatinfo = {
-        id: "wang+li",
-        name: "wang+li",
-        isFriend: true,
-        members: ["wang", "li"],
-        owner: "wang",
-        chatlog: "",
-      };
+      try {
+        this.chatinfo = await this.getGroup(this.chatId);
+        if (this.chatinfo) {
+          this.getAvatars(this.chatinfo.members);
+          if (this.chatinfo.isFriend) {
+            this.showSender = false;
+          }
+        }
+      } catch (err) {
+        console.log("get chatInfo err: ", err);
+      }
+      // this.chatinfo = {
+      //   id: "wang+li",
+      //   name: "wang+li",
+      //   isFriend: true,
+      //   members: ["wang", "li"],
+      //   owner: "wang",
+      //   chatlog: "",
+      // };
     },
     async getAvatars(ids: string[]) {
       for (let id of ids) {
@@ -775,7 +782,7 @@ export default Vue.extend({
   }
 
   .quote-text {
-    width: 400px;
+    width: 300px;
   }
 }
 
