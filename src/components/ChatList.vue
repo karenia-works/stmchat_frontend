@@ -56,7 +56,7 @@
             class="keyword"
             v-model="searchWord"
             v-on:input="queryData"
-            placeholder="search"
+            placeholder="搜索"
             clearable
             autofocus="true"
           >
@@ -74,7 +74,7 @@
         <botton @click="beforeCreate">test</botton>
         <!--                聊天列表-->
         <div
-          v-for="(o, index) in sortableData"
+          v-for="(o, index) in tableData"
           v-bind:key="o"
           @click="handleclick(index, o, 'Wang'), (o.unreadCount = 0)"
           :class="active == index ? 'addclass' : ''"
@@ -96,6 +96,7 @@
               >
                 <!-- <div >{{o.chat| ellipsis}}</div>-->
                 <template>
+                  <div v-if="o.latestMessage!=undefined">
                   <div v-if="o.latestMessage._t == 'text'">
                     <span
                       class="dark_sub_text"
@@ -109,12 +110,13 @@
                   <div v-if="o.latestMessage._t == 'file'">
                     <span class="dark_sub_text" v-html="file"> </span>
                   </div>
+                  </div>
                 </template>
               </div>
             </el-col>
             <el-col span="5">
               <div style="height: 50px; font-size: 12px; color: dimgray;">
-                <div class="dark_sub_text">{{ o.lastTimestamp }}</div>
+                <div class="dark_sub_text">{{ Date(o.lastTimestamp) }}</div>
                 <el-badge
                   :value="o.unreadCount"
                   class="item"
@@ -265,10 +267,28 @@ import axios from "axios";
 import {GroupProfile, ServerChatMsg} from "@/types/types";
 
 export default Vue.extend({
-    beforeMount: function() {
+  beforeMount: function() {
         try {
-            this.beforeCreate();
-            console.log("sss");
+          var datalist=[];
+          let mls = serviceProvider.resolve<MessageListService>(MessageListService);
+          // mls.messageListSubject.subscribe({
+          //   next(v){
+          //     mesgNotice();
+          //    this.tableData=JSON.parse(JSON.stringify(v));
+          //     // this.tableData=v ;
+          //     console.log("ChatList", v);
+          //   }
+          // })
+          mls.messageListSubject.subscribe({
+            next: v=> {
+              mesgNotice();
+              datalist=v;
+              // this.tableData = v;
+              console.log("ChatList", v);
+              //console.log("sss",this.tableData);
+            }
+          })
+          this.tableData=datalist;
         }catch (err) {
             console.log(err);
         }
@@ -302,7 +322,7 @@ export default Vue.extend({
         };
         return {
             input: "",
-            tableData: [item],
+            tableData: [] ,
             hiddenTableHeader: false,
             active: -1,
             messageProcess: 0,
@@ -338,6 +358,7 @@ export default Vue.extend({
         handleclick(index,o:MessageListItem,username) {
             this.active = index;
             if(o.chat.isFriend){
+
                 this.$emit("chat-people",o.chat.name+'+'+username);
                 console.log(o.chat.name+'+'+username);
             }
@@ -375,27 +396,32 @@ export default Vue.extend({
                 return;
             }
             //搜索
+          if(this.tableData!=null){
             let list = this.tableData.filter(
                 item => item.chat.name.indexOf(this.searchWord) >= 0,
             );
             if (list.length >= 1) this.selectableData = list;
             else this.selectableData = this.noselectData;
             this.$forceUpdate();
-        },
+        }},
         beforeCreate() {
+          var datalist=[]
             let mls = serviceProvider.resolve<MessageListService>(MessageListService);
             mls.messageListSubject.subscribe({
-                next(v){
+                next: v=> {
                     mesgNotice();
-                        this.tableData = v;
-                        console.log("ChatList", v);
-
-
+                    datalist=v;
+                 // this.tableData = v;
+                  console.log("ChatList", v);
+                  //console.log("sss",this.tableData);
                 }
             })
+          console.log("datalist",datalist);
+          this.tableData=datalist;
+          console.log("sss",this.tableData);
         },
         clicktry(){
-            console.log("sss",this.tableData)
+            //console.log("qqq",this.tableData)
         }
     },
     filters: {
@@ -411,7 +437,6 @@ export default Vue.extend({
     computed: {
         //最终需要显示的数组
         sortableData: function() {
-
             return sortByTime(this.tableData, "lastTimestamp");
         },
     },

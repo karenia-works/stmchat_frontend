@@ -8,6 +8,7 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
+    "@types/qs": "^6.9.3",
     "app-root-path": "^3.0.0",
     "axios": "^0.19.2",
     "circular-dependency-plugin": "^5.2.0",
@@ -15,6 +16,7 @@
     "element-ui": "^2.4.5",
     "moment": "^2.26.0",
     "push.js": "^1.0.12",
+    "qs": "^6.9.4",
     "rxjs": "^6.5.5",
     "tiny-lru": "^7.0.4",
     "tsyringe": "^4.3.0",

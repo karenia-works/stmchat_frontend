@@ -68,11 +68,11 @@ export class ProfilePool<T> implements ICachingDataPool<T> {
   public async updateData(
     id: string,
     data: T,
-    writeThrough: boolean = true,
+    writeThrough: boolean = false,
   ): Promise<void> {
     this.cache.set(id, data);
     if (writeThrough) {
-      await axios.post(this.singleDataEndpoint(id), data);
+      await axios.put(this.singleDataEndpoint(id), data);
     }
   }
 
@@ -163,7 +163,7 @@ export class GroupProfilePool extends ProfilePool<GroupProfile> {
         this.serverConfig.apiEndpoints.groupProfile.make,
       profile,
     );
-    this.updateData(result.data.id, result.data);
+    this.updateData(result.data.name, result.data, false);
     return result.data;
   }
 }
