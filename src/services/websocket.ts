@@ -50,7 +50,7 @@ export class WsMessageService {
     this.forceDisconnect = false;
     this.ws_connection = new WebSocket(this.dest);
     this.ws_connection.onopen = ev => {
-      this.ws_connection.onclose = ev => this.onWebsocketClose(ev);
+      this.ws_connection!.onclose = ev => this.onWebsocketClose(ev);
       this.onWebsocketOpen(ev);
     };
     this.ws_connection.onmessage = ev => this.onWebsocketMessage(ev);
@@ -59,7 +59,7 @@ export class WsMessageService {
 
   protected disconnectWebsocket() {
     this.forceDisconnect = true;
-    this.ws_connection.close();
+    this.ws_connection?.close();
   }
 
   private ws_connection: WebSocket | undefined;
@@ -119,9 +119,8 @@ export class WsMessageService {
   }
 
   protected onWebsocketOpen(err: Event) {
-    console.log("Connected to websocket");
+    console.trace("Connected to websocket");
     this.connection_state.next(true);
-    this.wait_time = 500;
 
     // Send all pending messages
   }
@@ -134,6 +133,7 @@ export class WsMessageService {
   }
 
   protected onWebsocketMessage(ev: MessageEvent) {
+    this.wait_time = 500;
     try {
       let raw_msg = ev.data;
       let msg = JSON.parse(raw_msg, (k, v) => {

@@ -61,6 +61,10 @@ export class ProfilePool<T> implements ICachingDataPool<T> {
     }
   }
 
+  public async getMultipleData(id: string[]): Promise<(T | undefined)[]> {
+    return Promise.all(id.map(id => this.getData(id, false)));
+  }
+
   public async refreshData(id: string): Promise<void> {
     this.getData(id, true);
   }
@@ -117,7 +121,6 @@ export class UserProfilePool extends ProfilePool<UserProfile> {
       let result = await axios.get<UserProfile>(
         this.serverConfig.apiBaseUrl +
           this.serverConfig.apiEndpoints.userProfile.getMine,
-        {},
       );
       return result.data;
     }
