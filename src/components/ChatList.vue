@@ -398,9 +398,9 @@
             beforeCreate() {
                 let mls=serviceProvider.resolve<MessageListService>(MessageListService);
                 mls.messageListSubject.subscribe({
-                    next(v){
+                    next:(v)=>{
                         this.tableData=v;
-                        console.log(v);
+                        console.log("ChatList",v);
                     }
                 })
             },

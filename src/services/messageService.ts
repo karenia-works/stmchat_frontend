@@ -87,8 +87,13 @@ export class MessageListService {
     private wss: WsMessageService,
     private groupProfileService: GroupProfilePool,
   ) {
-    wss.chatMessageSubject.subscribe({ next: this.onNewChatMessage });
-    wss.unreadMessageCount.subscribe({ next: this.onNewUnreadCountUpdate });
+    console.log("MessageListService constructed");
+    wss.chatMessageSubject.subscribe({
+      next: val => this.onNewChatMessage(val).then(),
+    });
+    wss.unreadMessageCount.subscribe({
+      next: val => this.onNewUnreadCountUpdate(val).then(),
+    });
   }
 
   private messageMap = new Map<string, MessageListItem>();
@@ -116,6 +121,7 @@ export class MessageListService {
   }
 
   private async onNewChatMessage(msg: ServerChatMessage) {
+    console.log("OnNewChatMessage", msg);
     let item = this.messageMap.get(msg.chatId);
     if (item === undefined) {
       let chatProfile = await this.groupProfileService.getData(msg.chatId);
@@ -150,10 +156,10 @@ export class MessageListService {
   }
 
   private async onNewUnreadCountUpdate(msg: ServerUnreadCountMessage) {
-    for (let [id, unreadProp] of msg.items) {
+    for (let [id, unreadProp] of msg.items.entries()) {
       let item = this.messageMap.get(id);
       if (item === undefined) {
-        let chatProfile = await this.groupProfileService.getData(msg.chatId);
+        let chatProfile = await this.groupProfileService.getData(id);
         if (chatProfile === undefined) {
           throw new Error("Cannot find chat profile!");
         }
