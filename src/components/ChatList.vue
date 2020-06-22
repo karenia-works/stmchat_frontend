@@ -71,7 +71,7 @@
                         </el-button>
                     </el-input>
                 </div>
-                <botton @click="beforeCreate">test</botton>
+<!--                <botton @click="beforeCreate">test</botton>-->
                 <!--                聊天列表-->
                 <div
                         v-for="(o, index) in sortableData"
