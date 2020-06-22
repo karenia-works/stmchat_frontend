@@ -138,15 +138,15 @@ import { LoginService } from "../services/loginService";
 export default {
   methods: {
     async register() {
-      if (this.userName == "" || this.userPasswd == "") {
+      if (this.userID == "" || this.userPasswd == "") {
         this.warning("基本信息不得为空");
       } else {
-        let userRegister =
-          serviceProvider.resolve < LoginService > LoginService;
-        let res = await userRegister.register(this.userName, this.userPasswd);
+        let userRegister = serviceProvider.resolve(LoginService);
+        let res = await userRegister.register(this.userID, this.userPasswd);
         console.log(res);
         if (res == true) {
           this.succeed();
+          this.ToLogin();
         } else {
           this.warning("已有重复用户名");
         }

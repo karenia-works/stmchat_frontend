@@ -47,7 +47,7 @@ let _cfg: IServerConfig = {
   apiEndpoints: {
     userProfile: {
       get: "/profile/test",
-      register: "/register",
+      register: "/profile/register",
       getMine: "/profile/me",
       single: "/profile/test/{id}",
     },

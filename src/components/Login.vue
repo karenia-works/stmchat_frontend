@@ -140,12 +140,19 @@ export default {
       if (this.userID == "" || this.userPasswd == "") {
         this.warning("登录信息不得为空");
       } else {
-        let userLogin = serviceProvider.resolve < LoginService > LoginService;
-        let res = await userLogin.login(this.userID, this.userPasswd);
-        console.log(res);
-        if (res == true) {
-          this.succeed();
-        } else {
+        let userLogin = serviceProvider.resolve(LoginService);
+        try{
+          let res = await userLogin.login(this.userID, this.userPasswd);
+          console.log(res);
+          if (res == true) {
+            this.succeed();
+            this.$store.state.userID=this.userID;
+            console.log(this.$store.state.userID);
+            this.$router.push({ path: "/" });
+          } else {
+            this.warning("登录信息错误");
+          }
+        }catch(err){
           this.warning("登录信息错误");
         }
       }

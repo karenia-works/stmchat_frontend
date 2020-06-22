@@ -961,7 +961,7 @@ export default Vue.extend({
   }
 
   .non-chat {
-    // height: 650px;
+    height: 650px;
     align-items: center;
     justify-content: center;
 

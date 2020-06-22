@@ -25,12 +25,6 @@
                   @addContacts="addContacts"
                 >
                 </Contacts>
-                <Addmember
-                  v-show="showMember"
-                  @create="create"
-                  @cancel="cancel"
-                >
-                </Addmember>
               </el-aside>
               <el-container width="65%">
                 <Chat :chatId="'wang+li'"></Chat>
@@ -59,6 +53,21 @@
           top="5vh"
         >
           <Groupinfo @closeInfo="closeInfo"> </Groupinfo>
+        </el-dialog>
+
+        <!-- createGroup dialog -->
+        <el-dialog
+          :visible.sync="createGroupLayer"
+          :show-close="false"
+          class="cpn-dia"
+          width="500px"
+          top="5vh"
+        >
+          <CreateGroup
+            @closeGroup="cancel"
+            @cancelGroup="cancelGroup"
+          >
+          </CreateGroup>
         </el-dialog>
       </div>
     </el-main>
@@ -117,21 +126,28 @@
 import Chat from "@/components/Chat.vue";
 import ChatList from "@/components/ChatList.vue";
 import Contacts from "@/components/Contacts.vue";
-import Addmember from "@/components/Addmember.vue";
 import Setting from "@/components/Setting.vue";
 import Groupinfo from "@/components/Groupinf.vue";
+import CreateGroup from "@/components/Creatgroup.vue";
+
 export default {
   components: {
     ChatList: ChatList,
     Chat: Chat,
     Contacts: Contacts,
-    Addmember: Addmember,
     Setting: Setting,
     Groupinfo: Groupinfo,
+    CreateGroup: CreateGroup,
   },
   methods: {
     closeInfo() {
       this.groupinfoLayer = false;
+    },
+    closeGroup() {
+      this.createGroupLayer = false;
+    },
+    cancelGroup() {
+      this.createGroupLayer = false;
     },
     closed() {
       this.settingLayer = false;
@@ -144,18 +160,6 @@ export default {
     },
     open() {
       this.settingLayer = true;
-    },
-    create() {
-      this.showMember = false;
-      this.showChatList = true;
-      this.$message({
-        message: "群聊创建成功",
-        type: "success",
-      });
-    },
-    cancel() {
-      this.showMember = false;
-      this.showChatList = true;
     },
     contactClose() {
       this.showContacts = false;
@@ -173,20 +177,7 @@ export default {
     },
     chatListCommand(arg) {
       if (arg == "a") {
-        this.$prompt("输入群组名称", "新建群聊", {
-          confirmButtonText: "下一步",
-          cancelButtonText: "取消",
-        })
-
-          .then(({ value }) => {
-            this.$message("为" + value + "添加成员");
-            this.showChatList = false;
-            this.showMember = true;
-          })
-          .catch(() => {
-            this.showChatList = true;
-            this.showMember = false;
-          });
+        this.createGroupLayer = true;
       } else if (arg == "b") {
         this.showChatList = false;
         this.showContacts = true;
@@ -208,6 +199,7 @@ export default {
       dialogTableVisible: false,
       settingLayer: false,
       groupinfoLayer: false,
+      createGroupLayer: false,
       imgSrc:
         "http://pic.51yuansu.com/backgd/cover/00/06/10/5b6510370f849.jpg%21/fw/780/quality/90/unsharp/true/compress/true",
     };

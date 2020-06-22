@@ -1,7 +1,7 @@
 <template>
   <el-card class="sgp-card dark_medium_bg">
     <el-container>
-      <el-main height="600px">
+      <el-main>
         <el-container>
           <el-aside width="50px">
             <i
@@ -11,9 +11,9 @@
           </el-aside>
           <el-container>
             <el-header
-              style="height:20px;margin-top:20px;margin-right:20px;"
+              style="height:20px;margin-top:20px;margin-right:20px;font-size:18px"
               class="dark_main_text"
-              >Group name</el-header
+              >群组名称</el-header
             >
             <el-main>
               <el-input v-model="input" style="border:none"></el-input>
@@ -28,15 +28,14 @@
           type="text"
           class="dark_main_text"
           @click="cancelGroup"
-          >CANCEL</el-button
+          >取消</el-button
         >
         <el-button
           style="float: right;margin-right:20px"
           type="text"
-          v-on:click="goadd"
           class="dark_main_text"
-          @click="createGroup"
-          >NEXT</el-button
+          @click="$emit('Groupname', input)"
+          >下一步</el-button
         >
         <router-view></router-view>
       </el-footer>
@@ -45,8 +44,6 @@
 </template>
 
 <script lang="ts">
-import { serviceProvider } from "@/services/dependencyInjection";
-import { ChatMessageService } from "@/services/messageService";
 import Vue from "vue";
 
 export default Vue.extend({
@@ -58,9 +55,6 @@ export default Vue.extend({
     };
   },
   methods: {
-    goadd() {
-      this.$router.push({ path: "/Addmember" });
-    },
     createGroup() {
       this.$emit("createGroup");
     },
@@ -98,8 +92,10 @@ export default Vue.extend({
 }
 
 .sgp-card {
-  width: 400px;
-  margin-left: 100px;
+  margin-left: 0px;
+  margin-right: 0px;
+  width: 100%;
+  height: 300px;
   margin-top: 100px;
 }
 

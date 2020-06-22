@@ -395,5 +395,6 @@ export default {
       this.$emit("closeInfo");
     },
   },
+    
 };
 </script>
