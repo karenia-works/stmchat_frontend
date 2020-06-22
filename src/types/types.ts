@@ -98,7 +98,7 @@ export interface ServerUnreadCountMessage extends ServerMessage {
 
 export interface UnreadProperty {
   count: number;
-  maxMsgId: number;
+  maxMessage: string;
 }
 
 export interface ServerOnlineStatusMessage extends ServerMessage {
