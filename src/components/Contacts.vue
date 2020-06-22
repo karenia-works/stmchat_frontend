@@ -20,26 +20,25 @@
           type="text"
           class="dark_main_text"
           @click="close"
-          >关闭</el-button
-        >
+          >关闭</el-button>
       </el-footer>
     </el-container>
   </el-card>
 </template>
 
 <script>
-import axios from "axios";
+import axios from "axios"
 export default {
   name: "Contacts",
   data() {
     return {
-      list: [],
-      avatarUrl: "",
+       list: [],
+       avatarUrl:"",
     };
   },
-  beforeMount: function() {
-    this.getList();
-  },
+  beforeMount:function(){
+    this.getList()
+   },
   methods: {
     addContacts() {
       this.$emit("addContacts");
@@ -50,25 +49,25 @@ export default {
     getMsgFormSon(data) {
       console.log(data);
     },
-    getList() {
+    getList(){
       axios({
-        url: "http://yuuna.srv.karenia.cc/api/v1/profile/wang/friends",
-        method: "get",
-      }).then(data => {
-        this.list = data.data;
-      });
-    },
-    addDetail() {
-      this.list.forEach(item => {
-        axios({
-          url: `http://yuuna.srv.karenia.cc/api/v1/profile/test/${item.username}`,
-          method: "get",
-        }).then(data => {
-          this.avatarUrl = data.avatarUrl;
-        });
-        this.$set(item, "avatarUrl", this.avatarUrl);
-      });
-    },
+        url:'http://yuuna.srv.karenia.cc/api/v1/profile/wang/friends',
+        method:'get',
+      }).then(data=>{
+          this.list=data.data
+        })
+     },
+     addDetail(){
+        this.list.forEach(item => {
+           axios({
+            url:`http://yuuna.srv.karenia.cc/api/v1/profile/${item.username}`,
+            method:'get',
+              }).then(data=>{
+                this.avatarUrl=data.avatarUrl;
+            });
+            this.$set(item,"avatarUrl",this.avatarUrl);
+        });  
+     },
   },
 };
 </script>

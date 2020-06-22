@@ -50,9 +50,7 @@ export default {
   props: ["items"],
   computed: {
     queryList() {
-      return this.items.filter(
-        item => item.username.indexOf(this.selectVal) > -1,
-      );
+      return this.items.filter(item => item.username.indexOf(this.selectVal) > -1);
     },
   },
 };

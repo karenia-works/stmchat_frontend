@@ -9,6 +9,7 @@ import Chat from "@/components/Chat.vue";
 import ChatList from "@/components/ChatList.vue";
 import Setting from "@/components/Setting.vue";
 import Groupinf from "@/components/Groupinf.vue";
+import Creatgroup from "@/components/Creatgroup.vue";
 import STM_Chat from "@/components/STM_Chat.vue";
 
 Vue.use(VueRouter);
@@ -59,6 +60,10 @@ const routes = [
   {
     path: "/Groupinf",
     component: Groupinf,
+  },
+  {
+    path: "/Creatgroup",
+    component: Creatgroup,
   },
 ];
 
