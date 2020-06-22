@@ -4,9 +4,7 @@
     <div class="background">
       <img :src="imgSrc" width="100%" height="100%" alt="" />
     </div> -->
-    <el-header class="home-header dark_light_bg dark_main_text">
-      STM-Chat---STM for Lighter Communication</el-header
-    >
+
     <el-main class="home-main dark_medium_bg">
       <el-row>
         <el-col :span="3"><div class="grid-content-home"></div></el-col>
@@ -57,6 +55,9 @@
         <Groupinfo @closeInfo="closeInfo"> </Groupinfo>
       </el-dialog>
     </el-main>
+    <el-footer class="home-header dark_medium_bg dark_sub_text info">
+      STM Chat @ 2020</el-footer
+    >
     <!-- </div> -->
   </el-container>
 </template>
@@ -85,14 +86,15 @@
 // bottom: 0px;
 // }
 .home-header {
-  text-align: left;
+  text-align: center;
   line-height: 60px;
-  padding-top: 10px;
+  font-size: 14px;
+  padding-bottom: 10px;
 }
 
 .home-main {
   color: #333;
-  height: 100%;
+  padding: 72px 0 36px;
 }
 
 .home-row {
