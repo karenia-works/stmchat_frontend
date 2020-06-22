@@ -294,6 +294,7 @@ export default Vue.extend({
       this.msgSub = this.chatMsgService.getObservable(this.chatId).subscribe({
         next: msg => {
           this.msgList = msg;
+          this.onNewMessage(msg);
 
           let pos = this.chatPosition();
           if (pos == 1) this.jumpToMessage("bottom");
@@ -432,6 +433,7 @@ export default Vue.extend({
       }
       // this.sendToClient(msg, this.chatId);
       await this.chatMsgService.sendMessage(msg, this.chatId);
+      this.jumpToMessage("bottom");
     },
 
     sendToClient(msg: ClientChatMsg, id: string) {
@@ -483,7 +485,8 @@ export default Vue.extend({
         fromMessageId: msgId,
       };
       // this.sendToClient(msg, this.nameToChatid(chatname));
-      this.chatMsgService.sendMessage(msg, this.nameToChatid(chatname));
+      let chatid = this.nameToChatid(chatname);
+      this.chatMsgService.sendMessage(msg, chatid);
     },
 
     // delete message
@@ -570,6 +573,14 @@ export default Vue.extend({
       );
       let messageCountAfter = this.msgList.length;
       let messageDiff = messageCountAfter - messageCount;
+    },
+    onNewMessage(messageList: ServerChatMsg[]) {
+      if (messageList.length != 0)
+        this.chatMsgService.sendReadPosition(
+          this.chatId,
+          messageList[messageList.length - 1].id,
+        );
+      else this.chatMsgService.fetchPreviousMessageOfGroup(this.chatId);
     },
     enterInput(e: any) {
       if (this.configs.hotKey == "enterSend") {
