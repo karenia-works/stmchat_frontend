@@ -24,6 +24,9 @@ export interface IServerConfig {
       post: string;
       get: string;
     };
+    chat: {
+      messages: string;
+    };
   };
   getFile: string;
   debug?: {
@@ -55,6 +58,9 @@ let _cfg: IServerConfig = {
       get: "/group",
       make: "/group",
       single: "/group/{id}",
+    },
+    chat: {
+      messages: "/chat",
     },
     file: { post: "/file", get: "/file/id" },
   },

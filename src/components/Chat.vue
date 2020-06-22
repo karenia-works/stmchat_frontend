@@ -104,9 +104,9 @@
             <div>
               <div class="sendername">{{ quoteMsg.sender }}</div>
               <div class="quote-text">
-                <template v-if="quoteMsg._t == 'text'">{{
-                  quoteMsg.text
-                }}</template>
+                <template v-if="quoteMsg._t == 'text'">
+                  {{ quoteMsg.text }}
+                </template>
                 <template v-else-if="quoteMsg._t == 'image'">
                   [图片]
                   <span v-if="quoteMsg.caption">, {{ quoteMsg.caption }}</span>
@@ -290,7 +290,6 @@ export default Vue.extend({
           else this.messageProcess = pos;
         },
       });
-
       this.getChatInfo();
       this.getProfile();
     } catch (err) {
@@ -314,6 +313,10 @@ export default Vue.extend({
       showForward: false,
       messageProcess: 0,
       quoteMsg: null as ServerChatMsg | null,
+
+      // Message limit
+      moreMessageAtTop: true,
+      moreMessageAtBottom: true,
 
       // chat messages
       msgSub: null,
@@ -417,7 +420,7 @@ export default Vue.extend({
           this.sendMessage = "";
         }
       }
-      this.sendToClient(msg, this.chatId);
+      // this.sendToClient(msg, this.chatId);
       await this.chatMsgService.sendMessage(msg, this.chatId);
     },
 
@@ -469,7 +472,7 @@ export default Vue.extend({
         fromChatId: this.chatId,
         fromMessageId: msgId,
       };
-      this.sendToClient(msg, this.nameToChatid(chatname));
+      // this.sendToClient(msg, this.nameToChatid(chatname));
       this.chatMsgService.sendMessage(msg, this.nameToChatid(chatname));
     },
 
@@ -532,6 +535,31 @@ export default Vue.extend({
       if (vp < 1 && vp > this.messageProcess) this.showGoDown = true;
       else this.showGoDown = false;
       this.messageProcess = vp;
+      if (vertical.scrollTop < 50) {
+        this.handleScrollTop();
+      } else if (vp == 1) {
+        this.handleScrollBottom();
+      }
+    },
+    async handleScrollTop() {
+      // console.log("fetchTop");
+      if (!this.moreMessageAtTop) return;
+      let messageCount = this.msgList.length;
+      this.moreMessageAtTop = await this.chatMsgService.fetchPreviousMessageOfGroup(
+        this.chatId,
+      );
+      let messageCountAfter = this.msgList.length;
+      let messageDiff = messageCountAfter - messageCount;
+    },
+    async handleScrollBottom() {
+      // console.log("fetchBottom");
+      if (!this.moreMessageAtBottom) return;
+      let messageCount = this.msgList.length;
+      this.moreMessageAtBottom = await this.chatMsgService.fetchNextMessageOfGroup(
+        this.chatId,
+      );
+      let messageCountAfter = this.msgList.length;
+      let messageDiff = messageCountAfter - messageCount;
     },
     enterInput(e: any) {
       if (this.configs.hotKey == "enterSend") {
@@ -993,7 +1021,7 @@ export default Vue.extend({
   }
 
   .non-chat {
-    // height: 650px;
+    height: 650px;
     align-items: center;
     justify-content: center;
 
