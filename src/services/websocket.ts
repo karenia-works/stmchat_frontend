@@ -30,6 +30,10 @@ export class WsMessageService {
       state.subscribe({
         next: val => {
           if (val) {
+            this.dest = serverConfig.wsEndpoint.replace(
+              "{name}",
+              loginService.loginState.getUsername(),
+            );
             this.connectWebsocket();
           } else {
             this.disconnectWebsocket();
