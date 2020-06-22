@@ -34,8 +34,13 @@
           style="float: right;margin-right:20px"
           type="text"
           class="dark_main_text"
+<<<<<<< HEAD
           @click="$emit('Groupname', input)"
           >下一步</el-button
+=======
+          @click="$emit('Groupname',input)"
+          >NEXT</el-button
+>>>>>>> lastVersion
         >
         <router-view></router-view>
       </el-footer>
