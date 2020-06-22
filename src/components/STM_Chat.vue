@@ -1,110 +1,90 @@
 <template>
-  <div>
+  <el-container>
+    <!-- <div>
     <div class="background">
       <img :src="imgSrc" width="100%" height="100%" alt="" />
-    </div>
-    <div class="front">
-      <template>
-        <el-header class="home-header dark_light_bg dark_main_text">
-          STM-Chat---STM for Lighter Communication</el-header
+    </div> -->
+    <el-header class="home-header dark_light_bg dark_main_text">
+      STM-Chat---STM for Lighter Communication</el-header
+    >
+    <el-main class="home-main dark_medium_bg">
+      <div>
+        <el-row class="home-row">
+          <el-col :span="4"><div class="grid-content-home"></div></el-col>
+          <el-col :span="16" class="home-col"
+            ><el-container width="50%">
+              <el-aside width="35%" style="overflow-x: hidden;">
+                <ChatList
+                  v-show="showChatList"
+                  @chatListCommand="chatListCommand($event)"
+                >
+                </ChatList>
+                <Contacts
+                  v-show="showContacts"
+                  @contactClose="contactClose"
+                  @addContacts="addContacts"
+                >
+                </Contacts>
+                <Addmember
+                  v-show="showMember"
+                  @create="create"
+                  @cancel="cancel"
+                >
+                </Addmember>
+              </el-aside>
+              <el-container width="65%">
+                <Chat></Chat>
+              </el-container> </el-container
+          ></el-col>
+          <el-col :span="4"></el-col>
+        </el-row>
+
+        <!-- setting dialog -->
+        <el-dialog
+          :visible.sync="settingLayer"
+          :show-close="false"
+          class="cpn-dia"
+          width="400px"
+          top="5vh"
         >
-        <el-main class="home-main dark_deep_bg">
-          <template>
-            <div class="layermbox" v-show="settingLayer">
-              <div class="laymshade" style="height:100%">
-                <el-row :gutter="20">
-                  <el-col :span="8"
-                    ><div class="setting-placeholder"></div
-                  ></el-col>
-                  <el-col :span="8"
-                    ><Setting v-on:closed="closed" v-on:saved="saved"> </Setting
-                  ></el-col>
-                  <el-col :span="8"
-                    ><div class="setting-placeholder"></div
-                  ></el-col>
-                </el-row>
-              </div>
-            </div>
-          </template>
-          <template>
-            <div class="layermbox" v-show="groupinfoLayer">
-              <div class="laymshade" style="height:100%;padding-top:100px;">
-                <el-row :gutter="20">
-                  <el-col :span="6"
-                    ><div class="setting-placeholder"></div
-                  ></el-col>
-                  <el-col :span="10"
-                    ><Groupinfo v-on:closeInfo="closeInfo"> </Groupinfo
-                  ></el-col>
-                  <el-col :span="8"
-                    ><div class="setting-placeholder"></div
-                  ></el-col>
-                </el-row>
-              </div>
-            </div>
-          </template>
-          <el-row class="home-row">
-            <el-col :span="4"><div class="grid-content-home"></div></el-col>
-            <el-col :span="16" class="home-col"
-              ><el-container width="50%">
-                <el-aside width="35%" style="overflow-x: hidden;">
-                  <ChatList
-                    v-show="showChatList"
-                    v-on:chatListCommand="chatListCommand($event)"
-                  >
-                  </ChatList>
-                  <Contacts
-                    v-show="showContacts"
-                    v-on:contactClose="contactClose"
-                    v-on:addContacts="addContacts"
-                  >
-                  </Contacts>
-                  <Addmember
-                    v-show="showMember"
-                    v-on:create="create"
-                    v-on:cancel="cancel"
-                  >
-                  </Addmember>
-                </el-aside>
-                <el-container width="65%">
-                  <Chat></Chat>
-                </el-container> </el-container
-            ></el-col>
-            <el-col :span="4"></el-col>
-          </el-row>
-        </el-main>
-      </template>
-    </div>
-  </div>
+          <Setting @closed="closed" @saved="saved"> </Setting>
+        </el-dialog>
+
+        <!-- groupInfo dialog -->
+        <el-dialog
+          :visible.sync="groupinfoLayer"
+          :show-close="false"
+          class="cpn-dia"
+          width="600px"
+          top="5vh"
+        >
+          <Groupinfo @closeInfo="closeInfo"> </Groupinfo>
+        </el-dialog>
+      </div>
+    </el-main>
+    <!-- </div> -->
+  </el-container>
 </template>
 
 <style lang="stylus" scoped>
-.background{
-    background-size: cover;
-    width:100%;
-    height:100%;  /**宽高100%是为了图片铺满屏幕 */
-    z-index:-1;
-    position: fixed;
-    top:0px;
-    left:0px;
-    right:0px;
-    bottom:0px;
+.cpn-dia {
+  /deep/ .el-dialog__header, /deep/ .el-dialog__body {
+    padding: 0;
+    border-radius: 3px;
+  }
 }
 
-.front{
-    z-index:1;
-     top:0px;
-    left:0px;
-    right:0px;
-    bottom:0px;
-    position: fixed;
-    width:100%;
-    height:100%;
-}
-.setting-placeholder {
-    border-radius: 4px;
-    min-height: 36px;
-  }
+// .background {
+// background-size: cover;
+// width: 100%;
+// height: 100%; /* *宽高100%是为了图片铺满屏幕 */
+// z-index: -1;
+// position: fixed;
+// top: 0px;
+// left: 0px;
+// right: 0px;
+// bottom: 0px;
+// }
 .home-header {
   text-align: left;
   line-height: 60px;
@@ -113,22 +93,24 @@
 
 .home-main {
   color: #333;
-  text-align: center;
+  // text-align: center;
 }
+
 .home-row {
   &:last-child {
     margin-bottom: 0;
   }
 }
+
 .home-col {
   border-radius: 4px;
-  min-height=36px;
+  min-height = 36px;
 }
+
 .grid-content-home {
   border-radius: 4px;
   min-height: 36px;
 }
-
 
 @media (prefers-color-scheme: dark) {
   .dark_light_bg {
@@ -136,7 +118,7 @@
     border-color: #44474E;
   }
 
-  .dark_midium_bg {
+  .dark_medium_bg {
     background-color: #44474E;
     border-color: #606266;
   }
@@ -152,21 +134,6 @@
   .dark_main_text {
     color: #E4E7ED;
   }
-}
-
-.layermbox{
-  position:fixed
-  left: 0
-  top: 0
-  z-index:2
-  right: 0
-  bottom: 0
-}
-.laymshade{
-  position: relative
-  width: 100%
-  height: 100%
-  background: rgba(0,0,0,0.3)
 }
 </style>
 

@@ -8,7 +8,11 @@
         <user @selectUser="getMsgFormSon" :items="list"></user>
       </el-main>
       <el-footer height="30px">
-        <el-button style="float: left" type="text" class="dark_main_text" @click="addContacts"
+        <el-button
+          style="float: left"
+          type="text"
+          class="dark_main_text"
+          @click="addContacts"
           >添加联系人</el-button
         >
         <el-button
@@ -37,7 +41,7 @@ export default {
     this.getList();
   },
   methods: {
-    addContacts(){
+    addContacts() {
       this.$emit("addContacts");
     },
     close() {
@@ -57,7 +61,7 @@ export default {
     addDetail() {
       this.list.forEach(item => {
         axios({
-          url: `http://yuuna.srv.karenia.cc/api/v1/profile/${item.username}`,
+          url: `http://yuuna.srv.karenia.cc/api/v1/profile/test/${item.username}`,
           method: "get",
         }).then(data => {
           this.avatarUrl = data.avatarUrl;

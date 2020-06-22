@@ -1,5 +1,5 @@
 <template>
-  <el-container style="padding-top:10px">
+  <el-container>
     <el-col>
       <el-card class="box-card up_card">
         <el-header height="15px">
@@ -227,7 +227,7 @@ export default {
 };
 </script>
 
-<style lang="stylus">
+<style lang="stylus" scoped>
 @import '../styles/colors.styl';
 
 .el-header {
@@ -244,7 +244,9 @@ export default {
 
 .box-card {
   width: 400px;
-  margin-left: 50px;
+  margin: 0;
+  border: 0;
+  // margin-left: 50px;
 }
 
 .top_btn {
