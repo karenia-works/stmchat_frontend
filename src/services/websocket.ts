@@ -101,12 +101,6 @@ export class WsMessageService {
 
   /** 未读消息数目 */
   public get unreadMessageCount(): Observable<ServerUnreadCountMessage> {
-    this.unread_count_msg.next({
-      _t: "unread",
-      items: new Map([
-        ["family", { count: 0, maxMessage: "5eef47f522c99a00017a9752" }],
-      ]),
-    });
     return this.unread_count_msg;
   }
 
@@ -155,11 +149,7 @@ export class WsMessageService {
           this.chat_msg.next(msg as ServerChatMessage);
           break;
         case "unread":
-          {
-            let msg_1 = msg as ServerUnreadCountMessage;
-            msg_1.items = new Map(msg_1.items);
-            this.unread_count_msg.next(msg_1);
-          }
+          this.onNewUnreadMsg(msg);
           break;
         case "online_status":
           this.user_online_state.next(msg as ServerOnlineStatusMessage);
@@ -167,8 +157,21 @@ export class WsMessageService {
       }
       this.msg.next(msg);
     } catch (e) {
+      console.warn(e);
       this.errors.next(e);
     }
+  }
+
+  private onNewUnreadMsg(msg: ServerMessage) {
+    console.trace("unread start");
+    let msg_1 = msg as ServerUnreadCountMessage;
+    let orig: any = msg_1.items;
+    msg_1.items = new Map();
+    Object.keys(orig).forEach(k => {
+      msg_1.items.set(k, orig[k]);
+    });
+    this.unread_count_msg.next(msg_1);
+    console.trace("unread end");
   }
 
   protected onWebsocketError(err: Event) {
