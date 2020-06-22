@@ -18,7 +18,7 @@ export class ChatMessageService {
   public constructor(private wss: WsMessageService) {
     var chatSubject = wss.chatMessageSubject;
     chatSubject.subscribe({
-      next: this.onNextMessage,
+      next: msg => this.onNextMessage(msg),
     });
   }
 

@@ -1,39 +1,58 @@
 <template>
-  <el-row style="height:500px">
-    <div>
-      <el-input v-model="selectVal" placeholder="搜索" style="height:35px">
+  <div ref="out">
+    <div style="height:60px">
+      <el-input v-model="selectVal" placeholder="Search">
         <i slot="prefix" class="el-input__icon el-icon-search"></i>
       </el-input>
+      <hr />
     </div>
-    <hr />
-
-    <div v-for="item in queryList" :key="item.usrId">
-      <el-container @click.native="$emit('selectUser', item.usrId)">
-        <el-aside width="70px">
-          <el-avatar :size="50" :src="item.circleUrl"></el-avatar>
-        </el-aside>
-        <el-container>
-          <el-header height="30px" class="dark_main_text">{{
-            item.usrId
-          }}</el-header>
-          <el-footer height="20px" class="dark_sub_text">Footer</el-footer>
-        </el-container>
-      </el-container>
+    <div :style="{ height: listHeight }">
+      <vueScroll>
+        <div v-for="item in queryList" :key="item.username">
+          <el-container @click.native="$emit('selectUser', item.username)">
+            <el-aside width="70px">
+              <el-avatar
+                v-if="item.avatarUrl"
+                :src="item.avatarUrl"
+                :size="50"
+              ></el-avatar>
+              <el-avatar v-else :size="50">{{
+                item.username[0].toUpperCase()
+              }}</el-avatar>
+            </el-aside>
+            <el-container>
+              <el-header height="30px" class="dark_main_text">{{
+                item.username
+              }}</el-header>
+              <el-footer height="20px" class="dark_sub_text">Footer</el-footer>
+            </el-container>
+          </el-container>
+        </div>
+      </vueScroll>
     </div>
-  </el-row>
+  </div>
 </template>
+
 <script>
 export default {
   name: "Usersearch",
   data() {
     return {
       selectVal: "",
+      listHeight: "350px",
     };
   },
-  props: ['items'],
+
+  mounted: function() {
+    this.listHeight = this.$refs["out"].clientHeight - 60 + "px";
+  },
+
+  props: ["items"],
   computed: {
     queryList() {
-      return this.items.filter(item => item.usrId.indexOf(this.selectVal) > -1);
+      return this.items.filter(
+        item => item.username.indexOf(this.selectVal) > -1,
+      );
     },
   },
 };
@@ -68,15 +87,5 @@ export default {
   border-width: 1px;
   border-color: colors.theme-black;
   background-color: colors.theme-black;
-}
-
-@media (prefers-color-scheme: dark) {
-  .dark_hr {
-    border-style: solid;
-    border-radius: 1px;
-    border-width: 1px;
-    border-color: white;
-    background-color: white;
-  }
 }
 </style>

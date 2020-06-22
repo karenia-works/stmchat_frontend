@@ -3,6 +3,7 @@ import { singleton, inject } from "tsyringe";
 import { TYPES } from "./dependencyInjection";
 import { IServerConfig } from "./serverConfig";
 import { Subject } from "rxjs";
+import qs from "qs";
 
 export function interceptAuthorizationData(
   getToken: () => string | undefined,
@@ -16,6 +17,7 @@ export function interceptAuthorizationData(
 }
 
 const LOCAL_STORAGE_ACCESS_TOKEN_KEY: string = "access_token";
+const LOCAL_STORAGE_USERNAME_KEY: string = "username";
 
 export class LoginState extends Subject<boolean> {
   public constructor() {
@@ -24,16 +26,20 @@ export class LoginState extends Subject<boolean> {
   }
 
   public storeToken() {
-    if (this.token !== undefined)
+    if (this.token !== undefined && this.username !== undefined) {
       window.localStorage.setItem(LOCAL_STORAGE_ACCESS_TOKEN_KEY, this.token);
+      window.localStorage.setItem(LOCAL_STORAGE_USERNAME_KEY, this.username);
+    }
   }
 
   public loadToken() {
     let token = window.localStorage.getItem(LOCAL_STORAGE_ACCESS_TOKEN_KEY);
-    if (token !== null) this.setToken(token);
+    let username = window.localStorage.getItem(LOCAL_STORAGE_USERNAME_KEY);
+    if (token !== null && username !== null) this.setToken(username, token);
   }
 
   private token?: string;
+  private username?: string;
 
   public setupInterceptor() {
     Axios.interceptors.request.use(cfg =>
@@ -41,18 +47,24 @@ export class LoginState extends Subject<boolean> {
     );
   }
 
-  public setToken(token: string) {
+  public setToken(username: string, token: string) {
     this.token = token;
+    this.username = username;
     this.next(true);
   }
 
   public clearToken() {
     this.token = undefined;
+    this.username = undefined;
     this.next(false);
   }
 
   public isLoggedIn() {
     return this.token !== null;
+  }
+
+  public getUsername(): string | undefined {
+    return this.username;
   }
 }
 
@@ -106,12 +118,13 @@ export class LoginService {
       grant_type: "password",
       username,
       password,
+      scope: this.config.auth.scope,
     };
 
-    let result = await Axios.post<UserLoginData>(url, tokenCtx);
+    let result = await Axios.post<UserLoginData>(url, qs.stringify(tokenCtx));
     let success = result.status >= 200 && result.status < 300;
 
-    this._loginState.setToken(result.data.access_token);
+    this._loginState.setToken(username, result.data.access_token);
 
     return success;
   }

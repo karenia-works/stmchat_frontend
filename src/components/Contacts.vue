@@ -4,11 +4,15 @@
       <el-header height="15px" class="dark_main_text">
         <span>联系人列表</span>
       </el-header>
-      <el-main height="600px">
+      <el-main style="height:550px">
         <user @selectUser="getMsgFormSon" :items="list"></user>
       </el-main>
       <el-footer height="30px">
-        <el-button style="float: left" type="text" class="dark_main_text"
+        <el-button
+          style="float: left"
+          type="text"
+          class="dark_main_text"
+          @click="addContacts"
           >添加联系人</el-button
         >
         <el-button
@@ -23,31 +27,46 @@
 </template>
 
 <script>
+import axios from "axios";
 export default {
   name: "Contacts",
-   data() {
+  data() {
     return {
-      msgFormSon: "this is msg",
-      list: [
-        {
-          circleUrl:
-            "https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png",
-          usrId: "name1",
-        },
-        {
-          circleUrl:
-            "https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png",
-          usrId: "name2",
-        },
-      ],
+      list: [],
+      avatarUrl: "",
     };
   },
-  beforeMount:function(){
-      this.getList()
+  beforeMount: function() {
+    this.getList();
   },
   methods: {
+    addContacts() {
+      this.$emit("addContacts");
+    },
     close() {
       this.$emit("contactClose");
+    },
+    getMsgFormSon(data) {
+      console.log(data);
+    },
+    getList() {
+      axios({
+        url: "http://yuuna.srv.karenia.cc/api/v1/profile/wang/friends",
+        method: "get",
+      }).then(data => {
+        this.list = data.data;
+      });
+    },
+    addDetail() {
+      this.list.forEach(item => {
+        axios({
+          url: `http://yuuna.srv.karenia.cc/api/v1/profile/test/${item.username}`,
+          method: "get",
+        }).then(data => {
+          this.avatarUrl = data.avatarUrl;
+        });
+        this.$set(item, "avatarUrl", this.avatarUrl);
+      });
     },
   },
 };
@@ -71,31 +90,8 @@ export default {
 }
 
 .box-card {
-  width: 400px;
-  margin-left: 50px;
-}
-
-@media (prefers-color-scheme: dark) {
-  .dark_light_bg {
-    background-color: colors.dark-light;
-    border-color: colors.dark-medium;
-  }
-
-  .dark_medium_bg {
-    background-color: colors.dark-medium;
-    border-color: colors.dark-light;
-  }
-
-  .dark_deep_bg {
-    background-color: colors.dark-deep;
-  }
-
-  .dark_sub_text {
-    color: colors.dark-sub-text;
-  }
-
-  .dark_main_text {
-    color: colors.dark-main-text;
-  }
+  border-radius: 0px;
+  height: 650px;
+  margin-left: 0px;
 }
 </style>
