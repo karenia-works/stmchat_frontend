@@ -12,10 +12,11 @@ import { WsMessageService } from "./websocket";
 import { TYPES } from "./dependencyInjection";
 import { singleton, inject } from "tsyringe";
 import moment from "moment";
-import { GroupProfilePool } from "./cachingService";
+import { GroupProfilePool, UserProfilePool } from "./cachingService";
 import { IServerConfig } from "./serverConfig";
 import { set } from "vue/types/umd";
 import Axios from "axios";
+import { LoginService } from "./loginService";
 
 @singleton()
 export class ChatMessageService {
@@ -286,6 +287,7 @@ const OBJECT_ID_MIN = "0".repeat(24);
 export interface MessageListItem {
   chat: GroupProfile;
   latestMessage: ServerChatMsg | undefined;
+  avatar: string | undefined;
   lastTimestamp: number;
   unreadCount: number;
 }
@@ -296,8 +298,10 @@ export interface MessageListItem {
  */
 export class MessageListService {
   public constructor(
+    private loginService: LoginService,
     private wss: WsMessageService,
     private groupProfileService: GroupProfilePool,
+    private userProfilePool: UserProfilePool,
   ) {
     wss.chatMessageSubject.subscribe({ next: this.onNewChatMessage });
     wss.unreadMessageCount.subscribe({ next: this.onNewUnreadCountUpdate });
@@ -327,6 +331,21 @@ export class MessageListService {
     this._messageListSubject.next(this.messageList);
   }
 
+  private async getAvatar(chatInfo: GroupProfile): Promise<string | undefined> {
+    if (chatInfo.isFriend) {
+      let myUsername = this.loginService.loginState.getUsername();
+      let otherUsername =
+        myUsername === undefined
+          ? chatInfo.members[0]
+          : myUsername === chatInfo.members[0]
+          ? chatInfo.members[1]
+          : chatInfo.members[0];
+      return (await this.userProfilePool.getData(otherUsername))?.avatarUrl;
+    } else {
+      return chatInfo.avatarUrl;
+    }
+  }
+
   private async onNewChatMessage(msg: ServerChatMessage) {
     let item = this.messageMap.get(msg.chatId);
     if (item === undefined) {
@@ -334,9 +353,11 @@ export class MessageListService {
       if (chatProfile === undefined) {
         throw new Error("Cannot find chat profile!");
       }
+      let avatar = await this.getAvatar(chatProfile);
       this.messageMap.set(msg.chatId, {
         chat: chatProfile,
         latestMessage: msg.msg,
+        avatar,
         lastTimestamp: moment(msg.msg.time).unix(),
         unreadCount: 0,
       });
@@ -369,9 +390,11 @@ export class MessageListService {
         if (chatProfile === undefined) {
           throw new Error("Cannot find chat profile!");
         }
+        let avatar = await this.getAvatar(chatProfile);
         this.messageMap.set(msg.chatId, {
           chat: chatProfile,
           latestMessage: undefined,
+          avatar,
           lastTimestamp: moment().unix(),
           unreadCount: unreadProp.count,
         });
