@@ -74,7 +74,7 @@
         <botton @click="beforeCreate">test</botton>
         <!--                聊天列表-->
         <div
-          v-for="(o, index) in tableData"
+          v-for="(o, index) in sortableData"
           v-bind:key="o"
           @click="handleclick(index, o, 'Wang'), (o.unreadCount = 0)"
           :class="active == index ? 'addclass' : ''"
@@ -116,7 +116,8 @@
             </el-col>
             <el-col span="5">
               <div style="height: 50px; font-size: 12px; color: dimgray;">
-                <div class="dark_sub_text">{{ Date(o.lastTimestamp) }}</div>
+
+                <div class="dark_sub_text">{{Date(o.lastTimestamp) | dat }}</div>
                 <el-badge
                   :value="o.unreadCount"
                   class="item"
@@ -265,7 +266,9 @@ import { Vue } from "vue-property-decorator";
 import {UserProfilePool} from "@/services/cachingService";
 import axios from "axios";
 import {GroupProfile, ServerChatMsg} from "@/types/types";
-
+import moment from "moment";
+import Vuex from "vuex"
+Vue.use(Vuex);
 export default Vue.extend({
   beforeMount: function() {
         try {
@@ -285,10 +288,11 @@ export default Vue.extend({
               datalist=v;
               // this.tableData = v;
               console.log("ChatList", v);
+              this.tableData=datalist;
               //console.log("sss",this.tableData);
             }
           })
-          this.tableData=datalist;
+
         }catch (err) {
             console.log(err);
         }
@@ -336,7 +340,8 @@ export default Vue.extend({
             noselectData: [itemfalse],
             endpoint: " http://yuuna.srv.karenia.cc/api/v1",
             image:"[图片]",
-            file:"[文件]"
+            file:"[文件]",
+            username:""
         };
     },
     methods: {
@@ -355,16 +360,28 @@ export default Vue.extend({
                 this.$emit("chatListCommand", "e");
             }
         },
-        handleclick(index,o:MessageListItem,username) {
+        handleclick(index,o:MessageListItem) {
             this.active = index;
+            this.getUserID();
+            var i=o.chat.name.length<=this.username.length?o.chat.name.length:this.username.length;
             if(o.chat.isFriend){
+              for(var j=0;j<i;j++){
+                if(o.chat.name[j]>this.username[j]){
+                  this.$emit("chat-people",o.chat.name+'+'+this.username);
+                  console.log(o.chat.name+'+'+this.username);
+                     break;
+                }
+                else if(o.chat.name[j]<this.username[j]){
+                  this.$emit("chat-people",this.username+'+'+o.chat.name);
+                  console.log(o.chat.name+'+'+this.username);
+                  break;
+                }
+              }
 
-                this.$emit("chat-people",o.chat.name+'+'+username);
-                console.log(o.chat.name+'+'+username);
             }
             else{
                 this.$emit("chat-people",o.chat.name);
-                console.log("o.chat.name")
+                console.log(o.chat.name)
             }
             ;
         },
@@ -409,7 +426,7 @@ export default Vue.extend({
             let mls = serviceProvider.resolve<MessageListService>(MessageListService);
             mls.messageListSubject.subscribe({
                 next: v=> {
-                    mesgNotice();
+                    //mesgNotice();
                     datalist=v;
                  // this.tableData = v;
                   console.log("ChatList", v);
@@ -422,17 +439,29 @@ export default Vue.extend({
         },
         clicktry(){
             //console.log("qqq",this.tableData)
-        }
+        },
+      getUserID(){
+          this.userID=this.$store.state.UserID;
+          console.log(this.UserID);
+      }
     },
     filters: {
-        ellipsis(value) {
-            if (!value) return "";
-            value = value.replace(/\\n/gm, " ");
-            if (value.length > 11) {
-                return value.slice(0, 11) + "...";
-            }
-            return value;
-        },
+      ellipsis(value) {
+        if (!value) return "";
+        value = value.replace(/\\n/gm, " ");
+        if (value.length > 11) {
+          return value.slice(0, 11) + "...";
+        }
+        return value;
+      },
+      dat(time) {
+        let m = moment(time);
+        if (m.isBefore(moment(), "year"))
+          return moment(time).format("YYYY/M/D H:mm");
+        else if (m.isBefore(moment(), "day"))
+          return moment(time).format("M/D H:mm");
+        else return moment(time).format("H:mm");
+      }
     },
     computed: {
         //最终需要显示的数组
