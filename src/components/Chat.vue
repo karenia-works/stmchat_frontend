@@ -57,11 +57,11 @@
           circle
           v-show="showGoDown"
           class="goBtn"
-          @click="jumpToMessage('bottom')"
+          @click="jumpToMessage('last')"
         ></el-button>
 
         <vueScroll ref="chatMessages" @handle-scroll="handleScroll">
-          <div v-for="msg in msgList" :key="msg.id">
+          <div v-for="msg in list" :key="msg.id" :id="'msg' + msg.id">
             <!-- 多选框 -->
             <el-col :span="1" v-if="MultiOn">
               <el-checkbox
@@ -81,6 +81,7 @@
               <Message
                 :msg="msg"
                 :showSender="showSender"
+                @checkQuote="id => jumpToMessage(id)"
                 @contextmenu.native.prevent="
                   () => {
                     if (!MultiOn) openMenu($event, msg);
@@ -310,11 +311,11 @@ export default Vue.extend({
       quoteMsg: null as ServerChatMsg | null,
 
       // chat messages
-      // connector: null,
       msgSub: null,
       msgList: null as ServerChatMsg[] | null,
       list: ChatMsgs as ServerChatMsg[],
       sendMessage: "",
+      lastPos: [],
 
       // right click menu
       showMsgMenu: false,
@@ -489,16 +490,30 @@ export default Vue.extend({
         return v;
       } else return 0;
     },
+
     jumpToMessage(id: string) {
       let vs: any = this.$refs.chatMessages;
-      if (vs) {
-        if (id == "bottom") {
-          vs.scrollTo({
-            y: "200%",
-          });
+      if (!vs) return;
+
+      if (id == "bottom") {
+        console.log("go bottom");
+        vs.scrollTo({
+          y: "200%",
+        });
+      } else if (id == "last") {
+        console.log("go last");
+        if (this.lastPos.length > 0) {
+          let last = this.lastPos.pop();
+          vs.scrollIntoView("#msg" + last, 200);
         } else {
-          vs.scrollIntoView("#msg" + id);
+          this.jumpToMessage("bottom");
         }
+      } else {
+        console.log("go up", id);
+        let current = vs.getCurrentviewDom()[0].id.substring(3);
+        this.lastPos.push(current);
+        vs.scrollIntoView("#msg" + id, 200);
+        this.showGoDown = true;
       }
     },
     handleScroll(vertical: any) {
@@ -593,26 +608,25 @@ export default Vue.extend({
     },
 
     async getChatInfo() {
-      try {
-        this.chatinfo = await this.getGroup(this.chatId);
-        if (this.chatinfo) {
-          this.getAvatars(this.chatinfo.members);
-          if (this.chatinfo.isFriend) {
-            this.showSender = false;
-          }
-        }
-      } catch (err) {
-        console.log("get chatInfo err: ", err);
-      }
-
-      // this.chatinfo = {
-      //   id: "wang+li",
-      //   name: "wang+li",
-      //   isFriend: true,
-      //   members: ["wang", "li"],
-      //   owner: "wang",
-      //   chatlog: "",
-      // };
+      // try {
+      //   this.chatinfo = await this.getGroup(this.chatId);
+      //   if (this.chatinfo) {
+      //     this.getAvatars(this.chatinfo.members);
+      //     if (this.chatinfo.isFriend) {
+      //       this.showSender = false;
+      //     }
+      //   }
+      // } catch (err) {
+      //   console.log("get chatInfo err: ", err);
+      // }
+      this.chatinfo = {
+        id: "wang+li",
+        name: "wang+li",
+        isFriend: true,
+        members: ["wang", "li"],
+        owner: "wang",
+        chatlog: "",
+      };
     },
     async getAvatars(ids: string[]) {
       for (let id of ids) {
@@ -831,6 +845,7 @@ export default Vue.extend({
 }
 
 .msg-menu {
+  border: 0;
   height: 0;
   overflow: hidden;
   position: absolute;

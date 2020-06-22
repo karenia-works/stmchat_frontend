@@ -7,7 +7,11 @@
         {{ msg.sender }}
       </div>
       <!-- replyTo -->
-      <div v-if="msg.replyTo" class="quote">
+      <div
+        v-if="msg.replyTo"
+        class="quote"
+        @click="$emit('checkQuote', msg.replyTo.id)"
+      >
         <el-image
           v-if="msg.replyTo._t == 'image'"
           :src="msg.replyTo.image"
