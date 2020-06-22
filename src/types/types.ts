@@ -155,7 +155,6 @@ export interface GroupProfile {
   owner: string;
   describe?: string;
   members: string[];
-  chatlog: string;
 }
 
 let a: TextChatMsg = {
