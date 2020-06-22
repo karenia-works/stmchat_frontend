@@ -80,16 +80,15 @@
             <el-col :span="3">
               <div class="icon_part icon_pad">
                 <i class="el-icon-phone"></i>
+                <i class="el-icon-user"></i>
               </div>
             </el-col>
             <el-col :span="12" :offset="2">
               <div class="name_part top_pad" type="justify" align="start">
                 <div class="content">{{ phonenum }}</div>
-                <div class="comment">电话号码</div>
               </div>
               <div class="name_part top_pad" type="justify" align="start">
                 <div class="content">@{{ username }}</div>
-                <div class="comment">用户名</div>
               </div>
             </el-col>
           </el-row>
@@ -215,17 +214,8 @@
 
           <hr />
 
-          <!-- 登出 -->
-
-          <div>
-            <el-button class="top_btn" type="text" v-on:click="logOut"
-              >退出账户</el-button
-            >
-          </div>
-
           <!-- main结束 -->
         </el-main>
-        <el-footer height="30px"></el-footer>
       </el-card>
     </el-col>
   </el-container>
@@ -237,7 +227,7 @@ export default {
 };
 </script>
 
-<style lang="stylus">
+<style lang="stylus" scoped>
 @import '../styles/colors.styl';
 
 .el-header {
@@ -254,7 +244,9 @@ export default {
 
 .box-card {
   width: 400px;
-  margin-left: 50px;
+  margin: 0;
+  border: 0;
+  // margin-left: 50px;
 }
 
 .top_btn {

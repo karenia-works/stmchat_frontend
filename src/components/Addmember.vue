@@ -5,7 +5,7 @@
         <span class="dark_main_text">添加成员</span>
         <span class="mem-num dark_sub_text">1/200000</span>
       </el-header>
-      <el-main height="600px">
+      <el-main style="height:550px">
         <user @selectUser="getMsgFormSon" :items="list"></user>
       </el-main>
       <el-footer height="30px">
@@ -91,8 +91,10 @@ export default {
 }
 
 .box-card {
-  width: 400px;
-  margin-left: 50px;
+  width: 100%;
+  border-radius: 0px;
+  height: 650px;
+  margin-left: 0px;
 }
 
 .mem-num {
@@ -103,29 +105,5 @@ export default {
 
 .text {
   font-size: 15px;
-}
-
-@media (prefers-color-scheme: dark) {
-  .dark_light_bg {
-    background-color: colors.dark-light;
-    border-color: colors.dark-medium;
-  }
-
-  .dark_medium_bg {
-    background-color: colors.dark-medium;
-    border-color: colors.dark-light;
-  }
-
-  .dark_deep_bg {
-    background-color: colors.dark-deep;
-  }
-
-  .dark_sub_text {
-    color: colors.dark-sub-text;
-  }
-
-  .dark_main_text {
-    color: colors.dark-main-text;
-  }
 }
 </style>

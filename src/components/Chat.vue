@@ -1,60 +1,219 @@
 <template>
   <div class="chat" @click="showMsgMenu = false">
-    <button @click="getUser('wang')">test</button>
-    <!-- <div class="wrapper">
-      <div v-for="msg in list" :key="msg.msg.id">{{ msg }}</div>
-    </div>-->
-    <div class="chat-top-bar dark_main_text dark_light_bg">
-      <template v-if="!MultiOn">
-        <div class="chatinfo" :class="chatinfo.type">
-          <template v-if="chatinfo.isFriend">
-            <span>{{ chatname }}</span>
-            <span class="info online">
-              online
-            </span>
-          </template>
-          <template v-else>
-            <span>{{ chatname }}</span>
-            <span class="info">{{ chatinfo.members.length }} members</span>
-          </template>
-        </div>
-      </template>
+    <template v-if="!chatinfo">
+      <div class="non-chat chat-messages dark_deep_bg">
+        <div class="notice dark_main_text">选择一个联系人或群聊开始聊天</div>
+      </div>
+    </template>
+    <template v-else>
+      <div class="chat-top-bar dark_main_text dark_light_bg">
+        <template v-if="!MultiOn">
+          <div class="chatinfo">
+            <template v-if="chatinfo.isFriend">
+              <span>{{ chatname }}</span>
+              <span class="info online">online</span>
+            </template>
+            <template v-else>
+              <span>{{ chatname }}</span>
+              <span class="info">{{ chatinfo.members.length }} members</span>
+            </template>
+          </div>
+        </template>
 
-      <!-- 多选框功能栏 -->
-      <template v-else>
-        <div class="multi_row">
-          <el-button
-            type="primary"
-            class="multi_button"
-            @click="showDelete = true"
-          >
-            删除
-            <span class="multi_num">{{ checkedNumber }}</span>
-          </el-button>
-          <el-button type="primary" class="multi_button" @click="forwardMulti">
-            转发
-            <span class="multi_num">{{ checkedNumber }}</span>
-          </el-button>
-          <el-button class="multi_cancel" type="text" @click="CancelMulti"
-            >取消</el-button
-          >
-        </div>
-      </template>
-      <!-- <div class="chatopt icon24">
+        <!-- 多选框功能栏 -->
+        <template v-else>
+          <div class="multi_row">
+            <el-button
+              type="primary"
+              class="multi_button"
+              @click="handleDelete"
+            >
+              删除
+              <span class="multi_num">{{ checkedNumber }}</span>
+            </el-button>
+            <el-button
+              type="primary"
+              class="multi_button"
+              @click="showForward = true"
+            >
+              转发
+              <span class="multi_num">{{ checkedNumber }}</span>
+            </el-button>
+            <el-button class="multi_cancel" type="text" @click="CancelMulti"
+              >取消</el-button
+            >
+          </div>
+        </template>
+        <!-- <div class="chatopt icon24">
         <i class="el-icon-more"></i>
-      </div>-->
-    </div>
+        </div>-->
+      </div>
 
-    <div class="chat-messages dark_deep_bg">
-      <!-- 置底按钮 -->
-      <el-button
-        type="primary"
-        icon="el-icon-arrow-down"
-        circle
-        v-show="showGoDown"
-        class="goBtn"
-        @click="jumpToMessage(-1)"
-      ></el-button>
+      <div class="chat-messages dark_deep_bg">
+        <!-- 置底按钮 -->
+        <el-button
+          type="primary"
+          icon="el-icon-arrow-down"
+          circle
+          v-show="showGoDown"
+          class="goBtn"
+          @click="jumpToMessage(-1)"
+        ></el-button>
+
+        <vueScroll ref="chat-messages" @handle-scroll="handleScroll">
+          <div v-for="msg in msgList" :key="msg.id">
+            <!-- 多选框 -->
+            <el-col :span="1" v-if="MultiOn">
+              <el-checkbox
+                @change="checked => checkMulti(checked, msg)"
+              ></el-checkbox>
+            </el-col>
+
+            <div class="msg" :class="{ self: msg.sender == me.username }">
+              <template v-if="showAvatar">
+                <el-avatar
+                  v-if="name2avatar[msg.sender]"
+                  :src="name2avatar[msg.sender]"
+                ></el-avatar>
+                <el-avatar v-else>{{ msg.sender[0].toUpperCase() }}</el-avatar>
+              </template>
+
+              <Message
+                :msg="msg"
+                :showSender="showSender"
+                @contextmenu.native.prevent="
+                  () => {
+                    if (!MultiOn) openMenu($event, msg);
+                  }
+                "
+              ></Message>
+            </div>
+          </div>
+        </vueScroll>
+      </div>
+
+      <div class="chat-bottom-bar dark_light_bg dark_main_text">
+        <!-- 回复引用条 -->
+        <div v-if="quoteMsg" class="quote-bar">
+          <div class="quote">
+            <el-image
+              v-if="quoteMsg._t == 'image'"
+              :src="quoteMsg.image"
+            ></el-image>
+            <div>
+              <div class="sendername">{{ quoteMsg.sender }}</div>
+              <div class="quote-text">
+                <template v-if="quoteMsg._t == 'text'">{{
+                  quoteMsg.text
+                }}</template>
+                <template v-else-if="quoteMsg._t == 'image'">
+                  [图片]
+                  <span v-if="quoteMsg.caption">, {{ quoteMsg.caption }}</span>
+                </template>
+                <template v-else-if="quoteMsg._t == 'file'">
+                  {{ quoteMsg.filename }}
+                  <span v-if="quoteMsg.caption">, {{ quoteMsg.caption }}</span>
+                </template>
+              </div>
+            </div>
+          </div>
+          <i class="el-icon-close" @click="quoteMsg = null"></i>
+        </div>
+
+        <!-- 输入 -->
+        <div class="input-bar">
+          <div class="sendopt icon24">
+            <el-upload
+              action="https://jsonplaceholder.typicode.com/posts/"
+              :accept="uploadType == 'image' ? 'image/png, image/jpeg' : ''"
+              :show-file-list="false"
+              :before-upload="beforeUpload"
+              :http-request="handleUpload"
+              :on-success="handleUploadSuccess"
+              :on-error="handleUploadError"
+            >
+              <i class="el-icon-paperclip" @click="uploadType = 'file'"></i>
+              <i
+                class="el-icon-picture-outline"
+                @click="uploadType = 'image'"
+              ></i>
+            </el-upload>
+          </div>
+          <el-input
+            type="textarea"
+            :autosize="{ maxRows: 8 }"
+            placeholder="请输入内容"
+            v-model="sendMessage"
+            resize="none"
+            @keydown.native="enterInput"
+          ></el-input>
+          <div class="sendicon icon24" slot="reference">
+            <div class="emptyWarning" :class="{ show: showEmptyWarning }">
+              不能发送空消息
+            </div>
+            <i
+              class="el-icon-s-promotion"
+              :class="{ iconforbid: sendMessage.length == 0 }"
+              @click="send()"
+            ></i>
+          </div>
+        </div>
+
+        <!-- upload dialog -->
+        <el-dialog :visible="showUpload" width="40%" class="up-dialog">
+          <div class="image-wrapper" v-if="uploadType == 'image'">
+            <el-image :src="upUrl" fit="cover">
+              <div slot="error" class="icon24">
+                <i class="el-icon-loading"></i>
+              </div>
+            </el-image>
+          </div>
+          <div v-else-if="showUpload && uploadType == 'file'" class="file">
+            <div class="file-icon icon24">
+              <i class="el-icon-loading" v-if="uploading"></i>
+              <i class="el-icon-document" v-else></i>
+            </div>
+            <div class="file-info">
+              <div class="file-name">{{ fileInfo.name }}</div>
+              <div class="info">{{ fileInfo.size | fileSize }}</div>
+            </div>
+          </div>
+
+          <el-input
+            placeholder="请输入内容"
+            v-model="sendMessage"
+            @keydown.native="enterInput"
+          ></el-input>
+
+          <span slot="footer" class="dialog-footer">
+            <el-button
+              @click="showUpload = false"
+              type="text"
+              style="margin-right: 10px;"
+              >取消</el-button
+            >
+            <el-button type="primary" @click="send" :disabled="uploading"
+              >发送</el-button
+            >
+          </span>
+        </el-dialog>
+
+        <!-- forward dialog -->
+        <el-dialog
+          title="转发消息"
+          :visible.sync="showForward"
+          width="50%"
+          top="10vh"
+          class="forward-dia"
+          :append-to-body="true"
+        >
+          <user
+            @selectUser="handleForward"
+            :items="contacts"
+            style="height: 300px;"
+          />
+        </el-dialog>
+      </div>
 
       <!-- 右键菜单 -->
       <el-card
@@ -65,216 +224,45 @@
         :body-style="{ padding: '0' }"
       >
         <div class="menu-item" @click="quoteMsg = menuMsg">回复</div>
-        <div class="menu-item" @click="forwardMsg(menuMsg.id)">转发</div>
+        <div class="menu-item" @click="showForward = true">转发</div>
         <div class="menu-item" @click="MultiOn = true">多选</div>
-        <div class="menu-item delete" @click="showDelete = true">删除</div>
+        <div class="menu-item delete" @click="handleDelete">删除</div>
       </el-card>
-
-      <vueScroll ref="chat-messages" @handle-scroll="handleScroll">
-        <div v-for="msg in list" :key="msg.id">
-          <!-- 多选框 -->
-          <el-col :span="1" v-if="MultiOn">
-            <el-checkbox
-              @change="checked => checkMulti(checked, msg)"
-            ></el-checkbox>
-          </el-col>
-
-          <div class="msg" :class="{ self: msg.sender == me.username }">
-            <el-avatar
-              :src="name2avatar[msg.sender]"
-              v-if="showAvatar"
-            ></el-avatar>
-
-            <Message
-              :msg="msg"
-              :showSender="showSender"
-              @contextmenu.native.prevent="
-                () => {
-                  if (!MultiOn) openMenu($event, msg);
-                }
-              "
-            ></Message>
-          </div>
-        </div>
-      </vueScroll>
-
-      <!-- 删除消息确认 -->
-      <el-dialog title="删除消息" :visible.sync="showDelete" width="30%">
-        <span v-if="!MultiOn">是否删除此条消息？</span>
-        <span v-else>是否删除所选消息？</span>
-        <span slot="footer" class="dialog-footer">
-          <el-button
-            @click="showDelete = false"
-            type="text"
-            style="margin-right: 10px;"
-            >取消</el-button
-          >
-          <el-button
-            v-if="!MultiOn"
-            type="primary"
-            @click="
-              deleteMsg(menuMsg.id);
-              showDelete = false;
-            "
-            >确定</el-button
-          >
-          <el-button
-            v-else
-            type="primary"
-            @click="
-              deleteMulti();
-              showDelete = false;
-            "
-            >确定</el-button
-          >
-        </span>
-      </el-dialog>
-    </div>
-
-    <div class="chat-bottom-bar dark_light_bg dark_main_text">
-      <!-- 回复引用条 -->
-      <div v-if="quoteMsg" class="quote-bar">
-        <div class="quote">
-          <el-image
-            v-if="quoteMsg._t == 'image'"
-            :src="quoteMsg.image"
-          ></el-image>
-          <div>
-            <div class="sendername">{{ quoteMsg.sender }}</div>
-            <div class="quote-text">
-              <template v-if="quoteMsg._t == 'text'">
-                {{ quoteMsg.text }}
-              </template>
-              <template v-else-if="quoteMsg._t == 'image'">
-                [图片]
-                <span v-if="quoteMsg.caption">, {{ quoteMsg.caption }}</span>
-              </template>
-              <template v-else-if="quoteMsg._t == 'file'">
-                {{ quoteMsg.filename }}
-                <span v-if="quoteMsg.caption">, {{ quoteMsg.caption }}</span>
-              </template>
-            </div>
-          </div>
-        </div>
-        <i class="el-icon-close" @click="quoteMsg = null"></i>
-      </div>
-
-      <!-- 输入 -->
-      <div class="input-bar">
-        <div class="sendopt icon24">
-          <el-upload
-            action="https://jsonplaceholder.typicode.com/posts/"
-            :accept="uploadType == 'image' ? 'image/png, image/jpeg' : ''"
-            :show-file-list="false"
-            :before-upload="beforeUpload"
-            :http-request="handleUpload"
-            :on-success="handleUploadSuccess"
-            :on-error="handleUploadError"
-          >
-            <i class="el-icon-paperclip" @click="uploadType = 'file'"></i>
-            <i
-              class="el-icon-picture-outline"
-              @click="uploadType = 'image'"
-            ></i>
-          </el-upload>
-        </div>
-        <el-input
-          type="textarea"
-          :autosize="{ maxRows: 8 }"
-          placeholder="请输入内容"
-          v-model="sendMessage"
-          resize="none"
-          @keydown.native="enterInput"
-        ></el-input>
-        <div class="sendicon icon24" slot="reference">
-          <div class="emptyWarning" :class="{ show: showEmptyWarning }">
-            不能发送空消息
-          </div>
-          <i
-            class="el-icon-s-promotion"
-            :class="{ iconforbid: sendMessage.length == 0 }"
-            @click="send()"
-          ></i>
-        </div>
-      </div>
-
-      <el-dialog :visible="showUpload" width="40%" class="up-dialog">
-        <div class="image-wrapper" v-if="uploadType == 'image'">
-          <el-image :src="upUrl" fit="cover">
-            <div slot="error" class="icon24">
-              <i class="el-icon-loading"></i>
-            </div>
-          </el-image>
-        </div>
-        <div v-else-if="showUpload && uploadType == 'file'" class="file">
-          <div class="file-icon icon24">
-            <i class="el-icon-loading" v-if="uploading"></i>
-            <i class="el-icon-document" v-else></i>
-          </div>
-          <div class="file-info">
-            <div class="file-name">{{ fileInfo.name }}</div>
-            <div class="info">{{ fileInfo.size | fileSize }}</div>
-          </div>
-        </div>
-
-        <el-input
-          placeholder="请输入内容"
-          v-model="sendMessage"
-          @keydown.native="enterInput"
-        ></el-input>
-
-        <span slot="footer" class="dialog-footer">
-          <el-button
-            @click="showUpload = false"
-            type="text"
-            style="margin-right: 10px;"
-            >取消</el-button
-          >
-          <el-button type="primary" @click="send" :disabled="uploading"
-            >发送</el-button
-          >
-        </span>
-      </el-dialog>
-    </div>
+    </template>
   </div>
 </template>
 
 <script lang="ts">
-//todo: uploading async
+//// pass items into <user>
+//// without chat info template
 //todo: quote text / jump to message
-
-//// upload image/ file
 // ? download file: in same site
-//// right click: forward, quote, copy, muti-select
-//// quote input
-//// bottom-bar height
-//// muti-selected
-//// foward style
-//// quote style
-//// style for file
-//// online/offline
-//// send empty warning
-//// switch hotkey
-
 // * 处理消息数据：格式和字段名；转发消息从对象中移出
 
-import { WsMessageService } from "../services/websocket";
-import { ChatMessages } from "../assets/sample/wsSample";
-import { ChatMsgs } from "../assets/sample/wsChat";
+import Vue from "vue";
+// import axios from "axios";
 
-// import moment from "moment";
 import { serviceProvider, TYPES } from "../services/dependencyInjection";
-import { ServerChatMsg } from "@/types/types";
+import { WsMessageService } from "../services/websocket";
+import { LoginService } from "../services/loginService";
+import { FileUploader, getFileUri } from "../services/fileUploader";
+import { UserProfilePool, GroupProfilePool } from "../services/cachingService";
+import { ChatMessageService } from "../services/messageService";
+
+import { ChatMsgs } from "../assets/sample/wsChat";
 import Message from "./Message.vue";
 
-import { FileUploader, getFileUri } from "../services/fileUploader";
-import { UserProfilePool } from "../services/cachingService";
-import Vue from "vue";
+import {
+  ServerChatMsg,
+  GroupProfile,
+  UserProfile,
+  ClientChatMsg,
+} from "@/types/types";
+
 export default Vue.extend({
-  // props: {
-  //   showSender: Boolean,
-  //   showAvatar: Boolean,
-  // },
+  props: {
+    chatId: String,
+  },
   components: {
     Message,
   },
@@ -285,7 +273,25 @@ export default Vue.extend({
       else this.messageProcess = pos;
     },
   },
-  beforeMount: function() {},
+  beforeMount: function() {
+    try {
+      this.getServices();
+      // let loginService = serviceProvider.resolve<LoginService>(LoginService);
+      // let state = loginService.loginState;
+      // console.log("login state: ", state.getUsername());
+
+      this.msgSub = this.chatMsgService.getObservable(this.chatId).subscribe({
+        next: msg => {
+          this.msgList = msg;
+        },
+      });
+
+      this.getChatInfo();
+      this.getProfile();
+    } catch (err) {
+      console.log(err);
+    }
+  },
 
   data() {
     return {
@@ -294,12 +300,14 @@ export default Vue.extend({
       showAvatar: true,
       showGoDown: false,
       showEmptyWarning: false,
-      showDelete: false,
+      showForward: false,
       messageProcess: 0,
+      quoteMsg: null as ServerChatMsg | null,
 
       // chat messages
-      connector: null,
-      messages: ChatMessages,
+      // connector: null,
+      msgSub: null,
+      msgList: null as ServerChatMsg[] | null,
       list: ChatMsgs as ServerChatMsg[],
       sendMessage: "",
 
@@ -310,35 +318,23 @@ export default Vue.extend({
         x: 0,
         y: 0,
       },
-      quoteMsg: null,
 
       //upload
       showUpload: false,
-      uploadType: "",
+      uploadType: "image" as "image" | "file",
       upUrl: "",
       fileInfo: null as null | { name: string; size: number },
       uploading: false,
 
       // data cache
-      name2avatar: {
-        wang: "https://www.gx8899.com/uploads/allimg/180118/3-1P11P92057.jpg",
-        li:
-          "https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcSeKy1XelUk53kiE3EfnxfppDz5n3hYaseeK8O8KdzmBl7oOH5o&usqp=CAU",
-      },
-      me: {
-        id: "5ee5feeeac7ecb0001782b5d",
-        username: "wang",
-        friends: ["li", "yang"],
-        groups: ["kruodis"],
-      },
-      chatinfo: {
-        id: "5ee5feefac7ecb0001782b61",
-        name: "wang+li",
-        isFriend: true,
-        owner: "wang",
-        members: ["wang", "li"],
-        chatlog: "5ee5feefac7ecb0001782b62",
-      },
+      me: null as UserProfile | null,
+      chatinfo: null as GroupProfile | null,
+      name2avatar: {} as { [propName: string]: string }[],
+      contacts: [] as {
+        username: string;
+        avatarUrl: string;
+        state?: boolean;
+      }[],
       configs: {
         hotKey: "enterSend", //"enterNewline"
       },
@@ -346,54 +342,144 @@ export default Vue.extend({
       // multi select
       MultiOn: false,
       checkedMessage: [] as ServerChatMsg[],
+
+      // services
+      endpoint: " http://yuuna.srv.karenia.cc/api/v1",
+      userProfilePool: null,
+      groupProfilePool: null,
+      chatMsgService: null as ChatMessageService,
+      // loginService: null,
     };
   },
   methods: {
-    async getUser(id: string) {
-      let ufp = serviceProvider.resolve<UserProfilePool>(UserProfilePool);
-      try {
-        let user = await ufp.getData(id);
-        console.log(user);
-      } catch (err) {
-        console.log(err);
-      }
+    getServices() {
+      this.userProfilePool = serviceProvider.resolve<UserProfilePool>(
+        UserProfilePool,
+      );
+      this.groupProfilePool = serviceProvider.resolve<GroupProfilePool>(
+        GroupProfilePool,
+      );
+      this.chatMsgService = serviceProvider.resolve<ChatMessageService>(
+        ChatMessageService,
+      );
     },
-    send() {
-      if (this.showUpload && this.upUrl) {
-        console.log({
-          _t: "image",
-          id: "1" + new Date().getTime(),
-          time: new Date(),
-          image: this.upUrl,
-          caption: this.sendMessage,
-          sender: this.me,
-        });
+    async send() {
+      let msg: ClientChatMsg = { _t: "text" };
+
+      if (this.quoteMsg) {
+        msg.replyTo = this.quoteMsg.id;
+        this.quoteMsg = null;
+      }
+
+      // file of image
+      if (this.showUpload) {
+        if (!this.upUrl) return; // throw error
+        msg._t = this.uploadType;
+        msg.caption = this.sendMessage;
+
+        switch (this.uploadType) {
+          case "image":
+            msg.image = this.upUrl;
+            break;
+          case "file":
+            msg.file = this.upUrl;
+            msg.filename = this.fileInfo ? this.fileInfo.name : "";
+            msg.size = this.fileInfo ? this.fileInfo.size : 0;
+            break;
+        }
+
         this.sendMessage = "";
         this.upUrl = "";
+        this.fileInfo = null;
         this.showUpload = false;
       } else {
+        // test msg
         if (this.sendMessage.length == 0) {
           this.showEmptyWarning = true;
           setTimeout(() => {
             this.showEmptyWarning = false;
           }, 1500);
+          return;
         } else {
-          console.log({
-            _t: "text",
-            id: "1" + new Date().getTime(),
-            time: new Date(),
-            text: this.sendMessage,
-            sender: this.me,
-          });
+          msg.text = this.sendMessage;
           this.sendMessage = "";
         }
       }
+      this.sendToClient(msg, this.chatId);
+      await this.chatMsgService.sendMessage(msg, this.chatId);
       this.jumpToMessage(-1);
     },
+
+    sendToClient(msg: ClientChatMsg, id: string) {
+      // todo: convey private chatId
+      console.log({
+        chatId: id,
+        msg: msg,
+      });
+    },
+
+    // forward message
+    handleForward(id: string) {
+      this.$confirm("确认将信息转发给" + id + "？")
+        .then(() => {
+          // single forward
+          if (!this.MultiOn) {
+            if (this.menuMsg) {
+              this.forwardMsg(this.menuMsg.id, id);
+            } else {
+              this.$message({
+                type: "error",
+                message: "转发失败",
+              });
+            }
+            this.showForward = false;
+
+            // multi forward
+          } else {
+            this.checkedMessage.forEach(msg => {
+              this.forwardMsg(msg.id, id);
+            });
+            this.CancelMulti();
+          }
+        })
+        .catch(() => {});
+    },
+
+    forwardMsg(msgId: string, chatId: string) {
+      let msg: ClientChatMsg = {
+        _t: "forward",
+        fromChatId: this.chatId,
+        fromMessageId: msgId,
+      };
+      this.sendToClient(msg, chatId);
+      this.chatMsgService.sendMessage(msg, this.chatId);
+    },
+
+    // delete message
+    handleDelete() {
+      this.$confirm(this.MultiOn ? "是否删除所选消息？" : "是否删除此条消息？")
+        .then(() => {
+          // single forward
+          if (!this.MultiOn) {
+            if (this.menuMsg) this.deleteMsg(this.menuMsg.id);
+
+            // multi forward
+          } else {
+            this.checkedMessage.forEach(msg => {
+              this.deleteMsg(msg.id);
+            });
+            this.CancelMulti();
+          }
+        })
+        .catch(() => {});
+    },
+    deleteMsg(id: string) {
+      console.log("delete msg", id);
+    },
+
     chatPosition() {
       let vs: any = this.$refs["chat-messages"];
       const { v, h } = vs.getScrollProcess();
-      // console.log(v);
       return v;
     },
     jumpToMessage(id: number) {
@@ -427,8 +513,8 @@ export default Vue.extend({
     },
 
     openMenu(e: any, msg: ServerChatMsg) {
-      this.msgMenuPos.x = e.clientX - 5;
-      this.msgMenuPos.y = e.clientY - 60;
+      this.msgMenuPos.x = e.clientX;
+      this.msgMenuPos.y = e.clientY - 50;
       this.showMsgMenu = true;
       this.menuMsg = msg;
     },
@@ -443,16 +529,12 @@ export default Vue.extend({
       this.uploading = true;
     },
     async handleUpload(options: any) {
-      console.log(options);
+      // console.log(options);
       let uploader = serviceProvider.resolve<FileUploader>(FileUploader);
-      // try {
       let res = await uploader.uploadFile([options.file]);
-      console.log("onHandleUpload", res);
+      // console.log("onHandleUpload", res);
       // options.onSuccess(res[0]);
       return res[0];
-      // } catch (e) {
-      //   options.onError(e);
-      // }
     },
     handleUploadError() {
       // ProgressEvent 找不着错误消息提示
@@ -460,7 +542,7 @@ export default Vue.extend({
       this.showUpload = false;
     },
     handleUploadSuccess(res: string, file: { raw: File }) {
-      console.log("uploadSuccess", res);
+      // console.log("uploadSuccess", res);
       this.uploading = false;
       this.upUrl = getFileUri(res);
     },
@@ -478,30 +560,97 @@ export default Vue.extend({
       this.MultiOn = false;
       this.checkedMessage = [];
     },
-    forwardMulti() {
-      this.checkedMessage.forEach(msg => {
-        this.forwardMsg(msg.id);
-      });
-      this.CancelMulti();
-    },
-    forwardMsg(id: string) {
-      console.log("forward msg", id);
-    },
-    deleteMulti() {
-      this.checkedMessage.forEach(msg => {
-        this.deleteMsg(msg.id);
-      });
-      this.CancelMulti();
-    },
-    deleteMsg(id: string) {
-      console.log("delete msg", id);
-      // let index = this.messages.findIndex(o => o.msg.id === id);
-      // if (index > -1) {
-      //   this.messages.splice(index, 1);
-      // }
-    },
+
     func() {
       console.log("hi");
+    },
+
+    // get data
+    async getUser(id: string) {
+      try {
+        return await this.userProfilePool.getData(id);
+      } catch (err) {
+        console.log("getUser err: ", err);
+      }
+    },
+
+    async getGroup(id: string) {
+      try {
+        return await this.groupProfilePool.getData(id);
+      } catch (err) {
+        console.log("getGroup err: ", err);
+      }
+    },
+
+    async getChatInfo() {
+      try {
+        this.chatinfo = await this.getGroup(this.chatId);
+        if (this.chatinfo) {
+          this.getAvatars(this.chatinfo.members);
+          if (this.chatinfo.isFriend) {
+            this.showSender = false;
+          }
+        }
+      } catch (err) {
+        console.log("get chatInfo err: ", err);
+      }
+
+      // this.chatinfo = {
+      //   id: "wang+li",
+      //   name: "wang+li",
+      //   isFriend: true,
+      //   members: ["wang", "li"],
+      //   owner: "wang",
+      //   chatlog: "",
+      // };
+    },
+    async getAvatars(ids: string[]) {
+      for (let id of ids) {
+        let pf = await this.getUser(id);
+        this.$set(this.name2avatar, id, pf.avatarUrl);
+      }
+    },
+
+    async getProfile() {
+      // try {
+      //   this.me = await this.userProfilePool.getMyProfile();
+      //   console.log("get me: ", this.me);
+      // } catch (err) {
+      //   console.log("getProfile err: ", err);
+      // }
+      this.me = {
+        id: "5eec7cd9c1e7520001d26e79",
+        username: "wang",
+        avatarUrl:
+          "https://www.gx8899.com/uploads/allimg/180118/3-1P11P92057.jpg",
+        friends: ["li", "yang"],
+        groups: ["family"],
+        state: true,
+      };
+      this.getContacts();
+    },
+
+    async getContacts() {
+      try {
+        for (let id of this.me.friends) {
+          let pf = await this.getUser(id);
+          this.contacts.push({
+            username: id,
+            avatarUrl: pf.avatarUrl,
+            state: pf.state,
+          });
+        }
+
+        for (let id of this.me.groups) {
+          let pf = await this.getGroup(id);
+          this.contacts.push({
+            username: id,
+            avatarUrl: pf.avatarUrl,
+          });
+        }
+      } catch (err) {
+        console.log("get contact err: ", err);
+      }
     },
   },
   computed: {
@@ -509,6 +658,8 @@ export default Vue.extend({
       return (this as any).checkedMessage.length;
     },
     chatname(): string {
+      if (!this.chatinfo || !this.me) return "";
+
       if (!this.chatinfo.isFriend) return this.chatinfo.name;
 
       // private chat
@@ -605,7 +756,7 @@ export default Vue.extend({
 }
 
 .up-dialog {
-  .el-dialog__header, .el-dialog__body {
+  /deep/ .el-dialog__header, /deep/ .el-dialog__body {
     padding-bottom: 0;
   }
 
@@ -656,6 +807,10 @@ export default Vue.extend({
   .el-input {
     margin-top: 16px;
   }
+}
+
+/deep/ .forward-dia .el-dialog__body {
+  padding-top: 10px;
 }
 
 .goBtn {
@@ -782,8 +937,8 @@ export default Vue.extend({
 .chat {
   display: flex;
   flex-direction: column;
-  max-width: 750px;
-  height: 600px;
+  width: 850px;
+  height: 650px;
 
   .chat-top-bar {
     flex-basis: 55px;
@@ -798,10 +953,26 @@ export default Vue.extend({
     display: flex;
     flex-direction: column;
     min-height: 0;
+    height: 600px;
   }
 
   .chat-bottom-bar {
     padding: 0 20px;
+  }
+
+  .non-chat {
+    // height: 650px;
+    align-items: center;
+    justify-content: center;
+
+    .notice {
+      width: 250px;
+      text-align: center;
+      background-color: rgba(128, 128, 128, 0.3);
+      border-radius: 20px;
+      font-size: 14px;
+      line-height: 28px;
+    }
   }
 }
 
@@ -814,28 +985,6 @@ export default Vue.extend({
 }
 
 @media (prefers-color-scheme: dark) {
-  .dark_light_bg {
-    background-color: colors.dark-light;
-    border-color: colors.dark-medium;
-  }
-
-  .dark_medium_bg {
-    background-color: colors.dark-medium;
-    border-color: colors.dark-light;
-  }
-
-  .dark_deep_bg {
-    background-color: colors.dark-deep;
-  }
-
-  .dark_sub_text {
-    color: colors.dark-sub-text;
-  }
-
-  .dark_main_text {
-    color: colors.dark-main-text;
-  }
-
   .chat-messages {
     .msgbody {
       background-color: colors.dark-medium;
@@ -852,11 +1001,6 @@ export default Vue.extend({
         }
       }
     }
-  }
-
-  .el-textarea__inner {
-    color: colors.dark-main-text;
-    background-color: colors.dark-light;
   }
 }
 

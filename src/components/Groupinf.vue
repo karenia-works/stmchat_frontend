@@ -1,36 +1,10 @@
 <template>
-  <el-container>
+  <el-container style="width=100%">
     <el-col>
       <el-card class="box-card up_card">
-        <el-header height="15px">
-          <el-row>
-            <el-col :span="4">
-              <div>
-                <el-button class="set_title top_btn" type="text"
-                  >Group Info</el-button
-                >
-              </div>
-            </el-col>
-            <el-col :span="4" :offset="12">
-              <div>
-                <el-button class="func_btn top_btn" type="text">...</el-button>
-              </div>
-            </el-col>
-            <el-col :span="4">
-              <div>
-                <el-button
-                  class="func_btn top_btn"
-                  type="text"
-                  icon="el-icon-close"
-                ></el-button>
-              </div>
-            </el-col>
-          </el-row>
-        </el-header>
-
-        <el-main height="600px">
+        <el-main>
           <!-- main开始 -->
-          <el-row type="flex" align="middle">
+          <el-row type="flex">
             <el-col :span="6">
               <div class="ava_part">
                 <a href="https://sm.ms/image/Ym1yW5dCfaH2AnU" target="_blank">
@@ -43,8 +17,19 @@
             </el-col>
             <el-col :span="12" :offset="2">
               <div class="name_part" type="justify" align="start">
-                <div v-show="!editmode" class="name">{{ me.name }}</div>
-                <div class="state">{{me.members.length}} members</div>
+                <span v-show="!editmode" class="name">{{ me.name }} </span>
+                <el-divider direction="vertical"></el-divider>
+                <span class="state">{{ me.members.length }} members </span>
+              </div>
+            </el-col>
+            <el-col :span="2" :offset="6">
+              <div>
+                <el-button
+                  class="func_btn top_btn"
+                  type="text"
+                  icon="el-icon-close"
+                  v-on:click="close"
+                ></el-button>
               </div>
             </el-col>
           </el-row>
@@ -52,154 +37,156 @@
       </el-card>
 
       <el-card class="box-card down_card">
-        <el-main height="600px">
-          <!-- 群描述 -->
+        <el-container>
+          <el-aside>
+            <!-- 群描述 -->
 
-          <el-row type="flex" align="top">
-            <el-col :span="3">
-              <div class="icon_part icon_pad">
-                <i class="el-icon-warning-outline"></i>
-              </div>
-            </el-col>
-            <el-col :span="12" :offset="2">
-              <div class="name_part top_pad" type="justify" align="start">
-                <div class="content">{{ me.describe }}</div>
-                <div class="comment"></div>
-              </div>
-            </el-col>
-          </el-row>
-          <el-row type="flex" align="top">
-            <el-col :span="3">
-              <div class="icon_part icon_pad">
-                <i class="el-icon-bell"></i>
-              </div>
-            </el-col>
-            <el-col :span="19" :offset="2">
-              <div class="name_part" type="justify" align="start">
-                <el-row
-                  class="top_pad"
-                  type="flex"
-                  justify="space-between"
-                  align="middle"
-                >
-                  <div class="content">Desktop Notifications</div>
-                  <el-switch
-                    v-model="value1"
-                    active-color="#13ce66"
-                    inactive-color="#ff4949"
-                  ></el-switch>
-                </el-row>
-              </div>
-            </el-col>
-          </el-row>
+            <el-row type="flex" align="top">
+              <el-col :span="3">
+                <div class="icon_part icon_pad">
+                  <i class="el-icon-warning-outline"></i>
+                </div>
+              </el-col>
+              <el-col :span="12" :offset="2">
+                <div class="name_part top_pad" type="justify" align="start">
+                  <div class="content">{{ me.describe }}</div>
+                  <div class="comment"></div>
+                </div>
+              </el-col>
+            </el-row>
+            <el-row type="flex" align="top">
+              <el-col :span="3">
+                <div class="icon_part icon_pad">
+                  <i class="el-icon-bell"></i>
+                </div>
+              </el-col>
+              <el-col :span="19" :offset="2">
+                <div class="name_part" type="justify" align="start">
+                  <el-row
+                    class="top_pad"
+                    type="flex"
+                    justify="space-between"
+                    align="middle"
+                  >
+                    <div class="content">Desktop Notifications</div>
+                    <el-switch
+                      v-model="value1"
+                      active-color="#13ce66"
+                      inactive-color="#ff4949"
+                    ></el-switch>
+                  </el-row>
+                </div>
+              </el-col>
+            </el-row>
 
-          <hr />
+            <hr />
 
-          <!-- 群文件部分 -->
-          <el-row type="flex" align="top">
-            <el-col :span="3">
-              <div class="icon_part icon_pad">
-                <i class="el-icon-picture-outline"></i>
-              </div>
-            </el-col>
-            <el-col :span="12" :offset="2">
-              <div class="name_part top_pad" type="justify" align="start">
-                <div class="content">{{ photonum }} phono</div>
-              </div>
-            </el-col>
-          </el-row>
+            <!-- 群文件部分 -->
+            <el-row type="flex" align="top">
+              <el-col :span="3">
+                <div class="icon_part icon_pad">
+                  <i class="el-icon-picture-outline"></i>
+                </div>
+              </el-col>
+              <el-col :span="12" :offset="2">
+                <div class="name_part top_pad" type="justify" align="start">
+                  <div class="content">{{ photonum }} phono</div>
+                </div>
+              </el-col>
+            </el-row>
 
-          <el-row type="flex" align="top">
-            <el-col :span="3">
-              <div class="icon_part icon_pad">
-                <i class="el-icon-video-camera"></i>
-              </div>
-            </el-col>
-            <el-col :span="12" :offset="2">
-              <div class="name_part top_pad" type="justify" align="start">
-                <div class="content">{{ videonum }} video</div>
-              </div>
-            </el-col>
-          </el-row>
+            <el-row type="flex" align="top">
+              <el-col :span="3">
+                <div class="icon_part icon_pad">
+                  <i class="el-icon-video-camera"></i>
+                </div>
+              </el-col>
+              <el-col :span="12" :offset="2">
+                <div class="name_part top_pad" type="justify" align="start">
+                  <div class="content">{{ videonum }} video</div>
+                </div>
+              </el-col>
+            </el-row>
 
-          <el-row type="flex" align="top">
-            <el-col :span="3">
-              <div class="icon_part icon_pad">
-                <i class="el-icon-folder"></i>
+            <el-row type="flex" align="top">
+              <el-col :span="3">
+                <div class="icon_part icon_pad">
+                  <i class="el-icon-folder"></i>
+                </div>
+              </el-col>
+              <el-col :span="12" :offset="2">
+                <div class="name_part top_pad" type="justify" align="start">
+                  <div class="content">{{ filenum }} file</div>
+                </div>
+              </el-col>
+            </el-row>
+            <el-row type="flex" align="top">
+              <el-col :span="3">
+                <div class="icon_part icon_pad">
+                  <i class="el-icon-headset"></i>
+                </div>
+              </el-col>
+              <el-col :span="12" :offset="2">
+                <div class="name_part top_pad" type="justify" align="start">
+                  <div class="content">{{ audionum }} audio file</div>
+                </div>
+              </el-col>
+            </el-row>
+            <el-row type="flex" align="top">
+              <el-col :span="3">
+                <div class="icon_part icon_pad">
+                  <i class="el-icon-link"></i>
+                </div>
+              </el-col>
+              <el-col :span="12" :offset="2">
+                <div class="name_part top_pad" type="justify" align="start">
+                  <div class="content">{{ sharenum }} shared link</div>
+                </div>
+              </el-col>
+            </el-row>
+            <el-row type="flex" align="top">
+              <el-col :span="3">
+                <div class="icon_part icon_pad">
+                  <i class="el-icon-microphone"></i>
+                </div>
+              </el-col>
+              <el-col :span="12" :offset="2">
+                <div class="name_part top_pad" type="justify" align="start">
+                  <div class="content">{{ voicenum }} voice message</div>
+                </div>
+              </el-col>
+            </el-row>
+            <hr />
+            <!-- 成员信息部分 -->
+            <el-row type="flex" align="top">
+              <el-col :span="3">
+                <div class="icon_part icon_pad">
+                  <i class="el-icon-s-custom"></i>
+                </div>
+              </el-col>
+              <el-col :span="12" :offset="2">
+                <div class="name_part top_pad" type="justify" align="start">
+                  <div class="content">{{ groupnum }} members</div>
+                </div>
+              </el-col>
+              <el-col :span="4" :offset="6">
+                <div>
+                  <el-button class="add_btn" type="text">Add</el-button>
+                </div>
+              </el-col>
+            </el-row>
+          </el-aside>
+          <div
+            style="height:450px; width:1px; margin-left:10px;border-left:1px solid"
+          ></div>
+          <el-main>
+            <el-row type="flex" align="top">
+              <div class="usrlist">
+                <user @selectUser="getMsgFormSon" :items="contacts"></user>
               </div>
-            </el-col>
-            <el-col :span="12" :offset="2">
-              <div class="name_part top_pad" type="justify" align="start">
-                <div class="content">{{ filenum }} file</div>
-              </div>
-            </el-col>
-          </el-row>
-          <el-row type="flex" align="top">
-            <el-col :span="3">
-              <div class="icon_part icon_pad">
-                <i class="el-icon-headset"></i>
-              </div>
-            </el-col>
-            <el-col :span="12" :offset="2">
-              <div class="name_part top_pad" type="justify" align="start">
-                <div class="content">{{ audionum }} audio file</div>
-              </div>
-            </el-col>
-          </el-row>
-          <el-row type="flex" align="top">
-            <el-col :span="3">
-              <div class="icon_part icon_pad">
-                <i class="el-icon-link"></i>
-              </div>
-            </el-col>
-            <el-col :span="12" :offset="2">
-              <div class="name_part top_pad" type="justify" align="start">
-                <div class="content">{{ sharenum }} shared link</div>
-              </div>
-            </el-col>
-          </el-row>
-          <el-row type="flex" align="top">
-            <el-col :span="3">
-              <div class="icon_part icon_pad">
-                <i class="el-icon-microphone"></i>
-              </div>
-            </el-col>
-            <el-col :span="12" :offset="2">
-              <div class="name_part top_pad" type="justify" align="start">
-                <div class="content">{{ voicenum }} voice message</div>
-              </div>
-            </el-col>
-          </el-row>
-
-          <hr />
-
-          <!-- 成员信息部分 -->
-          <el-row type="flex" align="top">
-            <el-col :span="3">
-              <div class="icon_part icon_pad">
-                <i class="el-icon-s-custom"></i>
-              </div>
-            </el-col>
-            <el-col :span="12" :offset="2">
-              <div class="name_part top_pad" type="justify" align="start">
-                <div class="content">{{ groupnum }} members</div>
-              </div>
-            </el-col>
-            <el-col :span="4" :offset="6">
-              <div>
-                <el-button class="add_btn" type="text">Add</el-button>
-              </div>
-            </el-col>
-          </el-row>
-          <el-row type="flex" align="top">
-            <div class="usrlist">
-              <user @selectUser="getMsgFormSon" :items="contacts"></user>
-            </div>
-          </el-row>
-
-          <!-- main结束 -->
-        </el-main>
-        <el-footer height="30px"></el-footer>
+            </el-row>
+          </el-main>
+        </el-container>
       </el-card>
     </el-col>
   </el-container>
@@ -216,11 +203,6 @@
 
 .el-main {
   text-align: center;
-}
-
-.box-card {
-  width: 400px;
-  margin-left: 50px;
 }
 
 .top_btn {
@@ -251,11 +233,14 @@
 
 .up_card {
   background-color: #409EFF;
+  width: 600px;
+  height: 90px;
   border-bottom-left-radius: 0px;
   border-bottom-right-radius: 0px;
 }
 
 .down_card {
+  width: 600px;
   border-top-left-radius: 0px;
   border-top-right-radius: 0px;
 }
@@ -266,8 +251,8 @@
 }
 
 .ava {
-  width: 100%;
-  height: 100%;
+  width: 40%;
+  height: 40%;
   display: flex;
   border-radius: 50%;
   align-items: center;
@@ -278,6 +263,7 @@
 .name_part {
   .name {
     font-weight: bolder;
+    font-size: 20px;
   }
 }
 
@@ -314,7 +300,7 @@
 }
 
 .state {
-  font-size: 15px;
+  font-size: 20px;
   color: white;
 }
 
@@ -347,7 +333,7 @@
 </style>
 
 <script>
-import axios from "axios"
+import axios from "axios";
 export default {
   data() {
     return {
@@ -363,39 +349,35 @@ export default {
       editmode: false,
       value1: true,
       me: [],
-      contacts:[],
+      contacts: [],
       endpoint: " http://yuuna.srv.karenia.cc/api/v1",
     };
   },
-  beforeMount:function(){
+  beforeMount: function() {
     this.getProfile();
-   },
+  },
   methods: {
     getMsgFormSon(data) {
       this.msgFormSon = data;
       console.log(this.msgFormSon);
     },
     getProfile() {
-      this.me={
-        "id": "5eec7cd9c1e7520001d26e82",
-        "name": "family",
-        "isFriend": false,
-        "owner": "wang",
-        "describe": "wei are family",
-        "members": [
-            "wang",
-            "he",
-            "li"
-         ],
-        "chatlog": "5eec7cd9c1e7520001d26e81"
-      }
+      this.me = {
+        id: "5eec7cd9c1e7520001d26e82",
+        name: "family",
+        isFriend: false,
+        owner: "wang",
+        describe: "wei are family",
+        members: ["wang", "he", "li"],
+        chatlog: "5eec7cd9c1e7520001d26e81",
+      };
       this.getContacts();
     },
     getContacts() {
       if (!this.me) return;
       this.me.members.forEach(id => {
         axios
-          .get(this.endpoint + "/profile/" + id)
+          .get(this.endpoint + "/profile/test/" + id)
           .then(res => {
             let pf = res.data;
             this.contacts.push({
@@ -409,6 +391,10 @@ export default {
           });
       });
     },
+    close() {
+      this.$emit("closeInfo");
+    },
   },
+    
 };
 </script>
