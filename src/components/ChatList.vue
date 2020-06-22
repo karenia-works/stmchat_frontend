@@ -39,7 +39,7 @@
                                     </el-dropdown-item>
                                     <el-dropdown-item command="e" class="dark_main_text">
                                         <i class="el-icon-s-promotion el-icon-size"></i>
-                                        关于
+                                        登出
                                     </el-dropdown-item>
                                 </el-dropdown-menu>
                             </el-dropdown>

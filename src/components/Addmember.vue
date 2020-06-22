@@ -20,7 +20,7 @@
           style="float: right;margin-right:20px"
           type="text"
           class="dark_main_text"
-          @click="$emit('Groupmem',members)"
+          @click="create"
           >创建</el-button
         >
       </el-footer>
@@ -48,6 +48,10 @@ export default {
     this.getList()
    },
   methods: {
+    create(){
+      this.$emit('Groupmem',this.members);
+      this.$emit("create");
+    },
     cancel() {
       this.$emit("cancel");
     },

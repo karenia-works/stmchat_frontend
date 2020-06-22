@@ -22,8 +22,6 @@
                 @addContacts="addContacts"
               >
               </Contacts>
-              <Addmember v-show="showMember" @create="create" @cancel="cancel">
-              </Addmember>
             </el-aside>
             <el-main width="65%" style="padding: 0">
               <Chat :chatId="openChat"></Chat>
@@ -44,32 +42,28 @@
         <Setting @closed="closed" @saved="saved"> </Setting>
       </el-dialog>
 
-        <!-- groupInfo dialog -->
-        <el-dialog
-          :visible.sync="groupinfoLayer"
-          :show-close="false"
-          class="cpn-dia"
-          width="600px"
-          top="5vh"
-        >
-          <Groupinfo @closeInfo="closeInfo"> </Groupinfo>
-        </el-dialog>
+      <!-- groupInfo dialog -->
+      <el-dialog
+        :visible.sync="groupinfoLayer"
+        :show-close="false"
+        class="cpn-dia"
+        width="600px"
+        top="5vh"
+      >
+        <Groupinfo @closeInfo="closeInfo"> </Groupinfo>
+      </el-dialog>
 
-        <!-- createGroup dialog -->
-        <el-dialog
-          :visible.sync="createGroupLayer"
-          :show-close="false"
-          class="cpn-dia"
-          width="500px"
-          top="5vh"
-        >
-          <CreateGroup
-            @closeGroup="cancel"
-            @cancelGroup="cancelGroup"
-          >
-          </CreateGroup>
-        </el-dialog>
-      </div>
+      <!-- createGroup dialog -->
+      <el-dialog
+        :visible.sync="createGroupLayer"
+        :show-close="false"
+        class="cpn-dia"
+        width="500px"
+        top="5vh"
+      >
+        <CreateGroup @closeGroup="cancel" @cancelGroup="cancelGroup">
+        </CreateGroup>
+      </el-dialog>
     </el-main>
     <el-footer class="home-header dark_medium_bg dark_sub_text info">
       STM Chat @ 2020</el-footer
