@@ -123,6 +123,7 @@ export class WsMessageService {
   protected onWebsocketClose(err: CloseEvent) {
     console.log("Disconnected from websocket", this.ws_connection.url);
     this.connection_state.next(false);
+    this.errors.next(new Error("Websocket disconnected: " + err));
     if (!this.forceDisconnect) this.reconnectWebsocket();
   }
 
@@ -152,14 +153,13 @@ export class WsMessageService {
           throw new Error(`Unknown Message type ${msg._t}`);
       }
     } catch (e) {
-      this.msg.error(e);
       this.errors.next(e);
     }
   }
 
   protected onWebsocketError(err: Event) {
     this.connection_state.next(false);
-    this.chat_msg.error(err);
+    this.errors.next(new Error("Websocket disconnected in error: " + err));
     console.error(
       "Failed to connect to websocket",
       this.ws_connection.url,
