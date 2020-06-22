@@ -3,6 +3,7 @@ import { singleton, inject } from "tsyringe";
 import { TYPES } from "./dependencyInjection";
 import { IServerConfig } from "./serverConfig";
 import { Subject } from "rxjs";
+import qs from "qs";
 
 export function interceptAuthorizationData(
   getToken: () => string | undefined,
@@ -117,9 +118,10 @@ export class LoginService {
       grant_type: "password",
       username,
       password,
+      scope: this.config.auth.scope,
     };
 
-    let result = await Axios.post<UserLoginData>(url, tokenCtx);
+    let result = await Axios.post<UserLoginData>(url, qs.stringify(tokenCtx));
     let success = result.status >= 200 && result.status < 300;
 
     this._loginState.setToken(username, result.data.access_token);
