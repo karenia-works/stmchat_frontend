@@ -251,6 +251,7 @@ export default Vue.extend({
       this.msgSub = this.chatMsgService.getObservable(this.chatId).subscribe({
         next: msg => {
           this.msgList = msg;
+          this.onNewMessage(msg);
         },
       });
       this.getChatInfo();
@@ -495,6 +496,14 @@ export default Vue.extend({
       );
       let messageCountAfter = this.msgList.length;
       let messageDiff = messageCountAfter - messageCount;
+    },
+    onNewMessage(messageList: ServerChatMsg[]) {
+      if (messageList.length != 0)
+        this.chatMsgService.sendReadPosition(
+          this.chatId,
+          messageList[messageList.length - 1].id,
+        );
+      else this.chatMsgService.fetchPreviousMessageOfGroup(this.chatId);
     },
     enterInput(e: any) {
       if (this.configs.hotKey == "enterSend") {
