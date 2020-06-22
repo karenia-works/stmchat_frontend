@@ -61,7 +61,12 @@
         ></el-button>
 
         <vueScroll ref="chatMessages" @handle-scroll="handleScroll">
-          <div v-for="msg in msgList" :key="msg.id" :id="'msg' + msg.id">
+          <div
+            v-for="msg in msgList"
+            :key="msg.id"
+            :id="'msg' + msg.id"
+            class="msg-wrapper"
+          >
             <!-- 多选框 -->
             <el-col :span="1" v-if="MultiOn">
               <el-checkbox
@@ -275,6 +280,11 @@ export default Vue.extend({
   //   },
   // },
   beforeMount: function() {
+    if (!this.chatId) {
+      this.chatInfo = null;
+      return;
+    }
+
     try {
       this.getServices();
       // let loginService = serviceProvider.resolve<LoginService>(LoginService);
@@ -956,6 +966,10 @@ export default Vue.extend({
 .chat-messages {
   position: relative;
 
+  // .msg-wrapper {
+  // display: flex;
+  // align-items: center;
+  // }
   .msg {
     display: flex;
     margin: 6px 20px;
@@ -963,6 +977,7 @@ export default Vue.extend({
     .el-avatar {
       margin-left: 0;
       margin-right: 12px;
+      flex-shrink: 0;
     }
 
     &.self {
@@ -1067,6 +1082,8 @@ export default Vue.extend({
 // 多选框样式
 .el-col {
   margin-left: 20px;
+  position: relative;
+  top: -5px;
 }
 
 .multi_row {
