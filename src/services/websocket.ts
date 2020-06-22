@@ -6,7 +6,7 @@ import {
   ServerOnlineStatusMessage,
 } from "../types/types";
 import "rxjs";
-import { Subject, BehaviorSubject } from "rxjs";
+import { Subject, BehaviorSubject, ReplaySubject, Observable } from "rxjs";
 import { singleton, inject } from "tsyringe";
 import { IServerConfig } from "./serverConfig";
 import { TYPES } from "./dependencyInjection";
@@ -66,14 +66,16 @@ export class WsMessageService {
   private pendingMessages: ClientMessage[] = [];
   private forceDisconnect: boolean = false;
 
-  private readonly msg: Subject<ServerMessage> = new Subject();
-  private readonly chat_msg: Subject<ServerChatMessage> = new Subject();
+  private readonly msg: Subject<ServerMessage> = new ReplaySubject(500);
+  private readonly chat_msg: Subject<ServerChatMessage> = new ReplaySubject(
+    500,
+  );
   private readonly unread_count_msg: Subject<
     ServerUnreadCountMessage
-  > = new Subject();
+  > = new ReplaySubject(500);
   private readonly user_online_state: Subject<
     ServerOnlineStatusMessage
-  > = new Subject();
+  > = new ReplaySubject(500);
   private readonly errors: Subject<Error> = new Subject();
 
   private readonly connection_state: BehaviorSubject<
@@ -98,12 +100,18 @@ export class WsMessageService {
   }
 
   /** 未读消息数目 */
-  public get unreadMessageCount(): Subject<ServerUnreadCountMessage> {
+  public get unreadMessageCount(): Observable<ServerUnreadCountMessage> {
+    this.unread_count_msg.next({
+      _t: "unread",
+      items: new Map([
+        ["family", { count: 0, maxMessage: "5eef47f522c99a00017a9752" }],
+      ]),
+    });
     return this.unread_count_msg;
   }
 
   /** 其他用户在线状态 */
-  public get userOnlineState(): Subject<ServerOnlineStatusMessage> {
+  public get userOnlineState(): Observable<ServerOnlineStatusMessage> {
     return this.user_online_state;
   }
 
@@ -134,7 +142,6 @@ export class WsMessageService {
   protected onWebsocketMessage(ev: MessageEvent) {
     try {
       let raw_msg = ev.data;
-      console.log("Websocket: got", raw_msg);
       let msg = JSON.parse(raw_msg, (k, v) => {
         if (k == "_t" && typeof v === "string" && v.endsWith("_s")) {
           return v.substr(0, v.length - 2);
@@ -142,20 +149,23 @@ export class WsMessageService {
           return v;
         }
       }) as ServerMessage;
-      this.msg.next(msg);
+      console.log("ws: got", msg);
       switch (msg._t) {
         case "chat":
           this.chat_msg.next(msg as ServerChatMessage);
           break;
         case "unread":
-          this.unread_count_msg.next(msg as ServerUnreadCountMessage);
+          {
+            let msg_1 = msg as ServerUnreadCountMessage;
+            msg_1.items = new Map(msg_1.items);
+            this.unread_count_msg.next(msg_1);
+          }
           break;
         case "online_status":
           this.user_online_state.next(msg as ServerOnlineStatusMessage);
           break;
-        default:
-          throw new Error(`Unknown Message type ${msg._t}`);
       }
+      this.msg.next(msg);
     } catch (e) {
       this.errors.next(e);
     }
