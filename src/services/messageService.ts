@@ -71,6 +71,7 @@ export class ChatMessageService {
 
   public prependMessages(chatId: string, messages: ServerChatMsg[]) {
     this.createOrModifyMsgList(chatId, arr => {
+      console.log(messages);
       arr.splice(0, 0, ...messages);
       return arr;
     });
@@ -94,12 +95,13 @@ export class ChatMessageService {
     return (
       await Axios.get<ServerChatMsg[]>(
         this.serverConfig.apiBaseUrl +
-          this.serverConfig.apiEndpoints.chat.messages.replace(/{id}/, chatId),
+          this.serverConfig.apiEndpoints.chat.messages,
         {
           params: {
-            startId: startId,
+            groupName: chatId,
+            start_id: startId,
             limit: limit,
-            rev: reverse,
+            reverse: reverse,
           },
         },
       )
@@ -169,7 +171,8 @@ export class ChatMessageService {
         return true;
       }
     } else {
-      throw new Error(`ChatId ${chatId} does not exist!`);
+      this.createOrModifyMsgList(chatId, v => v);
+      return true;
     }
   }
 
@@ -180,11 +183,17 @@ export class ChatMessageService {
    */
   public async fetchPreviousMessageOfGroup(chatId: string): Promise<boolean> {
     let chat = this.subjects.get(chatId)?.value;
-    if (chat === undefined) throw new Error(`ChatId ${chatId} does not exist!`);
+    if (chat === undefined) {
+      this.createOrModifyMsgList(chatId, v => v);
+      return true;
+    }
     let minMessageId = chat.length === 0 ? OBJECT_ID_MAX : chat[0].id;
-    let previousMessages = (
-      await this.fetchMessages(chatId, minMessageId, 30, true)
-    ).reverse();
+    let previousMessages = await this.fetchMessages(
+      chatId,
+      minMessageId,
+      30,
+      true,
+    );
 
     if (previousMessages.length == 0) return false;
     else {
@@ -198,7 +207,10 @@ export class ChatMessageService {
    */
   public async fetchNextMessageOfGroup(chatId: string): Promise<boolean> {
     let chat = this.subjects.get(chatId)?.value;
-    if (chat === undefined) throw new Error(`ChatId ${chatId} does not exist!`);
+    if (chat === undefined) {
+      this.createOrModifyMsgList(chatId, v => v);
+      return true;
+    }
     let minMessageId =
       chat.length === 0 ? OBJECT_ID_MIN : chat[chat.length - 1].id;
 

@@ -60,7 +60,7 @@ let _cfg: IServerConfig = {
       single: "/group/{id}",
     },
     chat: {
-      messages: "/chat/{id}",
+      messages: "/chat",
     },
     file: { post: "/file", get: "/file/id" },
   },
