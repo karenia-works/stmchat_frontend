@@ -24,7 +24,9 @@
               <el-header height="30px" class="dark_main_text">{{
                 item.username
               }}</el-header>
-              <el-footer height="20px" class="dark_sub_text">Footer</el-footer>
+              <el-footer height="20px" class="dark_sub_text">{{
+                item.state ? "online" : "offline"
+              }}</el-footer>
             </el-container>
           </el-container>
         </div>
@@ -50,7 +52,9 @@ export default {
   props: ["items"],
   computed: {
     queryList() {
-      return this.items.filter(item => item.username.indexOf(this.selectVal) > -1);
+      return this.items.filter(
+        item => item.username.indexOf(this.selectVal) > -1,
+      );
     },
   },
 };
