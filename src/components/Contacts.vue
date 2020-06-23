@@ -28,6 +28,8 @@
 
 <script>
 import axios from "axios"
+import { serviceProvider , TYPES } from "@/services/dependencyInjection";
+import { LoginService } from "@/services/loginService";
 export default {
   name: "Contacts",
   data() {
@@ -50,23 +52,16 @@ export default {
       console.log(data);
     },
     getList(){
+      let loginService = serviceProvider.resolve(LoginService);
+      let state = loginService.getLoginState();
+      let name = state.getUsername();
+      console.log("login state: ", state.getUsername());
       axios({
-        url:'http://yuuna.srv.karenia.cc/api/v1/profile/wang/friends',
+        url:'http://yuuna.srv.karenia.cc/api/v1/profile/'+name+'/friends',
         method:'get',
       }).then(data=>{
           this.list=data.data
-        })
-     },
-     addDetail(){
-        this.list.forEach(item => {
-           axios({
-            url:`http://yuuna.srv.karenia.cc/api/v1/profile/${item.username}`,
-            method:'get',
-              }).then(data=>{
-                this.avatarUrl=data.avatarUrl;
-            });
-            this.$set(item,"avatarUrl",this.avatarUrl);
-        });  
+        });
      },
   },
 };

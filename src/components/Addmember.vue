@@ -31,7 +31,7 @@
 <script lang="ts">
 import axios from "axios"
 import { serviceProvider , TYPES } from "@/services/dependencyInjection";
-import { GroupProfilePool } from "@/services/cachingService";
+import { LoginService } from "@/services/loginService";
 export default {
   name: "Addmember",
   data() {
@@ -63,8 +63,12 @@ export default {
        });
     },
     getList(){
+      let loginService = serviceProvider.resolve(LoginService);
+      let state = loginService.getLoginState();
+      let name = state.getUsername();
+      console.log("login state: ", state.getUsername());
       axios({
-        url:'http://yuuna.srv.karenia.cc/api/v1/profile/wang/friends',
+        url:'http://yuuna.srv.karenia.cc/api/v1/profile/'+name+'/friends',
         method:'get',
       }).then(data=>{
           this.list=data.data
