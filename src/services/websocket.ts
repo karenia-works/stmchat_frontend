@@ -32,7 +32,7 @@ export class WsMessageService {
           if (val) {
             this.dest = serverConfig.wsEndpoint.replace(
               "{name}",
-              loginService.loginState.getUsername(),
+              loginService.loginState.getUsername()!,
             );
             this.connectWebsocket();
           } else {
@@ -78,7 +78,7 @@ export class WsMessageService {
 
   private readonly connection_state: BehaviorSubject<
     boolean
-  > = new BehaviorSubject(false);
+  > = new BehaviorSubject(false as boolean);
 
   private wait_time: number = 500;
 
@@ -112,7 +112,7 @@ export class WsMessageService {
     if (this.connection_state.value === false) {
       this.pendingMessages.push(msg);
     } else {
-      this.ws_connection.send(JSON.stringify(msg));
+      this.ws_connection?.send(JSON.stringify(msg));
     }
   }
 
@@ -124,7 +124,7 @@ export class WsMessageService {
   }
 
   protected onWebsocketClose(err: CloseEvent) {
-    console.log("Disconnected from websocket", this.ws_connection.url);
+    console.log("Disconnected from websocket", this.ws_connection?.url);
     this.connection_state.next(false);
     this.errors.next(new Error("Websocket disconnected: " + err));
     if (!this.forceDisconnect) this.reconnectWebsocket();
@@ -143,22 +143,35 @@ export class WsMessageService {
         }
       }) as ServerMessage;
       this.msg.next(msg);
+      console.log("ws: got", msg);
       switch (msg._t) {
         case "chat":
           this.chat_msg.next(msg as ServerChatMessage);
           break;
         case "unread":
-          this.unread_count_msg.next(msg as ServerUnreadCountMessage);
+          this.onNewUnreadMsg(msg);
           break;
         case "online_status":
           this.user_online_state.next(msg as ServerOnlineStatusMessage);
           break;
-        default:
-          throw new Error(`Unknown Message type ${msg._t}`);
       }
+      this.msg.next(msg);
     } catch (e) {
+      console.warn(e);
       this.errors.next(e);
     }
+  }
+
+  private onNewUnreadMsg(msg: ServerMessage) {
+    console.trace("unread start");
+    let msg_1 = msg as ServerUnreadCountMessage;
+    let orig: any = msg_1.items;
+    msg_1.items = new Map();
+    Object.keys(orig).forEach(k => {
+      msg_1.items.set(k, orig[k]);
+    });
+    this.unread_count_msg.next(msg_1);
+    console.trace("unread end");
   }
 
   protected onWebsocketError(err: Event) {
@@ -166,7 +179,7 @@ export class WsMessageService {
     this.errors.next(new Error("Websocket disconnected in error: " + err));
     console.error(
       "Failed to connect to websocket",
-      this.ws_connection.url,
+      this.ws_connection?.url,
       err,
     );
     // this.reconnectWebsocket(this.dest);

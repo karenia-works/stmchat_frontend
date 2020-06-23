@@ -303,8 +303,12 @@ export class MessageListService {
     private groupProfileService: GroupProfilePool,
     private userProfilePool: UserProfilePool,
   ) {
-    wss.chatMessageSubject.subscribe({ next: this.onNewChatMessage });
-    wss.unreadMessageCount.subscribe({ next: this.onNewUnreadCountUpdate });
+    wss.chatMessageSubject.subscribe({
+      next: val => this.onNewChatMessage(val),
+    });
+    wss.unreadMessageCount.subscribe({
+      next: val => this.onNewUnreadCountUpdate(val),
+    });
   }
 
   private messageMap = new Map<string, MessageListItem>();
