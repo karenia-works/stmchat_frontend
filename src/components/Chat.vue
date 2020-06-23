@@ -941,14 +941,13 @@ export default Vue.extend({
   position: absolute;
   bottom: 50px;
   right: 0;
-  border: 1px colors.dark-sub-text solid;
-  color: colors.dark-sub-text;
+  border: 1px colors.theme-grey solid;
+  background-color: white;
   font-size: 14px;
   width: 100px;
   line-height: 14px;
   padding: 10px 15px;
   border-radius: 7px 7px 0 7px;
-  background-color: rgba(68, 71, 78, 0.5);
   cursor: default;
   opacity: 0;
   transition: opacity 0.3s ease-in;
@@ -1095,6 +1094,12 @@ export default Vue.extend({
         }
       }
     }
+  }
+
+  .emptyWarning {
+    border: 1px colors.dark-main-text solid;
+    background-color: colors.dark-light;
+    color: colors.dark-main-text;
   }
 
   .msg-menu {

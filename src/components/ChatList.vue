@@ -166,7 +166,7 @@
             </el-col>
             <el-col :span="12">
               <div class="name_size">
-                <span>{{ o.chat.name | chatname }}</span>
+                <span>{{ chatname(o.chat.name) }}</span>
               </div>
               <div
                 class="bottom clearfix margin-bottom:5px"
@@ -193,7 +193,7 @@
 
 .el-container {
   height: 650px;
-  solid-color: #eeeeee;
+  background-color: colors.theme-light-grey;
 }
 
 .el-icon-size {
