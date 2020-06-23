@@ -20,7 +20,7 @@ const LOCAL_STORAGE_ACCESS_TOKEN_KEY: string = "access_token";
 const LOCAL_STORAGE_USERNAME_KEY: string = "username";
 
 export class LoginState extends BehaviorSubject<boolean> {
-  public constructor() {
+  public constructor(private tokenValidator: (token: string) => Promise<boolean>) {
     super(false);
     this.setupInterceptor();
   }
@@ -32,10 +32,17 @@ export class LoginState extends BehaviorSubject<boolean> {
     }
   }
 
-  public loadToken() {
+  public async loadAndValidateToken(): Promise<boolean> {
     let token = window.localStorage.getItem(LOCAL_STORAGE_ACCESS_TOKEN_KEY);
     let username = window.localStorage.getItem(LOCAL_STORAGE_USERNAME_KEY);
-    if (token !== null && username !== null) this.setToken(username, token);
+    if (token !== null && username !== null) {
+      let valid = await this.tokenValidator(token);
+      if(valid){
+      this.setToken(username, token);
+      return true;}else{return false}
+    } else {
+      return false;
+    }
   }
 
   public deleteStoredToken() {
@@ -107,9 +114,17 @@ export interface User {
 
 @singleton()
 export class LoginService {
-  public constructor(@inject("server_config") private config: IServerConfig) {}
+  public constructor(@inject("server_config") private config: IServerConfig) {
+    this._loginState = new LoginState(async token => {
+      let result = await Axios.get(
+        config.apiBaseUrl + config.apiEndpoints.userProfile.getMine,
+        { validateStatus: () => true },
+      );
+      return result.status >= 200 && result.status < 300;
+    });
+  }
 
-  private _loginState: LoginState = new LoginState();
+  private _loginState: LoginState;
 
   public get loginState() {
     return this._loginState;

@@ -26,6 +26,7 @@ export interface IServerConfig {
     };
     chat: {
       messages: string;
+      messageList: string;
     };
   };
   getFile: string;
@@ -61,6 +62,7 @@ let _cfg: IServerConfig = {
     },
     chat: {
       messages: "/chat",
+      messageList: "/chat/me/all",
     },
     file: { post: "/file", get: "/file/id" },
   },
