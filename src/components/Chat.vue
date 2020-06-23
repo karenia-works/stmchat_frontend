@@ -309,8 +309,6 @@ export default Vue.extend({
   },
 
   beforeDestroy() {
-    console.log("beforeDestroy: ", this.chatId);
-
     this.msgSub?.unsubscribe();
   },
 
@@ -352,7 +350,13 @@ export default Vue.extend({
       uploading: false,
 
       // data cache
-      me: null as UserProfile | null,
+      me: {
+        id: "",
+        username: "",
+        friends: [""],
+        groups: [""],
+        state: true,
+      } as UserProfile,
       chatinfo: null as GroupProfile | null,
       name2avatar: {} as { [propName: string]: string }[],
       contacts: [] as {
@@ -598,8 +602,8 @@ export default Vue.extend({
     },
 
     openMenu(e: any, msg: ServerChatMsg) {
-      this.msgMenuPos.x = e.clientX - 15;
-      this.msgMenuPos.y = e.clientY - 20;
+      this.msgMenuPos.x = e.clientX + 5;
+      this.msgMenuPos.y = e.clientY - 70;
       this.showMsgMenu = true;
       this.menuMsg = msg;
     },
@@ -649,7 +653,7 @@ export default Vue.extend({
     // get data
     async getUser(id: string) {
       try {
-        return await this.userProfilePool.getData(id);
+        if (id) return await this.userProfilePool.getData(id);
       } catch (err) {
         console.log("getUser err: ", err);
       }
@@ -692,21 +696,21 @@ export default Vue.extend({
     },
 
     async getProfile() {
-      // try {
-      //   this.me = await this.userProfilePool.getMyProfile();
-      //   console.log("get me: ", this.me);
-      // } catch (err) {
-      //   console.log("getProfile err: ", err);
-      // }
-      this.me = {
-        id: "5eec7cd9c1e7520001d26e79",
-        username: "wang",
-        avatarUrl:
-          "https://www.gx8899.com/uploads/allimg/180118/3-1P11P92057.jpg",
-        friends: ["li", "yang"],
-        groups: ["family"],
-        state: true,
-      };
+      try {
+        this.me = await this.userProfilePool.getMyProfile();
+        console.log("get me: ", this.me);
+      } catch (err) {
+        console.log("getProfile err: ", err);
+      }
+      // this.me = {
+      //   id: "5eec7cd9c1e7520001d26e79",
+      //   username: "wang",
+      //   avatarUrl:
+      //     "https://www.gx8899.com/uploads/allimg/180118/3-1P11P92057.jpg",
+      //   friends: ["li", "yang"],
+      //   groups: ["family"],
+      //   state: true,
+      // };
       this.getContacts();
     },
 
