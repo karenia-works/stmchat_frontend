@@ -212,7 +212,7 @@ export default {
       settingLayer: false,
       groupinfoLayer: false,
       createGroupLayer: false,
-      openChat: "family",
+      openChat: "",
       imgSrc:
         "http://pic.51yuansu.com/backgd/cover/00/06/10/5b6510370f849.jpg%21/fw/780/quality/90/unsharp/true/compress/true",
     };

@@ -272,19 +272,18 @@ export default Vue.extend({
 
   watch: {
     chatId(val) {
-      this.updateGroup();
+      if (val) this.updateGroup();
     },
   },
 
   beforeMount: function() {
-    if (!this.chatId) {
-      this.chatInfo = null;
-      return;
-    }
+    // if (!this.chatId) {
+    //   this.chatInfo = null;
+    //   return;
+    // }
 
     try {
       this.getServices();
-      this.updateGroup();
       this.getProfile();
     } catch (err) {
       console.log(err);
