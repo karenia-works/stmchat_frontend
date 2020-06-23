@@ -75,11 +75,11 @@
         <!--                聊天列表-->
         <div
           v-for="(o, index) in sortableData"
-          v-bind:key="o"
+          v-bind:key="o.chat.name"
           @click="
             handleclick(index, o),
               (o.unreadCount = 0),
-              $emit(chat - people, o.chat.name)
+              $emit('chatPeople', o.chat.name)
           "
           :class="active == index ? 'addclass' : ''"
           class="dark_main_text dark_deep_bg"
@@ -92,7 +92,7 @@
             </el-col>
             <el-col :span="12">
               <div class="name_size">
-                <span>{{ o.chat.name }}</span>
+                <span>{{ chatname(o.chat.name) }}</span>
               </div>
               <div
                 class="bottom clearfix margin-bottom:5px"
@@ -137,11 +137,11 @@
         <!--                搜索结果-->
         <div
           v-for="(o, index) in selectableData"
-          v-bind:key="o"
+          v-bind:key="o.chat.name"
           @click="
             handleclick(index, o, 'Wang'),
               (o.unreadCount = 0),
-              $emit(chat - people, o.chat.name)
+              $emit('chatPeople', o.chat.name)
           "
           :class="active == index ? 'addclass' : ''"
           class="dark_main_text dark_deep_bg"
@@ -154,7 +154,7 @@
             </el-col>
             <el-col :span="12">
               <div class="name_size">
-                <span>{{ o.chat.name }}</span>
+                <span>{{ o.chat.name | chatname }}</span>
               </div>
               <div
                 class="bottom clearfix margin-bottom:5px"
@@ -278,6 +278,7 @@ import { Vue } from "vue-property-decorator";
 import { UserProfilePool } from "@/services/cachingService";
 import moment from "moment";
 import Vuex from "vuex";
+import axios from "axios";
 
 export default Vue.extend({
   beforeMount: function() {
@@ -286,14 +287,15 @@ export default Vue.extend({
       let mls = serviceProvider.resolve<MessageListService>(MessageListService);
       mls.messageListSubject.subscribe({
         next: v => {
-          mesgNotice();
+          // mesgNotice();
           datalist = v;
           // this.tableData = v;
-          console.log("ChatList", v);
+          // console.log("ChatList", v);
           this.tableData = datalist;
           //console.log("sss",this.tableData);
         },
       });
+      this.getMe();
     } catch (err) {
       console.log(err);
     }
@@ -345,9 +347,25 @@ export default Vue.extend({
       image: "[图片]",
       file: "[文件]",
       username: "",
+      me: { username: "" },
     };
   },
   methods: {
+    chatname(chatId) {
+      if (!this.me) return chatId;
+      let names = chatId.split("+");
+      if (names[0] == this.me.username) return names[1];
+      else return names[0];
+    },
+    getMe() {
+      axios({
+        url: "http://yuuna.srv.karenia.cc/api/v1/profile/me",
+        method: "get",
+      }).then(data => {
+        this.me = data.data;
+        // console.log(this.me);
+      });
+    },
     handleCommand(command) {
       console.log("111");
 
@@ -366,7 +384,7 @@ export default Vue.extend({
     handleclick(index, o: MessageListItem) {
       this.active = index;
       this.getUserID();
-      console.log(o.chat.name);
+      // console.log(o.chat.name);
     },
     handleScroll(vertical) {
       let vp = vertical.process;

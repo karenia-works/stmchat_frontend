@@ -143,7 +143,7 @@ export class WsMessageService {
         }
       }) as ServerMessage;
       this.msg.next(msg);
-      console.log("ws: got", msg);
+      // console.log("ws: got", msg);
       switch (msg._t) {
         case "chat":
           this.chat_msg.next(msg as ServerChatMessage);
@@ -163,7 +163,7 @@ export class WsMessageService {
   }
 
   private onNewUnreadMsg(msg: ServerMessage) {
-    console.trace("unread start");
+    // console.trace("unread start");
     let msg_1 = msg as ServerUnreadCountMessage;
     let orig: any = msg_1.items;
     msg_1.items = new Map();
@@ -171,7 +171,7 @@ export class WsMessageService {
       msg_1.items.set(k, orig[k]);
     });
     this.unread_count_msg.next(msg_1);
-    console.trace("unread end");
+    // console.trace("unread end");
   }
 
   protected onWebsocketError(err: Event) {
