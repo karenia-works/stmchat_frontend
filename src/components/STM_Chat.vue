@@ -3,25 +3,22 @@
     <!-- <div>
     <div class="background">
       <img :src="imgSrc" width="100%" height="100%" alt="" />
-    </div> -->
+    </div>-->
 
     <el-main class="home-main dark_medium_bg">
       <el-row>
-        <el-col :span="3"><div class="grid-content-home"></div></el-col>
+        <el-col :span="3">
+          <div class="grid-content-home"></div>
+        </el-col>
         <el-col :span="18" class="home-col">
           <el-container class="main-container">
             <el-aside width="35%">
-              <ChatList
-                v-show="showChatList"
-                @chatListCommand="chatListCommand($event)"
-              >
-              </ChatList>
+              <ChatList v-show="showChatList" @chatListCommand="chatListCommand($event)"></ChatList>
               <Contacts
                 v-show="showContacts"
                 @contactClose="contactClose"
                 @addContacts="addContacts"
-              >
-              </Contacts>
+              ></Contacts>
             </el-aside>
             <el-main width="65%" style="padding: 0">
               <Chat :chatId="openChat"></Chat>
@@ -39,7 +36,7 @@
         width="400px"
         top="5vh"
       >
-        <Setting @closed="closed" @saved="saved"> </Setting>
+        <Setting @closed="closed" @saved="saved"></Setting>
       </el-dialog>
 
       <!-- groupInfo dialog -->
@@ -50,7 +47,7 @@
         width="600px"
         top="5vh"
       >
-        <Groupinfo @closeInfo="closeInfo"> </Groupinfo>
+        <Groupinfo @closeInfo="closeInfo"></Groupinfo>
       </el-dialog>
 
       <!-- createGroup dialog -->
@@ -61,27 +58,25 @@
         width="500px"
         top="5vh"
       >
-        <CreateGroup  @cancelGroup="cancelGroup">
-        </CreateGroup>
+        <CreateGroup @cancelGroup="cancelGroup"></CreateGroup>
       </el-dialog>
     </el-main>
-    <el-footer class="home-header dark_medium_bg dark_sub_text info">
-      STM Chat @ 2020</el-footer
-    >
+    <el-footer class="home-header dark_medium_bg dark_sub_text info">STM Chat @ 2020</el-footer>
     <!-- </div> -->
   </el-container>
 </template>
 
 <style lang="stylus" scoped>
 .cpn-dia {
-  /deep/ .el-dialog__header, /deep/ .el-dialog__body {
-    padding: 0;
-    border-radius: 3px;
+  /deep/ .el-dialog__header,
+  /deep/ .el-dialog__body {
+    padding: 0
+    border-radius: 3px
   }
 }
 
 .ctn-wrapper {
-  width: 80%;
+  width: 80%
 }
 
 // .background {
@@ -96,33 +91,33 @@
 // bottom: 0px;
 // }
 .home-header {
-  text-align: center;
-  line-height: 60px;
-  font-size: 14px;
-  padding-bottom: 10px;
+  text-align: center
+  line-height: 60px
+  font-size: 14px
+  padding-bottom: 10px
 }
 
 .home-main {
-  color: #333;
-  padding: 72px 0 36px;
+  color: #333
+  padding: 72px 0 36px
 }
 
 .home-row {
   &:last-child {
-    margin-bottom: 0;
+    margin-bottom: 0
   }
 }
 
 .home-col {
-  max-width: 900px;
-  min-width: 500px;
-  align-items: center;
-  justify-content: center;
+  max-width: 900px
+  min-width: 500px
+  align-items: center
+  justify-content: center
 }
 
 .grid-content-home {
-  border-radius: 4px;
-  min-height: 36px;
+  border-radius: 4px
+  min-height: 36px
 }
 </style>
 
@@ -134,7 +129,7 @@ import Setting from "@/components/Setting.vue";
 import Groupinfo from "@/components/Groupinf.vue";
 import CreateGroup from "@/components/Creatgroup.vue";
 import { serviceProvider, TYPES } from "../services/dependencyInjection";
-import { LoginState } from "../services/loginService";
+import { LoginState, LoginService } from "../services/loginService";
 
 export default {
   components: {
@@ -145,12 +140,14 @@ export default {
     Groupinfo: Groupinfo,
     CreateGroup: CreateGroup,
   },
-   beforeMount: function() {
-    let loginService = serviceProvider.resolve(LoginState);
-    let state = loginService.isLoggedIn();
-    console.log(state);
-    if(state == false)
-      this.$router.push({ path: "Login" });
+  beforeMount: function() {
+    let loginService = serviceProvider.resolve(LoginService);
+    let state = loginService.loginState.subscribe({
+      next: state => {
+        console.log(state);
+        if (state == false) this.$router.push({ path: "Login" });
+      },
+    });
   },
   methods: {
     closeInfo() {
