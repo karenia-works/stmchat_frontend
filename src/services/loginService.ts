@@ -2,7 +2,7 @@ import Axios, { AxiosRequestConfig } from "axios";
 import { singleton, inject } from "tsyringe";
 import { TYPES } from "./dependencyInjection";
 import { IServerConfig } from "./serverConfig";
-import { Subject } from "rxjs";
+import { Subject, BehaviorSubject } from "rxjs";
 import qs from "qs";
 
 export function interceptAuthorizationData(
@@ -19,9 +19,9 @@ export function interceptAuthorizationData(
 const LOCAL_STORAGE_ACCESS_TOKEN_KEY: string = "access_token";
 const LOCAL_STORAGE_USERNAME_KEY: string = "username";
 
-export class LoginState extends Subject<boolean> {
+export class LoginState extends BehaviorSubject<boolean> {
   public constructor() {
-    super();
+    super(false);
     this.setupInterceptor();
   }
 
@@ -38,6 +38,11 @@ export class LoginState extends Subject<boolean> {
     if (token !== null && username !== null) this.setToken(username, token);
   }
 
+  public deleteStoredToken() {
+    window.localStorage.removeItem(LOCAL_STORAGE_ACCESS_TOKEN_KEY);
+    window.localStorage.removeItem(LOCAL_STORAGE_USERNAME_KEY);
+  }
+
   private token?: string;
   private username?: string;
 
@@ -50,6 +55,7 @@ export class LoginState extends Subject<boolean> {
   public setToken(username: string, token: string) {
     this.token = token;
     this.username = username;
+    this.storeToken();
     this.next(true);
   }
 
