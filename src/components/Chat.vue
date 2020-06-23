@@ -331,6 +331,7 @@ export default Vue.extend({
           let pos = this.chatPosition();
           if (pos == 1) this.jumpToMessage("bottom");
           else this.messageProcess = pos;
+          this.justScrolled = true;
         },
       });
       this.getChatInfo();

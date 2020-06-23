@@ -456,6 +456,7 @@ export class MessageListService {
     for (let [id, unreadProp] of msg.items) {
       let item = this.messageMap.get(id);
       if (item === undefined) {
+        console.log(10);
         let chatProfile = await this.groupProfileService.getData(msg.chatId);
         if (chatProfile === undefined) {
           throw new Error("Cannot find chat profile!");
@@ -469,6 +470,7 @@ export class MessageListService {
           unreadCount: unreadProp.count - 1,
         });
       } else {
+        console.log(20);
         item.unreadCount = unreadProp.count - 1;
       }
     }
