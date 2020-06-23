@@ -299,7 +299,7 @@ export default Vue.extend({
       let mls = serviceProvider.resolve<MessageListService>(MessageListService);
       mls.messageListSubject.subscribe({
         next: v => {
-          // mesgNotice();
+          mesgNotice();
           datalist = v;
           // this.tableData = v;
           // console.log("ChatList", v);
