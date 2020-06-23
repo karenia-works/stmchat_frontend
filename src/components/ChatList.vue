@@ -7,7 +7,12 @@
       <vueScroll @handle-scroll="handleScroll">
         <!--                导航栏-->
         <div class="search" @click="openSearch">
-          <el-input v-model="input" placeholder="搜索" class="dark_eee_bg" v-if="!searchShow">
+          <el-input
+            v-model="input"
+            placeholder="搜索"
+            class="dark_eee_bg"
+            v-if="!searchShow"
+          >
             <div slot="prepend" @click.stop="clicktry">
               <el-dropdown @command="handleCommand">
                 <span class="el-dropdown-link">
@@ -61,7 +66,8 @@
               @click="closeSearch"
               class="el-button-new"
               size="mini"
-            >返回</el-button>
+              >返回</el-button
+            >
           </el-input>
         </div>
         <!--                <botton @click="beforeCreate">test</botton>-->
@@ -81,7 +87,14 @@
           <!-- <el-card body-style="{ padding: '0' }" style="height:100px"> -->
           <el-row type="flex" style="height: 65px;" align="middle">
             <el-col :span="6" :offset="2">
-              <img :src="o.chat.avartarUrl" class="round_icon img_size" />
+              <el-avatar
+                v-if="o.chat.avartarUrl"
+                :src="o.chat.avartarUrl"
+                :size="40"
+              ></el-avatar>
+              <el-avatar v-else :size="40">{{
+                chatname(o.chat.name)[0].toUpperCase()
+              }}</el-avatar>
             </el-col>
             <el-col :span="12">
               <div class="name_size">
@@ -112,7 +125,9 @@
             </el-col>
             <el-col :span="5">
               <div style="height: 50px; font-size: 12px; color: dimgray;">
-                <div class="dark_sub_text">{{ Date(o.lastTimestamp) | dat }}</div>
+                <div class="dark_sub_text">
+                  {{ Date(o.lastTimestamp) | dat }}
+                </div>
                 <el-badge
                   :value="o.unreadCount"
                   class="item"
@@ -140,7 +155,14 @@
           <!-- <el-card body-style="{ padding: '0' }" style="height:100px"> -->
           <el-row type="flex" style="height: 65px;" align="middle">
             <el-col :span="6" :offset="2">
-              <img :src="o.chat.avartarUrl" class="round_icon img_size" />
+              <el-avatar
+                v-if="o.chat.avartarUrl"
+                :src="o.chat.avartarUrl"
+                :size="40"
+              ></el-avatar>
+              <el-avatar v-else :size="40">{{
+                chatname(o.chat.name)[0].toUpperCase()
+              }}</el-avatar>
             </el-col>
             <el-col :span="12">
               <div class="name_size">
@@ -162,98 +184,98 @@
 
 <style lang="stylus" scoped>
 .el-icon--center {
-  color: dimgray
+  color: dimgray;
 }
 
 .el-aside-container {
-  background-color: white
+  background-color: white;
 }
 
 .el-container {
-  height: 650px
-  solid-color: #eeeeee
+  height: 650px;
+  solid-color: #eeeeee;
 }
 
 .el-icon-size {
-  font-size: 20px
+  font-size: 20px;
 }
 
 .round_icon {
-  width: 34px
-  height: 34px
-  display: flex
-  border-radius: 50%
-  align-items: center
-  justify-content: center
-  overflow: hidden
+  width: 34px;
+  height: 34px;
+  display: flex;
+  border-radius: 50%;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
 }
 
 .img_size {
-  width: 45px
-  height: 45px
+  width: 45px;
+  height: 45px;
 }
 
 .name_size {
-  padding-bottom: 10px
-  font-size: 16px
+  padding-bottom: 10px;
+  font-size: 16px;
 }
 
 .addclass {
-  background-color: colors.theme-blue
-  color: colors.theme-light-grey
+  background-color: colors.theme-blue;
+  color: colors.theme-light-grey;
 }
 
 @media (prefers-color-scheme: dark) {
   .dark_light_bg {
-    background-color: colors.dark-light
+    background-color: colors.dark-light;
   }
 
   .dark_medium_bg {
-    background-color: colors.dark-medium
+    background-color: colors.dark-medium;
   }
 
   .dark_deep_bg {
-    background-color: colors.dark-deep
+    background-color: colors.dark-deep;
   }
 
   .dark_eee_bg {
-    background-color: colors.theme-light-grey
+    background-color: colors.theme-light-grey;
   }
 
   .dark_sub_text {
-    color: colors.dark-sub-text
+    color: colors.dark-sub-text;
   }
 
   .dark_main_text {
-    color: colors.dark-main-text
+    color: colors.dark-main-text;
   }
 
   .el-badge__content {
-    color: colors.dark-main-text
-    background-color: colors.theme-blue
+    color: colors.dark-main-text;
+    background-color: colors.theme-blue;
   }
 
   .el-input__inner {
-    color: colors.dark-main-text
-    background-color: colors.dark-light
+    color: colors.dark-main-text;
+    background-color: colors.dark-light;
   }
 
   .el-input-group__prepend {
-    color: colors.dark-main-text
-    background-color: colors.dark-light
+    color: colors.dark-main-text;
+    background-color: colors.dark-light;
   }
 
   .el-icon-backgroud {
-    color: colors.theme-black
-    background-color: colors.theme-grey
+    color: colors.theme-black;
+    background-color: colors.theme-grey;
   }
 }
 
 .el-button-new {
-  height: 0.5rem
-  width: 3.8rem
-  margin-top: 0rem
-  background-color: white
+  height: 0.5rem;
+  width: 3.8rem;
+  margin-top: 0rem;
+  background-color: white;
 }
 </style>
 
