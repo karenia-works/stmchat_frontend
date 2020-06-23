@@ -24,7 +24,12 @@
               <el-header height="30px" class="dark_main_text">{{
                 item.username
               }}</el-header>
-              <el-footer height="20px" class="dark_sub_text">Footer</el-footer>
+              <div v-if="item.state">
+                <el-footer height="20px" class="dark_sub_text">online</el-footer>
+              </div>
+              <div v-else="">
+                <el-footer height="20px" class="dark_sub_text">not-online</el-footer>
+              </div>
             </el-container>
           </el-container>
         </div>
