@@ -73,7 +73,6 @@ export class ChatMessageService {
 
   public prependMessages(chatId: string, messages: ServerChatMsg[]) {
     this.createOrModifyMsgList(chatId, arr => {
-      console.log(messages);
       arr.splice(0, 0, ...messages);
       return arr;
     });
@@ -113,7 +112,6 @@ export class ChatMessageService {
                 else return v;
               }),
             resp => {
-              console.log(resp);
               return resp.map((x: any) => x.msg);
             },
           ],
@@ -326,7 +324,6 @@ export class MessageListService {
       this.serverConfig.apiBaseUrl +
         this.serverConfig.apiEndpoints.chat.messageList,
     );
-    console.log("ChatList", allMessage);
     this.messageMap.clear();
     this._messageListSubject.next([]);
     this._messageList = undefined;

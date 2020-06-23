@@ -46,7 +46,6 @@ export class WsMessageService {
   private dest: string;
 
   protected connectWebsocket() {
-    console.log("Connecting to websocket", this.dest);
     this.forceDisconnect = false;
     this.ws_connection = new WebSocket(this.dest);
     this.ws_connection.onopen = ev => {
@@ -163,7 +162,6 @@ export class WsMessageService {
   }
 
   private onNewUnreadMsg(msg: ServerMessage) {
-    // console.trace("unread start");
     let msg_1 = msg as ServerUnreadCountMessage;
     let orig: any = msg_1.items;
     msg_1.items = new Map();
@@ -171,7 +169,6 @@ export class WsMessageService {
       msg_1.items.set(k, orig[k]);
     });
     this.unread_count_msg.next(msg_1);
-    // console.trace("unread end");
   }
 
   protected onWebsocketError(err: Event) {

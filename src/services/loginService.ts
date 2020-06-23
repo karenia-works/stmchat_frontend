@@ -20,7 +20,9 @@ const LOCAL_STORAGE_ACCESS_TOKEN_KEY: string = "access_token";
 const LOCAL_STORAGE_USERNAME_KEY: string = "username";
 
 export class LoginState extends BehaviorSubject<boolean> {
-  public constructor(private tokenValidator: (token: string) => Promise<boolean>) {
+  public constructor(
+    private tokenValidator: (token: string) => Promise<boolean>,
+  ) {
     super(false);
     this.setupInterceptor();
   }
@@ -37,9 +39,12 @@ export class LoginState extends BehaviorSubject<boolean> {
     let username = window.localStorage.getItem(LOCAL_STORAGE_USERNAME_KEY);
     if (token !== null && username !== null) {
       let valid = await this.tokenValidator(token);
-      if(valid){
-      this.setToken(username, token);
-      return true;}else{return false}
+      if (valid) {
+        this.setToken(username, token);
+        return true;
+      } else {
+        return false;
+      }
     } else {
       return false;
     }
@@ -127,6 +132,10 @@ export class LoginService {
   private _loginState: LoginState;
 
   public get loginState() {
+    return this._loginState;
+  }
+
+  public getLoginState() {
     return this._loginState;
   }
 
