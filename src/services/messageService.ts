@@ -292,28 +292,72 @@ export interface MessageListItem {
   unreadCount: number;
 }
 
+export interface ServerMessageListItem {
+  group: GroupProfile;
+  message: ServerChatMsg | undefined;
+  unreadCount: number;
+}
+
 @singleton()
 /**
  * 消息列表服务，订阅 `messageListSubject` 获得消息列表的所有更新
  */
 export class MessageListService {
   public constructor(
+    @inject(TYPES.ServerConfig) private serverConfig: IServerConfig,
     private loginService: LoginService,
     private wss: WsMessageService,
     private groupProfileService: GroupProfilePool,
     private userProfilePool: UserProfilePool,
   ) {
-    wss.chatMessageSubject.subscribe({
-      next: val => this.onNewChatMessage(val),
-    });
-    wss.unreadMessageCount.subscribe({
-      next: val => this.onNewUnreadCountUpdate(val),
+    this.loginService.loginState.subscribe({
+      next: v => {
+        if (v) this.onUserLoggedIn();
+      },
     });
   }
 
   private messageMap = new Map<string, MessageListItem>();
   private _messageListSubject = new BehaviorSubject<MessageListItem[]>([]);
   private _messageList: MessageListItem[] | undefined;
+
+  private async onUserLoggedIn() {
+    let allMessage = await Axios.get<ServerMessageListItem[]>(
+      this.serverConfig.apiBaseUrl +
+        this.serverConfig.apiEndpoints.chat.messageList,
+    );
+    console.log("ChatList", allMessage);
+    this.messageMap.clear();
+    this._messageListSubject.next([]);
+    this._messageList = undefined;
+
+    for (let message of allMessage.data) {
+      let avatar = await this.getAvatar(message.group);
+      if (message.message) {
+        message.message._t = message.message._t.replace("_s", "") as any;
+      }
+      let item: MessageListItem = {
+        chat: message.group,
+        avatar,
+        latestMessage: message.message,
+        unreadCount: message.unreadCount,
+        lastTimestamp:
+          message.message !== undefined
+            ? moment(message.message.time).unix()
+            : Date.now(),
+      };
+      this.messageMap.set(message.group.name, item);
+    }
+
+    this.wss.chatMessageSubject.subscribe({
+      next: val => this.onNewChatMessage(val),
+    });
+    this.wss.unreadMessageCount.subscribe({
+      next: val => this.onNewUnreadCountUpdate(val),
+    });
+
+    this.messageMapChanged();
+  }
 
   public get messageList(): MessageListItem[] {
     if (this._messageList !== undefined) {
