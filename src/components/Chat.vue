@@ -106,9 +106,9 @@
             <div>
               <div class="sendername">{{ quoteMsg.sender }}</div>
               <div class="quote-text">
-                <template v-if="quoteMsg._t == 'text'">{{
-                  quoteMsg.text
-                }}</template>
+                <template v-if="quoteMsg._t == 'text'">
+                  {{ quoteMsg.text }}
+                </template>
                 <template v-else-if="quoteMsg._t == 'image'">
                   [图片]
                   <span v-if="quoteMsg.caption">, {{ quoteMsg.caption }}</span>
@@ -588,7 +588,7 @@ export default Vue.extend({
           this.chatId,
           messageList[messageList.length - 1].id,
         );
-      else this.chatMsgService.fetchPreviousMessageOfGroup(this.chatId);
+      else this.chatMsgService.fetchLatestMessageOfGroup(this.chatId);
     },
     enterInput(e: any) {
       if (this.configs.hotKey == "enterSend") {

@@ -213,6 +213,31 @@ export class ChatMessageService {
       return true;
     }
   }
+  /**
+   * 获取某个群当前消息之前一段时间的消息，如果到头了返回 false。
+   *
+   * 只会在没到头的时候更新消息列表。
+   */
+  public async fetchLatestMessageOfGroup(chatId: string): Promise<boolean> {
+    let chat = this.subjects.get(chatId)?.value;
+    if (chat === undefined) {
+      this.createOrModifyMsgList(chatId, v => v);
+      return true;
+    }
+    let minMessageId = OBJECT_ID_MAX;
+    let previousMessages = await this.fetchMessages(
+      chatId,
+      minMessageId,
+      30,
+      true,
+    );
+
+    if (previousMessages.length == 0) return false;
+    else {
+      this.createOrModifyMsgList(chatId, v => previousMessages);
+      return true;
+    }
+  }
 
   /**
    * 获取某个群当前消息之后一段时间的消息，如果到头了返回 false
@@ -441,10 +466,10 @@ export class MessageListService {
           latestMessage: undefined,
           avatar,
           lastTimestamp: moment().unix(),
-          unreadCount: unreadProp.count,
+          unreadCount: unreadProp.count - 1,
         });
       } else {
-        item.unreadCount = unreadProp.count;
+        item.unreadCount = unreadProp.count - 1;
       }
     }
     this.messageMapChanged();
