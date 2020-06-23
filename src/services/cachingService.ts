@@ -38,14 +38,18 @@ export class ProfilePool<T> implements ICachingDataPool<T> {
       return t;
     } else {
       let pending = new Subject<T>();
-      let pendingRequest = axios.get<T>(this.singleDataEndpoint(id));
-      this.pending.set(id, pending);
-      let userResp = await pendingRequest;
-      let user = userResp.data;
-      this.cache.set(id, user);
-      pending.next(user);
-      this.pending.delete(id);
-      return user;
+      try {
+        let pendingRequest = axios.get<T>(this.singleDataEndpoint(id));
+        this.pending.set(id, pending);
+        let userResp = await pendingRequest;
+        let user = userResp.data;
+        this.cache.set(id, user);
+        pending.next(user);
+        this.pending.delete(id);
+        return user;
+      } catch (e) {
+        return undefined;
+      }
     }
   }
 
