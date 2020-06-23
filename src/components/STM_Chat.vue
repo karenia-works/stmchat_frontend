@@ -61,7 +61,7 @@
         width="500px"
         top="5vh"
       >
-        <CreateGroup @closeGroup="cancel" @cancelGroup="cancelGroup">
+        <CreateGroup  @cancelGroup="cancelGroup">
         </CreateGroup>
       </el-dialog>
     </el-main>
@@ -133,6 +133,8 @@ import Contacts from "@/components/Contacts.vue";
 import Setting from "@/components/Setting.vue";
 import Groupinfo from "@/components/Groupinf.vue";
 import CreateGroup from "@/components/Creatgroup.vue";
+import { serviceProvider, TYPES } from "../services/dependencyInjection";
+import { LoginState } from "../services/loginService";
 
 export default {
   components: {
@@ -143,12 +145,16 @@ export default {
     Groupinfo: Groupinfo,
     CreateGroup: CreateGroup,
   },
+   beforeMount: function() {
+    let loginService = serviceProvider.resolve(LoginState);
+    let state = loginService.isLoggedIn();
+    console.log(state);
+    if(state == false)
+      this.$router.push({ path: "Login" });
+  },
   methods: {
     closeInfo() {
       this.groupinfoLayer = false;
-    },
-    closeGroup() {
-      this.createGroupLayer = false;
     },
     cancelGroup() {
       this.createGroupLayer = false;
