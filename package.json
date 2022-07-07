@@ -14,7 +14,7 @@
     "circular-dependency-plugin": "^5.2.0",
     "core-js": "^3.6.5",
     "element-ui": "^2.4.5",
-    "moment": "^2.26.0",
+    "moment": "^2.29.4",
     "push.js": "^1.0.12",
     "qs": "^6.9.4",
     "rxjs": "^6.5.5",
